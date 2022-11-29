@@ -1,0 +1,3 @@
+[submodule "src/mbase"]
+	path = src/mbase
+	url = https://github.com/miu200521358/mmd_base.git
