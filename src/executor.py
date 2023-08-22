@@ -1,26 +1,47 @@
-import multiprocessing
+import argparse
 import os
-import sys
+from multiprocessing import freeze_support
 
 import numpy as np
 import wx
 
-sys.path.append(os.path.join(os.path.dirname(__file__), "mbase"))
+from mlib.core.logger import LoggingMode, MLogger
+
+APP_NAME = "VmdSizing"
+VERSION_NAME = "6.00.00_β01"
 
 # 指数表記なし、有効小数点桁数6、30を超えると省略あり、一行の文字数200
 np.set_printoptions(suppress=True, precision=6, threshold=30, linewidth=200)
 
-# Windowsマルチプロセス対策
-multiprocessing.freeze_support()
-
 if __name__ == "__main__":
+    try:
+        # Windowsマルチプロセス対策
+        freeze_support()
+    except:
+        pass
 
-    from mbase.mlib.pmx.collection import PmxModel
+    # 引数の取得
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--verbose", default=20, type=int)
+    parser.add_argument("--log_mode", default=0, type=int)
+    parser.add_argument("--out_log", default=0, type=int)
+    parser.add_argument("--is_saving", default=1, type=int)
+    parser.add_argument("--lang", default="ja", type=str)
 
-    model = PmxModel()
+    args, argv = parser.parse_known_args()
 
-    # 引数指定がない場合、通常起動
+    # ロガーの初期化
+    MLogger.initialize(
+        args.lang, os.path.dirname(os.path.abspath(__file__)), LoggingMode(args.log_mode), level=args.verbose, is_out_log=args.out_log
+    )
+
+    from mlib.utils.file_utils import get_path
+    from service.form.main_frame import MainFrame
+
+    # アプリの起動
     app = wx.App(False)
-    frame = wx.Frame(parent=None, id=-1, title="wxPython", size=(400, 400))
+    icon = wx.Icon(get_path("resources/logo.ico"), wx.BITMAP_TYPE_ICO)
+    frame = MainFrame(app, f"{APP_NAME} {VERSION_NAME}", wx.Size(1100, 880))
+    frame.SetIcon(icon)
     frame.Show(True)
     app.MainLoop()
