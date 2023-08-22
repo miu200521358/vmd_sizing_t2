@@ -87,7 +87,7 @@ class FilePanel(NotebookPanel):
         sizing_set = SizingSet(self.window, self.frame, self, sizing_idx)
 
         self.sizing_sets.append(sizing_set)
-        self.window_sizer.Add(sizing_set.sizer, 1, wx.GROW, 0)
+        self.set_sizer.Add(sizing_set.sizer, 1, wx.GROW, 0)
 
         self.Enable(True)
         self.fit_window()

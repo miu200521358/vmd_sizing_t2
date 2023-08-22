@@ -27,7 +27,7 @@ class SizingSet:
 
         self.sizer = wx.BoxSizer(wx.VERTICAL)
 
-        self.background_color = "LIGHT GREY" if 0 == self.sizing_idx % 2 else "LIGHT BLUE"
+        self.background_color = wx.Colour("LIGHT GREY") if 0 == self.sizing_idx % 2 else wx.Colour("LIGHT BLUE")
         self.box = wx.StaticBox(self.window, wx.ID_ANY, f"No.{self.sizing_idx + 1}")
         self.box.SetBackgroundColour(self.background_color)
 
@@ -49,6 +49,7 @@ class SizingSet:
             file_change_event=self.on_change_motion,
         )
         self.motion_ctrl.set_parent_sizer(self.file_sizer)
+        self.motion_ctrl.set_color(self.background_color)
 
         self.src_model_ctrl = MPmxFilePickerCtrl(
             self.window,
@@ -57,12 +58,13 @@ class SizingSet:
             key="org_pmx",
             title="モーション作成元モデル",
             is_show_name=True,
-            name_spacer=3,
+            name_spacer=2,
             is_save=False,
             tooltip="モーションを作成した時に使用されたトレースモデル（或いは類似モデル）を指定してください",
             file_change_event=self.on_change_src_model_pmx,
         )
         self.src_model_ctrl.set_parent_sizer(self.file_sizer)
+        self.src_model_ctrl.set_color(self.background_color)
 
         self.dest_model_ctrl = MPmxFilePickerCtrl(
             self.window,
@@ -71,12 +73,13 @@ class SizingSet:
             key="rep_pmx",
             title="サイジング先モデル",
             is_show_name=True,
-            name_spacer=3,
+            name_spacer=4,
             is_save=False,
             tooltip="モーションを適用させたいモデルを指定してください\nこのモデルに合わせてモーションをサイジングします",
             file_change_event=self.on_change_dest_model_pmx,
         )
         self.dest_model_ctrl.set_parent_sizer(self.file_sizer)
+        self.dest_model_ctrl.set_color(self.background_color)
 
         self.output_motion_ctrl = MVmdFilePickerCtrl(
             self.window,
@@ -88,6 +91,7 @@ class SizingSet:
             tooltip="サイジングモーションの出力ファイルパスです\n任意の値に変更可能です",
         )
         self.output_motion_ctrl.set_parent_sizer(self.file_sizer)
+        self.output_motion_ctrl.set_color(self.background_color)
 
         self.camera_model_ctrl = MPmxFilePickerCtrl(
             self.window,
@@ -96,12 +100,13 @@ class SizingSet:
             key="camera_pmx",
             title="カメラモーション作成元モデル",
             is_show_name=True,
-            name_spacer=3,
+            name_spacer=0,
             is_save=False,
             tooltip="カメラモーションを作成した時に使用されたモデル（或いは類似モデル）を指定してください（任意）",
             file_change_event=self.on_change_camera_model_pmx,
         )
         self.camera_model_ctrl.set_parent_sizer(self.file_sizer)
+        self.camera_model_ctrl.set_color(self.background_color)
 
         self.box_sizer.Add(self.file_sizer, 6, wx.ALL, 0)
 
@@ -110,6 +115,7 @@ class SizingSet:
 
         # 位置合わせ
         self.align_check_ctrl = wx.CheckBox(self.window, wx.ID_ANY, __("位置合わせ"), wx.DefaultPosition, wx.DefaultSize, 0)
+        self.align_check_ctrl.SetBackgroundColour(self.background_color)
         self.config_sizer.Add(self.align_check_ctrl, 0, wx.ALL, 0)
 
         # 足
