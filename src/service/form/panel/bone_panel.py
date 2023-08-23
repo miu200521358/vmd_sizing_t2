@@ -2,15 +2,14 @@ import os
 
 import wx
 
-from mlib.core.logger import MLogger
+from mlib.core.logger import ConsoleHandler, MLogger
 from mlib.service.form.notebook_frame import NotebookFrame
 from mlib.service.form.notebook_panel import NotebookPanel
-from mlib.service.form.widgets.exec_btn_ctrl import ExecButton
-from service.form.widgets.sizing_set import SizingSet
 from mlib.service.form.widgets.console_ctrl import ConsoleCtrl
-from mlib.core.logger import ConsoleHandler
+from mlib.service.form.widgets.exec_btn_ctrl import ExecButton
 from mlib.utils.file_utils import save_histories
 from mlib.vmd.vmd_collection import VmdMotion
+from service.form.widgets.sizing_set import SizingSet
 from service.worker.exec_worker import ExecWorker
 
 logger = MLogger(os.path.basename(__file__))

@@ -3,13 +3,10 @@ from datetime import datetime
 
 import wx
 
-from mlib.service.form.widgets.file_ctrl import MPmxFilePickerCtrl
-from mlib.service.form.widgets.file_ctrl import MVmdFilePickerCtrl
-from mlib.service.form.notebook_panel import NotebookPanel
-from mlib.service.form.notebook_frame import NotebookFrame
 from mlib.core.logger import MLogger
-from mlib.service.form.widgets.float_slider_ctrl import FloatSliderCtrl
-
+from mlib.service.form.notebook_frame import NotebookFrame
+from mlib.service.form.notebook_panel import NotebookPanel
+from mlib.service.form.widgets.file_ctrl import MPmxFilePickerCtrl, MVmdFilePickerCtrl
 
 logger = MLogger(os.path.basename(__file__))
 __ = logger.get_text
@@ -19,7 +16,6 @@ STANCE_DETAIL_CHOICES = [
     __("センターY補正:【注目点: 手首の接地】【補正対象: センターYの位置】【有効例: 倒立】"),
     __("上半身補正:【注目点: 頭の位置】【補正対象: 上半身・上半身2の傾き】【有効例: 上体反らし】"),
     __("肩補正:【注目点: 手首の位置】【補正対象: 肩Pを肩に合併・肩の角度】【有効例: 肩の傾き違い】"),
-    __("捩り分散:【注目点: 腕の回転】【補正対象: 腕を腕捩りなどに分散】【有効例: 捩りなしモーション】"),
     __("下半身補正:【注目点: 足ボーンの傾き】【補正対象: 下半身の傾き】【有効例: 四つ足モデル】"),
     __("足IK補正:【注目点: 足首の位置】【補正対象: 足IKの位置】【有効例: 低頭身モデル】"),
     __("足D補正:【注目点: 足D系の回転】【補正対象: 足D系を足に合併】【有効例: 足D使用モーション】"),
@@ -27,7 +23,7 @@ STANCE_DETAIL_CHOICES = [
     __("つま先IK補正:【注目点: 足首の向き】【補正対象: つま先IKを足IKに合併】【有効例: つま先IK使用モーション】"),
 ]
 
-INITIAL_STANCE_DETAIL_CHOICES = [0, 1, 2, 3, 5, 7, 8, 9]
+INITIAL_STANCE_DETAIL_CHOICES = [0, 1, 2, 3, 4, 6, 7, 8]
 
 
 class SizingSet:
@@ -128,6 +124,16 @@ class SizingSet:
         self.stance_correct_btn_ctrl.SetToolTip(__("スタンス追加補正で行う補正を取捨選択することができます"))
         self.stance_sizer.Add(self.stance_correct_btn_ctrl, 0, wx.ALL, 2)
 
+        self.separate1 = wx.StaticText(self.window, wx.ID_ANY, "     |     ")
+        self.separate1.SetBackgroundColour(self.background_color)
+        self.stance_sizer.Add(self.separate1)
+
+        # 捩り分散
+        self.twist_check_ctrl = wx.CheckBox(self.window, wx.ID_ANY, __("捩り分散"), wx.DefaultPosition, wx.DefaultSize, 0)
+        self.twist_check_ctrl.SetToolTip(__("腕を腕捩りなど、捩りボーンに捩り回転を分散させます"))
+        self.twist_check_ctrl.SetBackgroundColour(self.background_color)
+        self.stance_sizer.Add(self.twist_check_ctrl, 0, wx.ALL, 2)
+
         self.config_sizer.Add(self.stance_sizer, 0, wx.ALL, 2)
 
         self.config_sizer.Add(wx.StaticLine(self.window, wx.ID_ANY), 1, wx.EXPAND | wx.ALL, 10)
@@ -164,29 +170,29 @@ class SizingSet:
 
         self.config_sizer.Add(wx.StaticLine(self.window, wx.ID_ANY), 1, wx.EXPAND | wx.ALL, 10)
 
-        # 足IKオフセット ------------------------
-        self.offset_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        # # 足IKオフセット ------------------------
+        # self.offset_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.leg_ik_offset_label = wx.StaticText(self.window, wx.ID_ANY, __("足IKオフセット"))
-        self.leg_ik_offset_label.SetBackgroundColour(self.background_color)
-        self.offset_sizer.Add(self.leg_ik_offset_label, 0, wx.ALL, 2)
+        # self.leg_ik_offset_label = wx.StaticText(self.window, wx.ID_ANY, __("足IKオフセット"))
+        # self.leg_ik_offset_label.SetBackgroundColour(self.background_color)
+        # self.offset_sizer.Add(self.leg_ik_offset_label, 0, wx.ALL, 2)
 
-        self.leg_ik_offset_slider = FloatSliderCtrl(
-            parent=self.window,
-            value=0,
-            min_value=-5,
-            max_value=5,
-            increment=0.01,
-            spin_increment=0.01,
-            border=3,
-            size=wx.Size(270, -1),
-            change_event=None,
-            tooltip=__("モーションで足が重なってしまう場合などで、足を少し開き気味にするなどのオフセットを追加できます"),
-        )
-        self.leg_ik_offset_slider._slider.SetBackgroundColour(self.background_color)
-        self.offset_sizer.Add(self.leg_ik_offset_slider.sizer, 0, wx.ALL, 2)
+        # self.leg_ik_offset_slider = FloatSliderCtrl(
+        #     parent=self.window,
+        #     value=0,
+        #     min_value=-5,
+        #     max_value=5,
+        #     increment=0.01,
+        #     spin_increment=0.01,
+        #     border=3,
+        #     size=wx.Size(270, -1),
+        #     change_event=None,
+        #     tooltip=__("モーションで足が重なってしまう場合などで、足を少し開き気味にするなどのオフセットを追加できます"),
+        # )
+        # self.leg_ik_offset_slider._slider.SetBackgroundColour(self.background_color)
+        # self.offset_sizer.Add(self.leg_ik_offset_slider.sizer, 0, wx.ALL, 2)
 
-        self.config_sizer.Add(self.offset_sizer, 0, wx.ALL, 2)
+        # self.config_sizer.Add(self.offset_sizer, 0, wx.ALL, 2)
 
         self.box_sizer.Add(self.config_sizer, 4, wx.ALL, 0)
         self.sizer.Add(self.box_sizer, 1, wx.EXPAND | wx.ALL, 0)

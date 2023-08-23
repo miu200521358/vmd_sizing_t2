@@ -9,8 +9,8 @@ from mlib.pmx.shader import MShader
 from mlib.service.form.base_panel import BasePanel
 from mlib.service.form.notebook_frame import NotebookFrame
 from mlib.vmd.vmd_collection import VmdMotion
-from service.form.widgets.morph_sub_window import MorphSubCanvasWindow
 from service.form.panel.bone_panel import BonePanel
+from service.form.widgets.morph_sub_window import MorphSubCanvasWindow
 
 logger = MLogger(os.path.basename(__file__), level=1)
 __ = logger.get_text
