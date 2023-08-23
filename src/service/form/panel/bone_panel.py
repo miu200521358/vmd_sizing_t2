@@ -9,7 +9,7 @@ from mlib.service.form.widgets.console_ctrl import ConsoleCtrl
 from mlib.service.form.widgets.exec_btn_ctrl import ExecButton
 from mlib.utils.file_utils import save_histories
 from mlib.vmd.vmd_collection import VmdMotion
-from service.form.widgets.sizing_set import SizingSet
+from service.form.widgets.bone_set import SizingBoneSet
 from service.worker.exec_worker import ExecWorker
 
 logger = MLogger(os.path.basename(__file__))
@@ -19,7 +19,7 @@ __ = logger.get_text
 class BonePanel(NotebookPanel):
     def __init__(self, frame: NotebookFrame, tab_idx: int, *args, **kw) -> None:
         super().__init__(frame, tab_idx, *args, **kw)
-        self.sizing_sets: list[SizingSet] = []
+        self.sizing_sets: list[SizingBoneSet] = []
 
         self.service_worker = ExecWorker(frame, self.on_exec_result)
 
@@ -82,7 +82,7 @@ class BonePanel(NotebookPanel):
 
     def on_add_set(self, event: wx.Event) -> None:
         sizing_idx = len(self.sizing_sets)
-        sizing_set = SizingSet(self.window, self.frame, self, sizing_idx)
+        sizing_set = SizingBoneSet(self.window, self.frame, self, sizing_idx)
 
         self.sizing_sets.append(sizing_set)
         self.set_sizer.Add(sizing_set.sizer, 1, wx.GROW, 0)

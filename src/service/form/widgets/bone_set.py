@@ -26,7 +26,7 @@ STANCE_DETAIL_CHOICES = [
 INITIAL_STANCE_DETAIL_CHOICES = [0, 1, 2, 3, 4, 6, 7, 8]
 
 
-class SizingSet:
+class SizingBoneSet:
     def __init__(self, window: wx.Window, frame: NotebookFrame, panel: NotebookPanel, sizing_idx: int) -> None:
         self.window = window
         self.frame = frame
