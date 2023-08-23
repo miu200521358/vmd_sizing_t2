@@ -10,7 +10,7 @@ from mlib.service.form.base_panel import BasePanel
 from mlib.service.form.notebook_frame import NotebookFrame
 from mlib.vmd.vmd_collection import VmdMotion
 from service.form.widgets.morph_sub_window import MorphSubCanvasWindow
-from service.form.panel.file_panel import FilePanel
+from service.form.panel.bone_panel import BonePanel
 
 logger = MLogger(os.path.basename(__file__), level=1)
 __ = logger.get_text
@@ -20,7 +20,7 @@ class MainFrame(NotebookFrame):
     def __init__(self, app: wx.App, title: str, size: wx.Size, *args, **kw) -> None:
         super().__init__(
             app,
-            history_keys=["vmd", "org_pmx", "rep_pmx", "camera_vmd", "camera_pmx", "bulk_csv"],
+            history_keys=["vmd", "org_pmx", "rep_pmx", "camera_vmd", "camera_pmx"],
             title=title,
             size=size,
         )
@@ -28,8 +28,8 @@ class MainFrame(NotebookFrame):
         self.running_worker = False
 
         # 目線生成
-        self.file_panel = FilePanel(self, 0)
-        self.notebook.AddPage(self.file_panel, __("ファイル"), True)
+        self.bone_panel = BonePanel(self, 0)
+        self.notebook.AddPage(self.bone_panel, __("ボーン"), True)
 
         self.models: dict[str, PmxModel] = {}
         self.motions: dict[str, VmdMotion] = {}

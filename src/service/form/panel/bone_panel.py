@@ -17,14 +17,13 @@ logger = MLogger(os.path.basename(__file__))
 __ = logger.get_text
 
 
-class FilePanel(NotebookPanel):
+class BonePanel(NotebookPanel):
     def __init__(self, frame: NotebookFrame, tab_idx: int, *args, **kw) -> None:
         super().__init__(frame, tab_idx, *args, **kw)
         self.sizing_sets: list[SizingSet] = []
 
         self.service_worker = ExecWorker(frame, self.on_exec_result)
 
-        # ヘッダ追加
         self._initialize_ui()
 
         self.on_add_set(wx.EVT_BUTTON)
@@ -113,7 +112,6 @@ class FilePanel(NotebookPanel):
 
     def exec(self, event: wx.Event) -> None:
         MLogger.console_handler = ConsoleHandler(self.console_ctrl.text_ctrl)
-        self.frame.running_worker = True
         self.Enable(False)
         self.exec_btn_ctrl.Enable(True)
         self.service_worker.start()

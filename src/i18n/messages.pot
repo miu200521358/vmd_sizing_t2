@@ -1,0 +1,198 @@
+# Translations template for PROJECT.
+# Copyright (C) 2023 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2023.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2023-04-06 02:14+0900\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.12.1\n"
+
+
+msgid "センターXZ補正: 【注目点: 腰あたりの位置】【補正対象: センターXZ】【有効例: ターン】"
+msgstr ""
+
+
+msgid "センターY補正:【注目点: 手首の接地】【補正対象: センターYの位置】【有効例: 倒立】"
+msgstr ""
+
+
+msgid "上半身補正:【注目点: 頭の位置】【補正対象: 上半身・上半身2の傾き】【有効例: 上体反らし】"
+msgstr ""
+
+
+msgid "肩補正:【注目点: 手首の位置】【補正対象: 肩Pを肩に合併・肩の角度】【有効例: 肩の傾き違い】"
+msgstr ""
+
+
+msgid "捩り分散:【注目点: 腕の回転】【補正対象: 腕を腕捩りなどに分散】【有効例: 捩りなしモーション】"
+msgstr ""
+
+
+msgid "下半身補正:【注目点: 足ボーンの傾き】【補正対象: 下半身の傾き】【有効例: 四つ足モデル】"
+msgstr ""
+
+
+msgid "足IK補正:【注目点: 足首の位置】【補正対象: 足IKの位置】【有効例: 低頭身モデル】"
+msgstr ""
+
+
+msgid "足D補正:【注目点: 足D系の回転】【補正対象: 足D系を足に合併】【有効例: 足D使用モーション】"
+msgstr ""
+
+
+msgid "つま先補正:【注目点: つま先の接地】【補正対象: 足IKの位置】【有効例: つま先立ち】"
+msgstr ""
+
+
+msgid "つま先IK補正:【注目点: 足首の向き】【補正対象: つま先IKを足IKに合併】【有効例: つま先IK使用モーション】"
+msgstr ""
+
+
+msgid "サイジングセット追加"
+msgstr ""
+
+
+msgid "サイジングセットを追加できます"
+msgstr ""
+
+
+msgid "サイジングセット全削除"
+msgstr ""
+
+
+msgid "全てのサイジングセットを削除できます"
+msgstr ""
+
+
+msgid "サイジング実行"
+msgstr ""
+
+
+msgid "サイジング実行停止"
+msgstr ""
+
+
+msgid "サイジングを実行します\nサイジングセットを1件以上設定後、クリックできるようになります"
+msgstr ""
+
+
+msgid "サイジング対象モーション"
+msgstr ""
+
+
+msgid "サイジングの対象となるVMDモーションデータを指定してください"
+msgstr ""
+
+
+msgid "(未設定)"
+msgstr ""
+
+
+msgid "{t}に記録されているモデル名です。\n文字列は選択およびコピー可能です。"
+msgstr ""
+
+
+msgid "開く"
+msgstr ""
+
+
+msgid "履歴"
+msgstr ""
+
+
+msgid "これまでに指定された事のある{t}を再指定することができます。"
+msgstr ""
+
+
+msgid "モーション作成元モデル"
+msgstr ""
+
+
+msgid "モーションを作成した時に使用されたトレースモデル（或いは類似モデル）を指定してください"
+msgstr ""
+
+
+msgid "サイジング先モデル"
+msgstr ""
+
+
+msgid "モーションを適用させたいモデルを指定してください\nこのモデルに合わせてモーションをサイジングします"
+msgstr ""
+
+
+msgid "サイジングモーション出力先"
+msgstr ""
+
+
+msgid "サイジングモーションの出力ファイルパスです\n任意の値に変更可能です"
+msgstr ""
+
+
+msgid "スタンス追加補正"
+msgstr ""
+
+
+msgid "元モーションの動きにより近くなるよう追加で補正を行います\n補正内容は任意で選択できます"
+msgstr ""
+
+
+msgid "補正内訳"
+msgstr ""
+
+
+msgid "スタンス追加補正で行う補正を取捨選択することができます"
+msgstr ""
+
+
+msgid "手首位置合わせ"
+msgstr ""
+
+
+msgid "手首の位置を元モーションと大体同じ位置になるよう合わせます"
+msgstr ""
+
+
+msgid "指位置合わせ"
+msgstr ""
+
+
+msgid "指の位置を元モーションと大体同じ位置になるよう合わせます"
+msgstr ""
+
+
+msgid "床位置合わせ"
+msgstr ""
+
+
+msgid "手首の位置が床から沈まないよう合わせます"
+msgstr ""
+
+
+msgid "足IKオフセット"
+msgstr ""
+
+
+msgid "モーションで足が重なってしまう場合などで、足を少し開き気味にするなどのオフセットを追加できます"
+msgstr ""
+
+
+msgid "\nEnterキーを押下したタイミングで値が反映されます。"
+msgstr ""
+
+
+msgid "スタンス追加補正のうち、チェックが入っている補正のみ実施します"
+msgstr ""
+
+
+msgid "スタンス追加補正選択"
+msgstr ""
+
