@@ -324,37 +324,6 @@ class SizingBoneSet:
 
         return can_load, loadable_motion_paths, loadable_model_paths
 
-        # if load_success:
-        #     # モーション
-        #     digest = self.motion_ctrl.reader.read_hash_by_filepath(self.motion_ctrl.path)
-        #     original_motion = self.frame.motions.get(digest)
-
-        #     if original_motion:
-        #         logger.info("モーション: キャッシュ読み込み完了")
-        #     else:
-        #         original_motion = self.motion_ctrl.reader.read_by_filepath(self.motion_ctrl.path)
-        #         self.frame.motions[digest] = original_motion
-
-        #     # 作成元モデル
-        #     digest = self.src_model_ctrl.reader.read_hash_by_filepath(self.src_model_ctrl.path)
-        #     original_src_model = self.frame.models.get(digest)
-
-        #     if original_src_model:
-        #         logger.info("モーション作成元モデル: キャッシュ読み込み完了")
-        #     else:
-        #         original_src_model = self.src_model_ctrl.reader.read_by_filepath(self.src_model_ctrl.path)
-        #         self.frame.models[digest] = original_src_model
-
-        #     # サイジングモデル
-        #     digest = self.dest_model_ctrl.reader.read_hash_by_filepath(self.dest_model_ctrl.path)
-        #     original_dest_model = self.frame.models.get(digest)
-
-        #     if original_dest_model:
-        #         logger.info("サイジング先モデル: キャッシュ読み込み完了")
-        #     else:
-        #         original_dest_model = self.dest_model_ctrl.reader.read_by_filepath(self.dest_model_ctrl.path)
-        #         self.frame.models[digest] = original_dest_model
-
     def Enable(self, enable: bool) -> None:
         self.motion_ctrl.Enable(enable)
         self.src_model_ctrl.Enable(enable)

@@ -17,7 +17,7 @@ __ = logger.get_text
 
 
 class MainFrame(NotebookFrame):
-    def __init__(self, app: wx.App, title: str, size: wx.Size, *args, **kw) -> None:
+    def __init__(self, app: wx.App, title: str, size: wx.Size, is_saving: bool, *args, **kw) -> None:
         super().__init__(
             app,
             history_keys=["vmd", "org_pmx", "rep_pmx", "camera_vmd", "camera_pmx"],
@@ -26,6 +26,7 @@ class MainFrame(NotebookFrame):
         )
         self.selected_tab_idx = 0
         self.running_worker = False
+        self.is_saving = is_saving
 
         # ボーンモーションサイジング
         self.bone_panel = BonePanel(self, 0)

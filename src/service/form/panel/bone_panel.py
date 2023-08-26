@@ -74,6 +74,7 @@ class BonePanel(NotebookPanel):
             250,
             __("サイジングを実行します\nサイジングセットを1件以上設定後、クリックできるようになります"),
         )
+        self.exec_btn_ctrl.exec_worker = self.bone_worker
         self.btn_sizer.Add(self.exec_btn_ctrl, 0, wx.ALL, 3)
 
         self.root_sizer.Add(self.btn_sizer, 0, wx.ALIGN_CENTER | wx.SHAPED, 3)
