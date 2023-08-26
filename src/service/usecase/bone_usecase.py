@@ -1,3 +1,5 @@
+from logging.handlers import QueueHandler
+from multiprocessing import Queue
 import os
 
 from mlib.core.logger import MLogger
@@ -11,7 +13,9 @@ __ = logger.get_text
 
 
 class BoneUsecase:
-    def load_motion(self, motion_path: str, cache_motions: dict[str, VmdMotion]) -> tuple[str, VmdMotion]:
+    def load_motion(self, motion_path: str, cache_motions: dict[str, VmdMotion], log_queue: Queue) -> tuple[str, VmdMotion]:
+        MLogger.queue_handler = QueueHandler(log_queue)
+
         reader = VmdReader()
         digest = reader.read_hash_by_filepath(motion_path)
         original_motion = cache_motions.get(digest)
@@ -21,7 +25,9 @@ class BoneUsecase:
 
         return digest, original_motion
 
-    def load_model(self, model_path: str, cache_models: dict[str, PmxModel]) -> tuple[str, PmxModel]:
+    def load_model(self, model_path: str, cache_models: dict[str, PmxModel], log_queue: Queue) -> tuple[str, PmxModel]:
+        MLogger.queue_handler = QueueHandler(log_queue)
+
         reader = PmxReader()
         digest = reader.read_hash_by_filepath(model_path)
         original_model = cache_models.get(digest)
