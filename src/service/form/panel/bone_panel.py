@@ -10,7 +10,7 @@ from mlib.service.form.widgets.exec_btn_ctrl import ExecButton
 from mlib.utils.file_utils import save_histories
 from mlib.vmd.vmd_collection import VmdMotion
 from service.form.widgets.bone_set import SizingBoneSet
-from service.worker.exec_worker import ExecWorker
+from service.worker.bone_worker import BoneWorker
 
 logger = MLogger(os.path.basename(__file__))
 __ = logger.get_text
@@ -21,11 +21,13 @@ class BonePanel(NotebookPanel):
         super().__init__(frame, tab_idx, *args, **kw)
         self.sizing_sets: list[SizingBoneSet] = []
 
-        self.service_worker = ExecWorker(frame, self.on_exec_result)
+        self.bone_worker = BoneWorker(frame, self.on_exec_result)
 
         self._initialize_ui()
 
         self.on_add_set(wx.EVT_BUTTON)
+
+        self.EnableExec(False)
 
     def _initialize_ui(self) -> None:
         # ヘッダー -----------------------------
@@ -105,17 +107,18 @@ class BonePanel(NotebookPanel):
             sizing_set.motion_ctrl.save_path()
             sizing_set.src_model_ctrl.save_path()
             sizing_set.dest_model_ctrl.save_path()
-            sizing_set.camera_model_ctrl.save_path()
 
         save_histories(self.frame.histories)
 
     def exec(self, event: wx.Event) -> None:
         MLogger.console_handler = ConsoleHandler(self.console_ctrl.text_ctrl)
+        self.frame.running_worker = True
+
         self.Enable(False)
         self.exec_btn_ctrl.Enable(True)
-        self.service_worker.start()
+        self.bone_worker.start()
 
-    def on_exec_result(self, result: bool, data: tuple[VmdMotion, VmdMotion, list[int]], elapsed_time: str):
+    def on_exec_result(self, result: bool, data: tuple[VmdMotion, VmdMotion], elapsed_time: str):
         MLogger.console_handler = ConsoleHandler(self.console_ctrl.text_ctrl)
         self.console_ctrl.write(f"\n----------------\n{elapsed_time}")
 
@@ -123,3 +126,11 @@ class BonePanel(NotebookPanel):
         self.frame.on_sound()
 
         logger.info("サイジング完了", decoration=MLogger.Decoration.BOX)
+
+    def Enable(self, enable: bool) -> None:
+        for sizing_set in self.sizing_sets:
+            sizing_set.Enable(enable)
+        self.EnableExec(enable)
+
+    def EnableExec(self, enable: bool) -> None:
+        self.exec_btn_ctrl.Enable(enable)

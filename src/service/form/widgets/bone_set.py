@@ -16,14 +16,16 @@ STANCE_DETAIL_CHOICES = [
     __("センターY補正:【注目点: 手首の接地】【補正対象: センターYの位置】【有効例: 倒立】"),
     __("上半身補正:【注目点: 頭の位置】【補正対象: 上半身・上半身2の傾き】【有効例: 上体反らし】"),
     __("肩補正:【注目点: 手首の位置】【補正対象: 肩Pを肩に合併・肩の角度】【有効例: 肩の傾き違い】"),
+    __("親指０補正:【注目点: 親指の位置】【補正対象: 親指０の角度】【有効例: 親指０の傾き違い】"),
     __("下半身補正:【注目点: 足ボーンの傾き】【補正対象: 下半身の傾き】【有効例: 四つ足モデル】"),
     __("足IK補正:【注目点: 足首の位置】【補正対象: 足IKの位置】【有効例: 低頭身モデル】"),
+    __("足FK補正:【注目点: 足FK系の回転】【補正対象: 足FKの焼き込み】【有効例: 足IK使用モーション】"),
     __("足D補正:【注目点: 足D系の回転】【補正対象: 足D系を足に合併】【有効例: 足D使用モーション】"),
     __("つま先補正:【注目点: つま先の接地】【補正対象: 足IKの位置】【有効例: つま先立ち】"),
     __("つま先IK補正:【注目点: 足首の向き】【補正対象: つま先IKを足IKに合併】【有効例: つま先IK使用モーション】"),
 ]
 
-INITIAL_STANCE_DETAIL_CHOICES = [0, 1, 2, 3, 4, 6, 7, 8]
+INITIAL_STANCE_DETAIL_CHOICES = [0, 1, 2, 3, 4, 5, 7, 8, 9, 10]
 
 
 class SizingBoneSet:
@@ -40,7 +42,7 @@ class SizingBoneSet:
         self.sizer = wx.BoxSizer(wx.VERTICAL)
 
         self.background_color = wx.Colour("LIGHT GREY") if 0 == self.sizing_idx % 2 else wx.Colour("LIGHT BLUE")
-        self.box = wx.StaticBox(self.window, wx.ID_ANY, f"No.{self.sizing_idx + 1}")
+        self.box = wx.StaticBox(self.window, wx.ID_ANY, f"【No.{self.sizing_idx + 1}】")
         self.box.SetBackgroundColour(self.background_color)
 
         self.box_sizer = wx.StaticBoxSizer(self.box, orient=wx.HORIZONTAL)
@@ -243,23 +245,21 @@ class SizingBoneSet:
         if self.src_model_ctrl.read_name():
             self.src_model_ctrl.read_digest()
             self.create_output_path()
-        if not self.src_model_ctrl.data:
-            self.frame.Enable(False)
+        self.panel.EnableExec(True)
 
     def on_change_dest_model_pmx(self, event: wx.Event) -> None:
         self.dest_model_ctrl.unwrap()
         if self.dest_model_ctrl.read_name():
             self.dest_model_ctrl.read_digest()
             self.create_output_path()
-        if not self.dest_model_ctrl.data:
-            self.frame.Enable(False)
+        self.panel.EnableExec(True)
 
     def on_change_motion(self, event: wx.Event) -> None:
         self.motion_ctrl.unwrap()
         if self.motion_ctrl.read_name():
             self.motion_ctrl.read_digest()
-        if not self.motion_ctrl.data:
-            self.frame.Enable(False)
+            self.create_output_path()
+        self.panel.EnableExec(True)
 
     def create_output_path(self) -> None:
         if self.motion_ctrl.valid() and self.src_model_ctrl.valid() and self.dest_model_ctrl.valid():
@@ -277,3 +277,92 @@ class SizingBoneSet:
                     ]
                 ),
             )
+
+    def get_loadable_path(self) -> tuple[bool, list[str], list[str]]:
+        logger.info("【No.{i}】読み込み開始", i=self.sizing_idx + 1, decoration=MLogger.Decoration.LINE)
+        loadable_motion_paths: list[str] = []
+        loadable_model_paths: list[str] = []
+        can_load: bool = True
+        is_check: bool = False
+
+        if self.motion_ctrl.path or self.src_model_ctrl.path or self.dest_model_ctrl.path:
+            is_check = True
+
+        if is_check:
+            if not self.motion_ctrl.path:
+                logger.error("サイジング対象モーションパスが指定されていません。")
+                can_load = False
+            elif not self.motion_ctrl.valid():
+                logger.error("有効なサイジング対象モーションが指定されていません。")
+                can_load = False
+
+            if not self.src_model_ctrl.path:
+                logger.error("モーション作成元モデルが指定されていません。")
+                can_load = False
+            elif not self.src_model_ctrl.valid():
+                logger.error("有効なモーション作成元モデルが指定されていません。")
+                can_load = False
+
+            if not self.dest_model_ctrl.path:
+                logger.error("サイジング先モデルが指定されていません。")
+                can_load = False
+            elif not self.dest_model_ctrl.valid():
+                logger.error("有効なサイジング先モデルが指定されていません。")
+                can_load = False
+
+        if can_load and (not self.output_motion_ctrl.path or (self.output_motion_ctrl.path and not self.output_motion_ctrl.valid())):
+            logger.warning("出力ファイルパスが有効なパスではないため、デフォルトの出力ファイルパスを再設定します。")
+            self.create_output_path()
+
+        if can_load:
+            if self.motion_ctrl.path:
+                loadable_motion_paths.append(self.motion_ctrl.path)
+            if self.src_model_ctrl.path:
+                loadable_model_paths.append(self.src_model_ctrl.path)
+            if self.dest_model_ctrl.path:
+                loadable_model_paths.append(self.dest_model_ctrl.path)
+
+        return can_load, loadable_motion_paths, loadable_model_paths
+
+        # if load_success:
+        #     # モーション
+        #     digest = self.motion_ctrl.reader.read_hash_by_filepath(self.motion_ctrl.path)
+        #     original_motion = self.frame.motions.get(digest)
+
+        #     if original_motion:
+        #         logger.info("モーション: キャッシュ読み込み完了")
+        #     else:
+        #         original_motion = self.motion_ctrl.reader.read_by_filepath(self.motion_ctrl.path)
+        #         self.frame.motions[digest] = original_motion
+
+        #     # 作成元モデル
+        #     digest = self.src_model_ctrl.reader.read_hash_by_filepath(self.src_model_ctrl.path)
+        #     original_src_model = self.frame.models.get(digest)
+
+        #     if original_src_model:
+        #         logger.info("モーション作成元モデル: キャッシュ読み込み完了")
+        #     else:
+        #         original_src_model = self.src_model_ctrl.reader.read_by_filepath(self.src_model_ctrl.path)
+        #         self.frame.models[digest] = original_src_model
+
+        #     # サイジングモデル
+        #     digest = self.dest_model_ctrl.reader.read_hash_by_filepath(self.dest_model_ctrl.path)
+        #     original_dest_model = self.frame.models.get(digest)
+
+        #     if original_dest_model:
+        #         logger.info("サイジング先モデル: キャッシュ読み込み完了")
+        #     else:
+        #         original_dest_model = self.dest_model_ctrl.reader.read_by_filepath(self.dest_model_ctrl.path)
+        #         self.frame.models[digest] = original_dest_model
+
+    def Enable(self, enable: bool) -> None:
+        self.motion_ctrl.Enable(enable)
+        self.src_model_ctrl.Enable(enable)
+        self.dest_model_ctrl.Enable(enable)
+        self.output_motion_ctrl.Enable(enable)
+        self.stance_correct_check_ctrl.Enable(enable)
+        self.stance_correct_btn_ctrl.Enable(enable)
+        self.twist_check_ctrl.Enable(enable)
+        self.align_check_ctrl.Enable(enable)
+        self.align_finger_check_ctrl.Enable(enable)
+        self.align_floor_check_ctrl.Enable(enable)

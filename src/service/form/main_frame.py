@@ -27,12 +27,12 @@ class MainFrame(NotebookFrame):
         self.selected_tab_idx = 0
         self.running_worker = False
 
-        # 目線生成
+        # ボーンモーションサイジング
         self.bone_panel = BonePanel(self, 0)
         self.notebook.AddPage(self.bone_panel, __("ボーン"), True)
 
-        self.models: dict[str, PmxModel] = {}
-        self.motions: dict[str, VmdMotion] = {}
+        self.cache_models: dict[str, PmxModel] = {}
+        self.cache_motions: dict[str, VmdMotion] = {}
 
         self.morph_sub_window_size = wx.Size(300, 400)
         self.morph_sub_window: Optional[MorphSubCanvasWindow] = None
@@ -41,9 +41,6 @@ class MainFrame(NotebookFrame):
         self.create_morph_sub_window(panel)
 
         if self.morph_sub_window:
-            if self.sync_sub_window and self.sync_sub_window.IsShown():
-                self.sync_sub_window.Hide()
-
             if not self.morph_sub_window.IsShown():
                 model: Optional[PmxModel] = panel.model_ctrl.data
                 if model:
@@ -80,3 +77,6 @@ class MainFrame(NotebookFrame):
 
         # 処理が終わっている場合、動かしてOK
         self.selected_tab_idx = self.notebook.GetSelection()
+
+    def Enable(self, enable: bool):
+        self.bone_panel.Enable(enable)
