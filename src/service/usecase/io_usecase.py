@@ -1,6 +1,4 @@
 import os
-from logging.handlers import QueueHandler
-from multiprocessing import Queue
 
 from mlib.core.logger import MLogger
 from mlib.pmx.pmx_collection import PmxModel
@@ -14,12 +12,8 @@ __ = logger.get_text
 
 
 class IoUsecase:
-    def load_motion(
-        self, sizing_idx: int, motion_path: str, cache_motions: dict[str, VmdMotion], log_queue: Queue
-    ) -> tuple[int, str, VmdMotion, VmdMotion]:
+    def load_motion(self, sizing_idx: int, motion_path: str, cache_motions: dict[str, VmdMotion]) -> tuple[int, str, VmdMotion, VmdMotion]:
         """モーションの読み込み"""
-        MLogger.queue_handler = QueueHandler(log_queue)
-
         reader = VmdReader()
         digest = reader.read_hash_by_filepath(motion_path)
         original_motion = cache_motions.get(digest)
@@ -29,12 +23,8 @@ class IoUsecase:
 
         return sizing_idx, digest, original_motion, original_motion.copy()
 
-    def load_model(
-        self, sizing_idx: int, model_path: str, cache_models: dict[str, PmxModel], log_queue: Queue
-    ) -> tuple[int, str, PmxModel, PmxModel]:
+    def load_model(self, sizing_idx: int, model_path: str, cache_models: dict[str, PmxModel]) -> tuple[int, str, PmxModel, PmxModel]:
         """モデルの読み込み"""
-        MLogger.queue_handler = QueueHandler(log_queue)
-
         reader = PmxReader()
         digest = reader.read_hash_by_filepath(model_path)
         original_model = cache_models.get(digest)
@@ -50,11 +40,8 @@ class IoUsecase:
         dest_model: PmxModel,
         motion: VmdMotion,
         output_path: str,
-        log_queue: Queue,
     ) -> None:
         """サイジング結果保存"""
-        MLogger.queue_handler = QueueHandler(log_queue)
-
         logger.info("【No.{i}】サイジング結果保存", i=sizing_idx + 1, decoration=MLogger.Decoration.LINE)
 
         os.makedirs(os.path.dirname(output_path), exist_ok=True)

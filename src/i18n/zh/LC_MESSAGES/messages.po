@@ -21,369 +21,277 @@ msgstr ""
 
 
 msgid "センターXZ補正: 【注目点: 腰あたりの位置】【補正対象: センターXZ】【有効例: ターン】"
-msgstr ""
-
+msgstr "中心 XZ 校正：[关注点：每腰] [校正目标：中心 XZ] [有效示例：转弯]"
 
 msgid "センターY補正:【注目点: 手首の接地】【補正対象: センターYの位置】【有効例: 倒立】"
-msgstr ""
-
+msgstr "Y 中心校正：[关注点：手腕接地][校正目标：Y 中心位置][有效示例：倒置]"
 
 msgid "上半身補正:【注目点: 頭の位置】【補正対象: 上半身・上半身2の傾き】【有効例: 上体反らし】"
-msgstr ""
-
+msgstr "上半身矫正：[关注点：头部位置] [矫正目标：上半身倾斜和上半身 2] [有效示例：上半身弯曲]"
 
 msgid "肩補正:【注目点: 手首の位置】【補正対象: 肩Pを肩に合併・肩の角度】【有効例: 肩の傾き違い】"
-msgstr ""
-
+msgstr "肩部矫正：[关注点：手腕位置][矫正目标：肩部 P 与肩部的合并、肩部角度][有效示例：不同的肩部倾斜度]"
 
 msgid "捩り分散:【注目点: 腕の回転】【補正対象: 腕を腕捩りなどに分散】【有効例: 捩りなしモーション】"
-msgstr ""
-
+msgstr "扭转分散：[重点：手臂旋转][修正目标：手臂扭转分散等][有效示例：无扭转运动]"
 
 msgid "下半身補正:【注目点: 足ボーンの傾き】【補正対象: 下半身の傾き】【有効例: 四つ足モデル】"
-msgstr ""
-
+msgstr "下半身校正：[关注点：脚骨倾斜][校正目标：下半身倾斜][有效示例：四脚模型]"
 
 msgid "足IK補正:【注目点: 足首の位置】【補正対象: 足IKの位置】【有効例: 低頭身モデル】"
-msgstr ""
-
+msgstr "脚 IK 校正：[关注点：脚踝位置][校正目标：脚 IK 位置][有效示例：低头模型]"
 
 msgid "足D補正:【注目点: 足D系の回転】【補正対象: 足D系を足に合併】【有効例: 足D使用モーション】"
-msgstr ""
-
+msgstr "脚 D 纠正：[重点：脚 D 系统的旋转][纠正目标：将脚 D 系统并入脚][有效示例：使用脚 D 的运动]"
 
 msgid "つま先補正:【注目点: つま先の接地】【補正対象: 足IKの位置】【有効例: つま先立ち】"
-msgstr ""
-
+msgstr "脚趾校正：[关注点：脚趾与地面接触][校正目标：脚 IK 位置][有效示例：脚趾站立]"
 
 msgid "つま先IK補正:【注目点: 足首の向き】【補正対象: つま先IKを足IKに合併】【有効例: つま先IK使用モーション】"
-msgstr ""
-
+msgstr "脚趾 IK 纠正：[关注点：脚踝方向] [纠正目标：将脚趾 IK 与脚 IK 合并] [有效示例：使用脚趾 IK 的运动]"
 
 msgid "サイジングセット追加"
-msgstr ""
-
+msgstr "附加尺码套装"
 
 msgid "サイジングセットを追加できます"
-msgstr ""
-
+msgstr "你可以添加尺码套装"
 
 msgid "サイジングセット全削除"
-msgstr ""
-
+msgstr "删除所有尺寸设置"
 
 msgid "全てのサイジングセットを削除できます"
-msgstr ""
-
+msgstr "您可以删除所有尺寸设置"
 
 msgid "サイジング実行"
-msgstr ""
-
+msgstr "确定执行规模"
 
 msgid "サイジング実行停止"
-msgstr ""
-
+msgstr "停止执行大小调整"
 
 msgid "サイジングを実行します\nサイジングセットを1件以上設定後、クリックできるようになります"
-msgstr ""
-
+msgstr "执行尺寸调整 Јn设置至少一个尺寸调整集后，您可以点击它"
 
 msgid "サイジング対象モーション"
-msgstr ""
-
+msgstr "运动受尺寸限制"
 
 msgid "サイジングの対象となるVMDモーションデータを指定してください"
-msgstr ""
-
+msgstr "请指定 VMD 运动数据，以便确定尺寸"
 
 msgid "(未設定)"
-msgstr ""
-
+msgstr "（未设定）"
 
 msgid "{t}に記録されているモデル名です。\n文字列は選択およびコピー可能です。"
-msgstr ""
-
+msgstr "{t}中记录的型号名称。\可以选择并复制ɑn 字符串"
 
 msgid "開く"
-msgstr ""
-
+msgstr "打开"
 
 msgid "履歴"
-msgstr ""
-
+msgstr "历史"
 
 msgid "これまでに指定された事のある{t}を再指定することができます。"
-msgstr ""
-
+msgstr "如果以前指定过{t}，则可以重新指定{t}"
 
 msgid "モーション作成元モデル"
-msgstr ""
-
+msgstr "运动产生的模型"
 
 msgid "モーションを作成した時に使用されたトレースモデル（或いは類似モデル）を指定してください"
-msgstr ""
-
+msgstr "请说明创建动议时使用的轨迹模型（或类似模型）"
 
 msgid "サイジング先モデル"
-msgstr ""
-
+msgstr "提前确定模型大小"
 
 msgid "モーションを適用させたいモデルを指定してください\nこのモデルに合わせてモーションをサイジングします"
-msgstr ""
-
+msgstr "指定要应用运动的模型 Ј调整运动大小以适应该模型"
 
 msgid "サイジングモーション出力先"
-msgstr ""
-
+msgstr "确定运动输出目的地的大小"
 
 msgid "サイジングモーションの出力ファイルパスです\n任意の値に変更可能です"
-msgstr ""
-
+msgstr "This is the output file path of the sizing motion （这是尺寸调整运动的输出文件路径）。
 
 msgid "スタンス追加補正"
-msgstr ""
-
+msgstr "补充立场修正"
 
 msgid "元モーションの動きにより近くなるよう追加で補正を行います\n補正内容は任意で選択できます"
-msgstr ""
-
+msgstr "可任意选择修正内容"
 
 msgid "補正内訳"
-msgstr ""
-
+msgstr "更正细目"
 
 msgid "スタンス追加補正で行う補正を取捨選択することができます"
-msgstr ""
-
+msgstr "您可以选择放弃修正，用额外的姿态修正"
 
 msgid "手首位置合わせ"
-msgstr ""
-
+msgstr "手腕定位"
 
 msgid "手首の位置を元モーションと大体同じ位置になるよう合わせます"
-msgstr ""
-
+msgstr "对准手腕，使其与最初动作的位置大致相同"
 
 msgid "指位置合わせ"
-msgstr ""
-
+msgstr "手指定位"
 
 msgid "指の位置を元モーションと大体同じ位置になるよう合わせます"
-msgstr ""
-
+msgstr "对齐手指，使其位置与原始动作大致相同"
 
 msgid "床位置合わせ"
-msgstr ""
-
+msgstr "楼层对齐"
 
 msgid "手首の位置が床から沈まないよう合わせます"
-msgstr ""
-
+msgstr "对准手腕，使其不会沉入地板"
 
 msgid "足IKオフセット"
-msgstr ""
-
+msgstr "脚 IK 偏移"
 
 msgid "モーションで足が重なってしまう場合などで、足を少し開き気味にするなどのオフセットを追加できます"
-msgstr ""
-
+msgstr "例如，如果运动导致腿部重叠，您可以增加一个偏移量，使腿部稍微开阔一些"
 
 msgid "\nEnterキーを押下したタイミングで値が反映されます。"
-msgstr ""
-
+msgstr "按下 \nEnter 键时，该值就会反映出来"
 
 msgid "スタンス追加補正のうち、チェックが入っている補正のみ実施します"
-msgstr ""
-
+msgstr "在额外的立场修正中，只有经过检查的修正才会得到执行"
 
 msgid "スタンス追加補正選択"
-msgstr ""
-
+msgstr "立场附加修正选择"
 
 msgid "腕を腕捩りなど、捩りボーンに捩り回転を分散させます"
-msgstr ""
-
+msgstr "将手臂的扭转旋转分散到扭转骨中，如手臂扭转"
 
 msgid "親指０補正:【注目点: 親指の位置】【補正対象: 親指０の角度】【有効例: 親指０の傾き違い】"
-msgstr ""
-
+msgstr "拇指 0 矫正：[关注点：拇指位置][矫正目标：拇指 0 角度][有效示例：拇指 0 倾斜差]"
 
 msgid "足FK補正:【注目点: 足FK系の回転】【補正対象: 足FKの焼き込み】【有効例: 足IK使用モーション】"
-msgstr ""
-
+msgstr "脚 FK 纠正：[重点：脚 FK 系统的旋转][纠正目标：脚 FK 烤制][有效示例：脚 IK 使用动作]"
 
 msgid "サイジング完了"
-msgstr ""
-
+msgstr "测量完成"
 
 msgid "処理が継続できないため、中断しました\n----------------\nサイジングできないファイルセットが含まれているため、処理を中断します\nファイルパスが正しいか確認してください"
-msgstr ""
-
+msgstr "Aborted because the process cannot continue!/n----------------\nThe process is aborted because it contains a set of files that cannot be sized./nPlease check that the file paths are correct."（请检查文件路径是否正确）。
 
 msgid "ファイルを選んでダブルクリック、またはOKボタンをクリックしてください。"
-msgstr ""
-
+msgstr 选择文件并双击或单击 "确定 "按钮。
 
 msgid "ファイル履歴選択"
-msgstr ""
-
+msgstr "文件历史选择"
 
 msgid "モーション作成元モデルが指定されていません。"
-msgstr ""
-
+msgstr "未指定创建运动的模型"
 
 msgid "サイジング先モデルが指定されていません。"
-msgstr ""
-
+msgstr "未指定与您的尺寸匹配的型号"
 
 msgid "出力ファイルパスが有効なパスではないため、デフォルトの出力ファイルパスを再設定します。"
-msgstr ""
-
+msgstr "输出文件路径不是有效路径，请重置默认输出文件路径。
 
 msgid "【No.{i}】読み込み開始"
-msgstr ""
-
+msgstr "[编号{i}] 开始阅读"
 
 msgid "【No.{i}】サイジングセット保持"
-msgstr ""
-
+msgstr "[编号{i}]尺寸调整装置的保留"
 
 msgid "【No.{i}】移動補正 [{n}]  縮尺: XZ[{x:.4f}]({ox:.4f}), Y[{y:.4f}]"
-msgstr ""
-
+msgstr "[编号{i}] 运动修正 [{n}] 比例：XZ[{x:.4f}]({ox:.4f}), Y[{y:.4f}]"
 
 msgid "*** 処理を停止します ***"
-msgstr ""
-
+msgstr "***停止处理***"
 
 msgid "予期せぬエラーが発生しました"
-msgstr ""
-
+msgstr "出现意外错误"
 
 msgid "処理を停止しました"
-msgstr ""
-
+msgstr "处理已停止"
 
 msgid "【No.{i}】移動補正  縮尺: XZ[{x:.4f}]({ox:.4f}), Y[{y:.4f}]"
-msgstr ""
-
+msgstr "[编号{i}] 运动修正比例：XZ[{x:.4f}]({ox:.4f}), Y[{y:.4f}]"
 
 msgid "【No.{i}】移動補正  縮尺: XZ[{x:.4f}](元: {ox:.4f}), Y[{y:.4f}] センターオフセット[{c}]"
-msgstr ""
-
+msgstr "[编号{i}] 运动修正比例：XZ[{x:.4f}] （原值：{ox:.4f}），Y[{y:.4f}] 中心偏移量[{c}]"
 
 msgid "【No.{i}】移動補正  縮尺: XZ[{x:.5f}](元: {ox:.5f}), Y[{y:.5f}] センターオフセット[{c}]"
-msgstr ""
-
+msgstr "[编号{i}] 运动校正比例：XZ[{x:.5f}] （原值：{ox:.5f}），Y[{y:.5f}] 中心偏移量[{c}]"
 
 msgid "----------------------"
-msgstr ""
-
+msgstr "----------------------"
 
 msgid "VMDモーションデータ読み取り開始"
-msgstr ""
-
+msgstr "开始读取 VMD 运动数据"
 
 msgid "PMXモデルデータ読み取り開始"
-msgstr ""
-
+msgstr "开始读取 PMX 模型数据"
 
 msgid "ボーンデータ読み取り完了: {c}"
-msgstr ""
-
+msgstr "伯恩数据读取完毕：{c}"
 
 msgid "モーフデータ読み取り完了: {c}"
-msgstr ""
-
+msgstr "变形数据读取完毕：{c}"
 
 msgid "カメラデータ読み取り完了: {c}"
-msgstr ""
-
+msgstr "相机数据读取完毕：{c}"
 
 msgid "照明データ読み取り完了: {c}"
-msgstr ""
-
+msgstr "照明数据读取完毕：{c}"
 
 msgid "セルフ影データ読み取り完了: {c}"
-msgstr ""
-
+msgstr "自影数据读取完毕：{c}"
 
 msgid "IKデータ読み取り完了: {c}"
-msgstr ""
-
+msgstr "IK 数据读取完毕：{c}"
 
 msgid "頂点データ読み取り"
-msgstr ""
-
+msgstr "顶点数据读取"
 
 msgid "-- 頂点データ読み取り [{i} ({p:.2f}%)]"
-msgstr ""
-
+msgstr "--顶点数据读取 [{i} ({p:.2f}%)]"
 
 msgid "頂点データ読み取り完了: {c}"
-msgstr ""
-
+msgstr "顶点数据读取完毕：{c}"
 
 msgid "面データ読み取り"
-msgstr ""
-
+msgstr "表面数据读取"
 
 msgid "-- 面データ読み取り [{i} ({p:.2f}%)]"
-msgstr ""
-
+msgstr "--读取的表面数据 [{i} ({p:.2f}%)]"
 
 msgid "面データ読み取り完了: {c}"
-msgstr ""
-
+msgstr "表面数据读取完毕：{c}"
 
 msgid "テクスチャデータ読み取り完了: {c}"
-msgstr ""
-
+msgstr "纹理数据读取完毕：{c}"
 
 msgid "材質データ読み取り完了: {c}"
-msgstr ""
-
+msgstr "材料数据读取完毕：{c}"
 
 msgid "表示枠データ読み取り完了: {c}"
-msgstr ""
-
+msgstr "显示帧数据读取完毕：{c}"
 
 msgid "剛体データ読み取り完了: {c}"
-msgstr ""
-
+msgstr "刚性数据读取完毕：{c}"
 
 msgid "ジョイントデータ読み取り完了: {c}"
-msgstr ""
-
+msgstr "联合数据读取完毕：{c}"
 
 msgid "モデルセットアップ開始"
-msgstr ""
-
+msgstr "模型设置开始"
 
 msgid "モデルセットアップ：システム用ボーン"
-msgstr ""
-
+msgstr "模型设置：系统的骨骼"
 
 msgid "モデルセットアップ：ボーン"
-msgstr ""
-
+msgstr "模型设置：骨骼"
 
 msgid "-- モデルセットアップ：ボーン [{i} ({p:.2f}%)]"
-msgstr ""
-
+msgstr "-- 模型设置：骨骼 [{i} ({p:.2f}%)]"
 
 msgid "モデルセットアップ：ボーンツリー"
-msgstr ""
-
+msgstr "模型设置：骨树"
 
 msgid "モデルセットアップ完了"
-msgstr ""
-
+msgstr "模型设置完成"
 
 msgid "【No.{i}】サイジング結果保存"
-msgstr ""
-
+msgstr "[编号{i}] 保存尺寸调整结果"
 
 msgid "【No.{i}】サイジング結果保存成功\n{p}"
-msgstr ""
-
+msgstr "[编号{i}] 成功保存的尺寸调整结果（{n{p}）"

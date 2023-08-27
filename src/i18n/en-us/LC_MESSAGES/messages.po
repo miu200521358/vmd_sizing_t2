@@ -21,369 +21,277 @@ msgstr ""
 
 
 msgid "センターXZ補正: 【注目点: 腰あたりの位置】【補正対象: センターXZ】【有効例: ターン】"
-msgstr ""
-
+msgstr "Center XZ correction: [Point of interest: position around the waist] [Correction target: Center XZ] [Effective example: turn]"
 
 msgid "センターY補正:【注目点: 手首の接地】【補正対象: センターYの位置】【有効例: 倒立】"
-msgstr ""
-
+msgstr "Center Y correction: [point of interest: wrist ground] [correction target: center Y position] [valid example: inverted]"
 
 msgid "上半身補正:【注目点: 頭の位置】【補正対象: 上半身・上半身2の傾き】【有効例: 上体反らし】"
-msgstr ""
-
+msgstr "Upper body correction: [point of interest: head position] [correction target: tilt of upper body and upper body 2] [valid example: upper body bending]"
 
 msgid "肩補正:【注目点: 手首の位置】【補正対象: 肩Pを肩に合併・肩の角度】【有効例: 肩の傾き違い】"
-msgstr ""
-
+msgstr "Shoulder correction: [point of interest: wrist position] [correction target: merge shoulder P to shoulder, shoulder angle] [valid examples: different shoulder tilt]"
 
 msgid "捩り分散:【注目点: 腕の回転】【補正対象: 腕を腕捩りなどに分散】【有効例: 捩りなしモーション】"
-msgstr ""
-
+msgstr "torsion dispersion: [point of interest: arm rotation] [correction target: arm dispersion for arm torsion, etc.] [valid examples: motion without torsion]"
 
 msgid "下半身補正:【注目点: 足ボーンの傾き】【補正対象: 下半身の傾き】【有効例: 四つ足モデル】"
-msgstr ""
-
+msgstr "Lower Body Correction: [Point of Interest: Foot Bone Tilt] [Correction Target: Lower Body Tilt] [Valid Example: Four-Legged Model]"
 
 msgid "足IK補正:【注目点: 足首の位置】【補正対象: 足IKの位置】【有効例: 低頭身モデル】"
-msgstr ""
-
+msgstr "Foot IK correction: [Point of interest: ankle position] [Correction target: foot IK position] [Valid example: low head model]"
 
 msgid "足D補正:【注目点: 足D系の回転】【補正対象: 足D系を足に合併】【有効例: 足D使用モーション】"
-msgstr ""
-
+msgstr "Foot D correction: [Focus: rotation of foot D system] [Correction target: merge foot D system into foot] [Effective example: motion using foot D]"
 
 msgid "つま先補正:【注目点: つま先の接地】【補正対象: 足IKの位置】【有効例: つま先立ち】"
-msgstr ""
-
+msgstr "Toe correction: [point of interest: toe ground] [correction target: foot IK position] [valid example: toe stand]"
 
 msgid "つま先IK補正:【注目点: 足首の向き】【補正対象: つま先IKを足IKに合併】【有効例: つま先IK使用モーション】"
-msgstr ""
-
+msgstr "Toe IK correction: [point of interest: ankle orientation] [correction target: merge toe IK with foot IK] [valid example: motion using toe IK]"
 
 msgid "サイジングセット追加"
-msgstr ""
-
+msgstr "Additional sizing set"
 
 msgid "サイジングセットを追加できます"
-msgstr ""
-
+msgstr "You can add a sizing set"
 
 msgid "サイジングセット全削除"
-msgstr ""
-
+msgstr "Remove all sizing sets"
 
 msgid "全てのサイジングセットを削除できます"
-msgstr ""
-
+msgstr "All sizing sets can be deleted"
 
 msgid "サイジング実行"
-msgstr ""
-
+msgstr "Sizing Execution"
 
 msgid "サイジング実行停止"
-msgstr ""
-
+msgstr "Stop sizing execution"
 
 msgid "サイジングを実行します\nサイジングセットを1件以上設定後、クリックできるようになります"
-msgstr ""
-
+msgstr "Perform sizing \nAfter setting at least one sizing set, you will be able to click on it"
 
 msgid "サイジング対象モーション"
-msgstr ""
-
+msgstr "Motion to be sized"
 
 msgid "サイジングの対象となるVMDモーションデータを指定してください"
-msgstr ""
-
+msgstr "Please specify the VMD motion data to be sized"
 
 msgid "(未設定)"
-msgstr ""
-
+msgstr "(Not set)"
 
 msgid "{t}に記録されているモデル名です。\n文字列は選択およびコピー可能です。"
-msgstr ""
-
+msgstr "The model name as recorded in {t}. \The ɛn string can be selected and copied"
 
 msgid "開く"
-msgstr ""
-
+msgstr "Open"
 
 msgid "履歴"
-msgstr ""
-
+msgstr "History"
 
 msgid "これまでに指定された事のある{t}を再指定することができます。"
-msgstr ""
-
+msgstr "You can re-specify {t} that has been previously specified"
 
 msgid "モーション作成元モデル"
-msgstr ""
-
+msgstr "Model from which motion was created"
 
 msgid "モーションを作成した時に使用されたトレースモデル（或いは類似モデル）を指定してください"
-msgstr ""
-
+msgstr "Please specify the trace model (or similar model) used to create the motion"
 
 msgid "サイジング先モデル"
-msgstr ""
-
+msgstr "Sizing ahead model"
 
 msgid "モーションを適用させたいモデルを指定してください\nこのモデルに合わせてモーションをサイジングします"
-msgstr ""
-
+msgstr "Specify the model to which you want the motion to be applied.
 
 msgid "サイジングモーション出力先"
-msgstr ""
-
+msgstr "Sizing motion output destination"
 
 msgid "サイジングモーションの出力ファイルパスです\n任意の値に変更可能です"
-msgstr ""
-
+msgstr "This is the output file path for the sizing motion.
 
 msgid "スタンス追加補正"
-msgstr ""
-
+msgstr "Additional Stance Correction"
 
 msgid "元モーションの動きにより近くなるよう追加で補正を行います\n補正内容は任意で選択できます"
-msgstr ""
-
+msgstr "Additional corrections are made to make the motion closer to the original motion.
 
 msgid "補正内訳"
-msgstr ""
-
+msgstr "Correction Breakdown"
 
 msgid "スタンス追加補正で行う補正を取捨選択することができます"
-msgstr ""
-
+msgstr "You can choose to discard the correction to be made with the additional stance correction"
 
 msgid "手首位置合わせ"
-msgstr ""
-
+msgstr "Wrist alignment"
 
 msgid "手首の位置を元モーションと大体同じ位置になるよう合わせます"
-msgstr ""
-
+msgstr "Align the wrists so that they are roughly in the same position as the original motion"
 
 msgid "指位置合わせ"
-msgstr ""
-
+msgstr "Finger alignment"
 
 msgid "指の位置を元モーションと大体同じ位置になるよう合わせます"
-msgstr ""
-
+msgstr "Align the fingers so that they are roughly in the same position as the original motion"
 
 msgid "床位置合わせ"
-msgstr ""
-
+msgstr "Floor alignment"
 
 msgid "手首の位置が床から沈まないよう合わせます"
-msgstr ""
-
+msgstr "Align the wrists so that they do not sink through the floor"
 
 msgid "足IKオフセット"
-msgstr ""
-
+msgstr "Foot IK offset"
 
 msgid "モーションで足が重なってしまう場合などで、足を少し開き気味にするなどのオフセットを追加できます"
-msgstr ""
-
+msgstr "You can add offsets, such as slightly opening the legs, in cases where the legs overlap in motion"
 
 msgid "\nEnterキーを押下したタイミングで値が反映されます。"
-msgstr ""
-
+msgstr "The value is reflected at the time the \nEnter key is pressed"
 
 msgid "スタンス追加補正のうち、チェックが入っている補正のみ実施します"
-msgstr ""
-
+msgstr "Of the additional stance corrections, only those that are checked will be performed"
 
 msgid "スタンス追加補正選択"
-msgstr ""
-
+msgstr "Additional Stance Correction Selection"
 
 msgid "腕を腕捩りなど、捩りボーンに捩り回転を分散させます"
-msgstr ""
-
+msgstr "Distributes the torsional rotation of the arm into torsional bones, such as arm torsion"
 
 msgid "親指０補正:【注目点: 親指の位置】【補正対象: 親指０の角度】【有効例: 親指０の傾き違い】"
-msgstr ""
-
+msgstr "Thumb 0 correction: [Point of interest: thumb position] [Correction target: thumb 0 angle] [Valid example: thumb 0 tilt difference]"
 
 msgid "足FK補正:【注目点: 足FK系の回転】【補正対象: 足FKの焼き込み】【有効例: 足IK使用モーション】"
-msgstr ""
-
+msgstr "Foot FK correction: [Focus: rotation of foot FK system] [Correction target: burn-in of foot FK] [Effective example: motion using foot IK]"
 
 msgid "サイジング完了"
-msgstr ""
-
+msgstr "Sizing complete"
 
 msgid "処理が継続できないため、中断しました\n----------------\nサイジングできないファイルセットが含まれているため、処理を中断します\nファイルパスが正しいか確認してください"
-msgstr ""
-
+msgstr "Aborted because the process cannot continue!\n----------------\nThe process is aborted because it contains a set of files that cannot be sized.\nPlease check that the file paths are correct"
 
 msgid "ファイルを選んでダブルクリック、またはOKボタンをクリックしてください。"
-msgstr ""
-
+msgstr "Please select the file and double click or click the OK button"
 
 msgid "ファイル履歴選択"
-msgstr ""
-
+msgstr "File History Selection"
 
 msgid "モーション作成元モデルが指定されていません。"
-msgstr ""
-
+msgstr "The model from which motion was created has not been specified"
 
 msgid "サイジング先モデルが指定されていません。"
-msgstr ""
-
+msgstr "The model to which you are sizing is not specified"
 
 msgid "出力ファイルパスが有効なパスではないため、デフォルトの出力ファイルパスを再設定します。"
-msgstr ""
-
+msgstr "The output file path is not a valid path, reset the default output file path"
 
 msgid "【No.{i}】読み込み開始"
-msgstr ""
-
+msgstr "[No.{i}] Start reading"
 
 msgid "【No.{i}】サイジングセット保持"
-msgstr ""
-
+msgstr "[No.{i}] Sizing set retention"
 
 msgid "【No.{i}】移動補正 [{n}]  縮尺: XZ[{x:.4f}]({ox:.4f}), Y[{y:.4f}]"
-msgstr ""
-
+msgstr "[No.{i}] Movement correction [{n}] Scale: XZ[{x:.4f}]({ox:.4f}), Y[{y:.4f}]"
 
 msgid "*** 処理を停止します ***"
-msgstr ""
-
+msgstr "*** Stop processing ***"
 
 msgid "予期せぬエラーが発生しました"
-msgstr ""
-
+msgstr "An unexpected error has occurred"
 
 msgid "処理を停止しました"
-msgstr ""
-
+msgstr "Processing has been stopped"
 
 msgid "【No.{i}】移動補正  縮尺: XZ[{x:.4f}]({ox:.4f}), Y[{y:.4f}]"
-msgstr ""
-
+msgstr "[No.{i}] Movement correction Scale: XZ[{x:.4f}]({ox:.4f}), Y[{y:.4f}]"
 
 msgid "【No.{i}】移動補正  縮尺: XZ[{x:.4f}](元: {ox:.4f}), Y[{y:.4f}] センターオフセット[{c}]"
-msgstr ""
-
+msgstr "[No.{i}] Movement correction Scale: XZ[{x:.4f}](original: {ox:.4f}), Y[{y:.4f}] Center offset[{c}]"
 
 msgid "【No.{i}】移動補正  縮尺: XZ[{x:.5f}](元: {ox:.5f}), Y[{y:.5f}] センターオフセット[{c}]"
-msgstr ""
-
+msgstr "[No.{i}] Movement correction Scale: XZ[{x:.5f}](original: {ox:.5f}), Y[{y:.5f}] Center offset[{c}]"
 
 msgid "----------------------"
-msgstr ""
-
+msgstr "----------------------"
 
 msgid "VMDモーションデータ読み取り開始"
-msgstr ""
-
+msgstr "Start reading VMD motion data"
 
 msgid "PMXモデルデータ読み取り開始"
-msgstr ""
-
+msgstr "PMX model data read started"
 
 msgid "ボーンデータ読み取り完了: {c}"
-msgstr ""
-
+msgstr "Bone data read complete: {c}"
 
 msgid "モーフデータ読み取り完了: {c}"
-msgstr ""
-
+msgstr "Morph data read complete: {c}"
 
 msgid "カメラデータ読み取り完了: {c}"
-msgstr ""
-
+msgstr "Camera data read complete: {c}"
 
 msgid "照明データ読み取り完了: {c}"
-msgstr ""
-
+msgstr "Lighting data read complete: {c}"
 
 msgid "セルフ影データ読み取り完了: {c}"
-msgstr ""
-
+msgstr "Self shadow data read complete: {c}"
 
 msgid "IKデータ読み取り完了: {c}"
-msgstr ""
-
+msgstr "IK data read complete: {c}"
 
 msgid "頂点データ読み取り"
-msgstr ""
-
+msgstr "Vertex data read"
 
 msgid "-- 頂点データ読み取り [{i} ({p:.2f}%)]"
-msgstr ""
-
+msgstr "-- Vertex data read [{i} ({p:.2f}%)]"
 
 msgid "頂点データ読み取り完了: {c}"
-msgstr ""
-
+msgstr "Vertex data read complete: {c}"
 
 msgid "面データ読み取り"
-msgstr ""
-
+msgstr "Surface data read"
 
 msgid "-- 面データ読み取り [{i} ({p:.2f}%)]"
-msgstr ""
-
+msgstr "-- Surface data read [{i} ({p:.2f}%)]"
 
 msgid "面データ読み取り完了: {c}"
-msgstr ""
-
+msgstr "Surface data read complete: {c}"
 
 msgid "テクスチャデータ読み取り完了: {c}"
-msgstr ""
-
+msgstr "Texture data read complete: {c}"
 
 msgid "材質データ読み取り完了: {c}"
-msgstr ""
-
+msgstr "Material data read complete: {c}"
 
 msgid "表示枠データ読み取り完了: {c}"
-msgstr ""
-
+msgstr "Display frame data read complete: {c}"
 
 msgid "剛体データ読み取り完了: {c}"
-msgstr ""
-
+msgstr "Rigid data read complete: {c}"
 
 msgid "ジョイントデータ読み取り完了: {c}"
-msgstr ""
-
+msgstr "Joint data read complete: {c}"
 
 msgid "モデルセットアップ開始"
-msgstr ""
-
+msgstr "Model setup started"
 
 msgid "モデルセットアップ：システム用ボーン"
-msgstr ""
-
+msgstr "Model Setup: bones for systems"
 
 msgid "モデルセットアップ：ボーン"
-msgstr ""
-
+msgstr "Model setup: bone"
 
 msgid "-- モデルセットアップ：ボーン [{i} ({p:.2f}%)]"
-msgstr ""
-
+msgstr "-- Model setup: bone [{i} ({p:.2f}%)]"
 
 msgid "モデルセットアップ：ボーンツリー"
-msgstr ""
-
+msgstr "Model Setup: Bone Tree"
 
 msgid "モデルセットアップ完了"
-msgstr ""
-
+msgstr "Model setup complete"
 
 msgid "【No.{i}】サイジング結果保存"
-msgstr ""
-
+msgstr "[No.{i}] Save sizing results"
 
 msgid "【No.{i}】サイジング結果保存成功\n{p}"
-msgstr ""
-
+msgstr "[No.{i}] Sizing results saved successfully\n{p}"
