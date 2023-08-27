@@ -10,11 +10,8 @@ from mlib.core.logger import MLogger
 from mlib.core.math import MVector3D
 from mlib.pmx.pmx_collection import PmxModel
 from mlib.pmx.pmx_part import BoneMorphOffset, Morph
-from mlib.pmx.pmx_reader import PmxReader
 from mlib.vmd.vmd_collection import VmdMotion
-from mlib.vmd.vmd_reader import VmdReader
 from mlib.vmd.vmd_part import VmdMorphFrame
-from mlib.vmd.vmd_writer import VmdWriter
 from mlib.pmx.pmx_part import MorphType
 from mlib.vmd.vmd_collection import VmdBoneFrames
 
@@ -30,55 +27,50 @@ class SizingMoveMorphs(StrEnum):
     LEG_XZ_RATIO = "足XZ比率"
 
 
-class BoneUsecase:
-    def load_motion(self, motion_path: str, cache_motions: dict[str, VmdMotion], log_queue: Queue) -> tuple[str, VmdMotion]:
-        """モーションの読み込み"""
-        MLogger.queue_handler = QueueHandler(log_queue)
-
-        reader = VmdReader()
-        digest = reader.read_hash_by_filepath(motion_path)
-        original_motion = cache_motions.get(digest)
-
-        if not original_motion:
-            original_motion = reader.read_by_filepath(motion_path)
-
-        return digest, original_motion
-
-    def load_model(self, model_path: str, cache_models: dict[str, PmxModel], log_queue: Queue) -> tuple[str, PmxModel]:
-        """モデルの読み込み"""
-        MLogger.queue_handler = QueueHandler(log_queue)
-
-        reader = PmxReader()
-        digest = reader.read_hash_by_filepath(model_path)
-        original_model = cache_models.get(digest)
-
-        if not original_model:
-            original_model = reader.read_by_filepath(model_path)
-
-        return digest, original_model
-
-    def save(
-        self,
-        sizing_idx: int,
-        dest_model: PmxModel,
-        motion: VmdMotion,
-        output_path: str,
-        log_queue: Queue,
-    ) -> None:
-        """サイジング結果保存"""
-        MLogger.queue_handler = QueueHandler(log_queue)
-
-        logger.info("【No.{i}】サイジング結果保存", i=sizing_idx + 1, decoration=MLogger.Decoration.LINE)
-
-        os.makedirs(os.path.dirname(output_path), exist_ok=True)
-        VmdWriter(motion, output_path, dest_model.name).save()
-
-        logger.info("【No.{i}】サイジング結果保存成功\n{p}", i=sizing_idx + 1, p=output_path, decoration=MLogger.Decoration.BOX)
-
+class MoveUsecase:
     def fit_move_sizing(
         self,
         sizing_idx: int,
+        xz_leg_ratio: float,
+        y_leg_ratio: float,
+        src_model: PmxModel,
+        dest_model: PmxModel,
+        motion: VmdMotion,
+        log_queue: Queue,
+    ) -> tuple[int, VmdMotion]:
+        """移動系モーフによるサイジングフィッティング"""
+        MLogger.queue_handler = QueueHandler(log_queue)
+
+        move_sizing_positions: list[np.ndarray] = []
+        for bone_name in MOVE_BONE_NAMES:
+            if bone_name not in motion.bones:
+                continue
+            for bf in motion.bones[bone_name]:
+                move_sizing_positions.append(bf.position.vector)
+        move_sizing_mats = np.full((len(move_sizing_positions), 4, 4), np.eye(4))
+        move_sizing_mats[..., :3, 3] = np.array(move_sizing_positions)
+
+        scale_mat = np.eye(4)
+        scale_mat[0, 0] = xz_leg_ratio
+        scale_mat[1, 1] = y_leg_ratio
+        scale_mat[2, 2] = xz_leg_ratio
+
+        move_scaled_mats = scale_mat @ move_sizing_mats
+        n = 0
+        for bone_name in MOVE_BONE_NAMES:
+            if bone_name not in motion.bones:
+                continue
+            for bf in motion.bones[bone_name]:
+                bf.position.vector = move_scaled_mats[n, :3, 3]
+                n += 1
+
+        return sizing_idx, motion
+
+    def fit_move_sizing2(
+        self,
+        sizing_idx: int,
         fit_bone_name: str,
+        src_model: PmxModel,
         dest_model: PmxModel,
         motion: VmdMotion,
         log_queue: Queue,
@@ -90,18 +82,19 @@ class BoneUsecase:
             motion.append_morph_frame(VmdMorphFrame(0, morph.value, 1.0))
 
         target_fnos: set[int] = {0}
-        target_bone_names: list[str] = []
+        target_bone_names: list[str] = [*MOVE_BONE_NAMES]
         if fit_bone_name in dest_model.bones and fit_bone_name in motion.bones:
             target_bone_names.append(fit_bone_name)
             if dest_model.bones[fit_bone_name].is_ik:
-                # IKの場合はIKターゲットも対象とする
-                target_bone_names.append(dest_model.bones[dest_model.bones[fit_bone_name].ik.bone_index].name)
+                # IKの場合はIK根元も対象とする
+                target_bone_names.append(dest_model.bones[dest_model.bones[fit_bone_name].ik.links[-1].bone_index].name)
             target_fnos |= set(motion.bones[fit_bone_name].indexes)
 
         if not target_bone_names:
             return sizing_idx, fit_bone_name, None
 
-        bone_matrixes = motion.animate_bone(sorted(target_fnos), dest_model, target_bone_names, append_ik=False, out_fno_log=True)
+        src_bone_matrixes = motion.animate_bone(sorted(target_fnos), src_model, target_bone_names, append_ik=False, out_fno_log=True)
+        dest_bone_matrixes = motion.animate_bone(sorted(target_fnos), dest_model, target_bone_names, append_ik=False, out_fno_log=True)
 
         for bone_name in target_bone_names:
             # 親INDEXが有効な場合、親ボーン名を取得
@@ -116,22 +109,16 @@ class BoneUsecase:
             )
 
             for fno in motion.bones[bone_name].indexes:
-                if bone_matrixes.exists(fno, bone_name):
-                    if ik_root_bone_name:
-                        # IK根元ボーンがある場合は、IKの根元からの相対位置を求め直す
-                        motion.bones[bone_name][fno].position = (
-                            bone_matrixes[fno, bone_name].local_matrix.to_position()
-                            - bone_matrixes[fno, ik_root_bone_name].local_matrix.to_position()
-                        )
-                    elif parent_bone_name:
+                if dest_bone_matrixes.exists(fno, bone_name):
+                    if parent_bone_name:
                         # 親ボーンがある場合は、親からの相対位置
                         motion.bones[bone_name][fno].position = (
-                            bone_matrixes[fno, bone_name].local_matrix.to_position()
-                            - bone_matrixes[fno, parent_bone_name].local_matrix.to_position()
+                            dest_bone_matrixes[fno, parent_bone_name].local_matrix_no_scale.inverse()
+                            * dest_bone_matrixes[fno, bone_name].local_matrix_no_scale.to_position()
                         )
                     else:
                         # 親ボーンがない場合は自身の位置
-                        motion.bones[bone_name][fno].position = bone_matrixes[fno, bone_name].local_matrix.to_position()
+                        motion.bones[bone_name][fno].position = dest_bone_matrixes[fno, bone_name].position
 
         return sizing_idx, fit_bone_name, motion.bones[fit_bone_name]
 

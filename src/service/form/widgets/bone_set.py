@@ -278,10 +278,11 @@ class SizingBoneSet:
                 ),
             )
 
-    def get_loadable_path(self) -> tuple[bool, list[str], list[str]]:
+    def get_loadable_path(self) -> tuple[bool, list[str], list[str], list[str]]:
         logger.info("【No.{i}】読み込み開始", i=self.sizing_idx + 1, decoration=MLogger.Decoration.LINE)
         loadable_motion_paths: list[str] = []
-        loadable_model_paths: list[str] = []
+        loadable_src_model_paths: list[str] = []
+        loadable_dest_model_paths: list[str] = []
         can_load: bool = True
         is_check: bool = False
 
@@ -318,11 +319,11 @@ class SizingBoneSet:
             if self.motion_ctrl.path:
                 loadable_motion_paths.append(self.motion_ctrl.path)
             if self.src_model_ctrl.path:
-                loadable_model_paths.append(self.src_model_ctrl.path)
+                loadable_src_model_paths.append(self.src_model_ctrl.path)
             if self.dest_model_ctrl.path:
-                loadable_model_paths.append(self.dest_model_ctrl.path)
+                loadable_dest_model_paths.append(self.dest_model_ctrl.path)
 
-        return can_load, loadable_motion_paths, loadable_model_paths
+        return can_load, loadable_motion_paths, loadable_src_model_paths, loadable_dest_model_paths
 
     def Enable(self, enable: bool) -> None:
         self.motion_ctrl.Enable(enable)

@@ -260,3 +260,7 @@ msgstr ""
 msgid "処理を停止しました"
 msgstr ""
 
+
+msgid "【No.{i}】移動補正  縮尺: XZ[{x:.4f}]({ox:.4f}), Y[{y:.4f}]"
+msgstr ""
+
