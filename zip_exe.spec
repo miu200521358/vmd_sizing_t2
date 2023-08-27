@@ -1,18 +1,17 @@
 # VmdEmotion 64bit版
 
+import os
 import sys
+from glob import glob
 
 sys.path.append("src")
 from executor import APP_NAME, VERSION_NAME
 
 file_name = f"{APP_NAME}_{VERSION_NAME}"
-binary_keys = [
-    ('mmd_base/mlib/core/*.pyd', 'mlib/core'),
-    ('mmd_base/mlib/pmx/*.pyd', 'mlib/pmx'),
-    ('mmd_base/mlib/service/*.pyd', 'mlib/service'),
-    ('mmd_base/mlib/utils/*.pyd', 'mlib/utils'),
-    ('mmd_base/mlib/vmd/*.pyd', 'mlib/vmd'),
-]
+binary_keys = [(path, os.path.dirname(path.replace("mmd_base\\", ""))) for path in glob('mmd_base\\mlib\\**\\*.pyd', recursive=True)] + \
+                [('src\\*.pyd', '.')] + \
+                [(path, os.path.dirname(path.replace("src\\", ""))) for path in glob('src\\**\\*.pyd', recursive=True) if "executor" not in path]
+
 data_keys = [
     ('src/resources/logo.ico', 'resources'),
     ('src/resources/icon/*.*', 'resources/icon'),
@@ -29,8 +28,7 @@ exclude_dlls = ['libssl-3-x64.dll', 'libcrypto-3-x64.dll', '_ssl.pyd', '_asyncio
 
 import os
 
-from glob import glob
-exclude_scripts = glob('mmd_base\mlib\**\*.py', recursive=True)
+exclude_scripts = glob('**/*.py', recursive=True)
 
 def remove_from_list(input):
     outlist = []
@@ -50,8 +48,7 @@ a = Analysis(['src/executor.py'],
             pathex=['src'],
             binaries=binary_keys,
             datas=data_keys,
-            hiddenimports=['quaternion', 'OpenGL', 'bezier', 'wx.glcanvas', 'PIL.Image', 'PIL.ImageOps', 'winsound',
-                           'mlib.service.form.base_notebook', 'mlib.service.form.notebook_frame', 'mlib.service.form.notebook_panel'],
+            hiddenimports=['quaternion', 'OpenGL', 'bezier', 'wx.glcanvas', 'PIL.Image', 'PIL.ImageOps', 'winsound'],
             hookspath=[],
             runtime_hooks=[],
             excludes=exclude_dlls,

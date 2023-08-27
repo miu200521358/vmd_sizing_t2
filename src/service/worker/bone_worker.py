@@ -12,6 +12,7 @@ from mlib.utils.file_utils import get_root_dir
 from service.form.widgets.bone_set import SizingBoneSet
 from service.usecase.io_usecase import IoUsecase
 from service.usecase.move_usecase import MoveUsecase
+from service.usecase.arm_stance_usecase import ArmStanceUsecase
 
 logger = MLogger(os.path.basename(__file__), level=1)
 __ = logger.get_text
@@ -27,14 +28,41 @@ class BoneWorker(BaseWorker):
         self.load()
 
         # 移動補正
-        self.fit_move_sizing()
+        self.sizing_move()
+
+        # 腕スタンス補正
+        self.sizing_arm_stance()
 
         # 保存
         self.save()
 
         self.result_data = []
 
-    def fit_move_sizing(self):
+    def sizing_arm_stance(self):
+        """腕スタンス補正"""
+        usecase = ArmStanceUsecase()
+        bone_panel = self.frame.bone_panel
+
+        with ThreadPoolExecutor(thread_name_prefix="arm_stance", max_workers=self.max_worker) as executor:
+            futures: list[Future] = []
+            for sizing_set in bone_panel.sizing_sets:
+                futures.append(
+                    executor.submit(
+                        usecase.sizing_arm_stance,
+                        sizing_set.sizing_idx,
+                        sizing_set.src_model_ctrl.data,
+                        sizing_set.dest_model_ctrl.data,
+                        sizing_set.output_motion_ctrl.data,
+                    )
+                )
+
+            for future in as_completed(futures):
+                if future.exception():
+                    raise future.exception()
+                sizing_idx, sizing_motion = future.result()
+                bone_panel.sizing_sets[sizing_idx].output_motion_ctrl.data = sizing_motion
+
+    def sizing_move(self):
         """移動補正"""
         usecase = MoveUsecase()
         bone_panel = self.frame.bone_panel
@@ -63,20 +91,11 @@ class BoneWorker(BaseWorker):
             for sizing_set, xz_leg_ratio, y_leg_ratio, center_offset in zip(
                 bone_panel.sizing_sets, xz_leg_ratios, y_leg_ratios, center_offsets
             ):
-                logger.info(
-                    "【No.{i}】移動補正  縮尺: XZ[{x:.5f}](元: {ox:.5f}), Y[{y:.5f}] センターオフセット[{c}]",
-                    i=sizing_set.sizing_idx + 1,
-                    x=all_xz_leg_ratio,
-                    ox=xz_leg_ratio,
-                    y=y_leg_ratio,
-                    c=center_offset,
-                    decoration=MLogger.Decoration.LINE,
-                )
-
                 futures.append(
                     executor.submit(
-                        usecase.fit_move_sizing,
+                        usecase.sizing_move,
                         sizing_set.sizing_idx,
+                        xz_leg_ratio,
                         MVector3D(all_xz_leg_ratio, y_leg_ratio, all_xz_leg_ratio),
                         center_offset,
                         sizing_set.src_model_ctrl.data,

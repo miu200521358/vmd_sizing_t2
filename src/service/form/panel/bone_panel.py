@@ -8,7 +8,6 @@ from mlib.service.form.notebook_panel import NotebookPanel
 from mlib.service.form.widgets.console_ctrl import ConsoleCtrl
 from mlib.service.form.widgets.exec_btn_ctrl import ExecButton
 from mlib.utils.file_utils import save_histories
-from mlib.vmd.vmd_collection import VmdMotion
 from service.form.widgets.bone_set import SizingBoneSet
 from service.worker.bone_worker import BoneWorker
 
@@ -119,7 +118,7 @@ class BonePanel(NotebookPanel):
         self.exec_btn_ctrl.Enable(True)
         self.bone_worker.start()
 
-    def on_exec_result(self, result: bool, data: tuple[VmdMotion, VmdMotion], elapsed_time: str):
+    def on_exec_result(self, result: bool, data: list, elapsed_time: str):
         MLogger.console_handler = ConsoleHandler(self.console_ctrl.text_ctrl)
         self.console_ctrl.write(f"\n----------------\n{elapsed_time}")
 

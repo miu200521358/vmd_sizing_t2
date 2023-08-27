@@ -11,23 +11,52 @@ logger = MLogger(os.path.basename(__file__), level=1)
 __ = logger.get_text
 
 
-MOVE_BONE_NAMES = ("全ての親", "センター", "グルーブ", "右足IK親", "左足IK親", "右足ＩＫ", "左足ＩＫ", "右つま先ＩＫ", "左つま先ＩＫ")
+MOVE_ALL_BONE_NAMES = {"全ての親", "センター", "グルーブ", "右足IK親", "左足IK親", "右足ＩＫ", "左足ＩＫ", "右つま先ＩＫ", "左つま先ＩＫ"}
+
+MOVE_CHECK_BONE_NAMES = {"右足", "右ひざ", "右足首", "右足ＩＫ", "右つま先ＩＫ", "左足", "左ひざ", "左足首", "左足ＩＫ", "左つま先ＩＫ"}
 
 
 class MoveUsecase:
-    def fit_move_sizing(
+    def sizing_move(
         self,
         sizing_idx: int,
+        xz_leg_ratio: float,
         leg_ratio: MVector3D,
         center_offset: MVector3D,
         src_model: PmxModel,
         dest_model: PmxModel,
         motion: VmdMotion,
     ) -> tuple[int, VmdMotion]:
-        """移動系モーフによるサイジングフィッティング"""
+        """移動補正"""
+        if MOVE_CHECK_BONE_NAMES - set(src_model.bones.names):
+            logger.warning(
+                "【No.{i}】モーション作成元モデルに足・ひざ・足首・足ＩＫ・つま先ＩＫの左右ボーンがないため、移動補正をスキップします",
+                i=sizing_idx + 1,
+                decoration=MLogger.Decoration.BOX,
+            )
+            return sizing_idx, motion
+
+        if MOVE_CHECK_BONE_NAMES - set(dest_model.bones.names):
+            logger.warning(
+                "【No.{i}】サイジング先モデルに足・ひざ・足首・足ＩＫ・つま先ＩＫの左右ボーンがないため、移動補正をスキップします",
+                i=sizing_idx + 1,
+                decoration=MLogger.Decoration.BOX,
+            )
+            return sizing_idx, motion
+
+        logger.info(
+            "【No.{i}】移動補正  縮尺: XZ[{x:.5f}](元: {ox:.5f}), Y[{y:.5f}] センターオフセット[{c}]",
+            i=sizing_idx + 1,
+            x=leg_ratio.x,
+            y=leg_ratio.y,
+            ox=xz_leg_ratio,
+            c=center_offset,
+            decoration=MLogger.Decoration.LINE,
+        )
+
         offset_positions: list[np.ndarray] = []
         move_sizing_positions: list[np.ndarray] = []
-        for bone_name in MOVE_BONE_NAMES:
+        for bone_name in MOVE_ALL_BONE_NAMES:
             if bone_name not in motion.bones:
                 continue
             for bf in motion.bones[bone_name]:
@@ -37,21 +66,21 @@ class MoveUsecase:
                 else:
                     offset_positions.append(np.zeros(3))
 
-        move_sizing_mats = np.full((len(move_sizing_positions), 4, 4), np.eye(4))
-        move_sizing_mats[..., :3, 3] = np.array(move_sizing_positions)
+        move_sizing_matrixes = np.full((len(move_sizing_positions), 4, 4), np.eye(4))
+        move_sizing_matrixes[..., :3, 3] = np.array(move_sizing_positions)
 
-        offset_mats = np.full((len(offset_positions), 4, 4), np.eye(4))
-        offset_mats[..., :3, 3] = np.array(offset_positions)
+        offset_matrixes = np.full((len(offset_positions), 4, 4), np.eye(4))
+        offset_matrixes[..., :3, 3] = np.array(offset_positions)
 
         scale_mat = np.diag(leg_ratio.vector4)
 
-        move_scaled_mats = scale_mat @ move_sizing_mats @ offset_mats
+        move_scaled_matrixes = offset_matrixes @ scale_mat @ move_sizing_matrixes
         n = 0
-        for bone_name in MOVE_BONE_NAMES:
+        for bone_name in MOVE_ALL_BONE_NAMES:
             if bone_name not in motion.bones:
                 continue
             for bf in motion.bones[bone_name]:
-                bf.position.vector = move_scaled_mats[n, :3, 3]
+                bf.position.vector = move_scaled_matrixes[n, :3, 3]
                 n += 1
 
         return sizing_idx, motion
@@ -65,14 +94,7 @@ class MoveUsecase:
 
     def get_move_ratio(self, src_model: PmxModel, dest_model: PmxModel) -> tuple[float, float, MVector3D]:
         """移動補正用比率算出"""
-        target_bone_names = {"右足", "右ひざ", "右足首", "右足ＩＫ", "右つま先ＩＫ", "左足", "左ひざ", "左足首", "左足ＩＫ", "左つま先ＩＫ"}
-
-        if not target_bone_names.issubset(src_model.bones.names):
-            logger.warning("モーション作成元モデルに足・ひざ・足首・足ＩＫ・つま先ＩＫの左右ボーンがないため、移動補正用比率が測れません", decoration=MLogger.Decoration.BOX)
-            return 1.0, 1.0, MVector3D()
-
-        if not target_bone_names.issubset(dest_model.bones.names):
-            logger.warning("サイジング先モデルに足・ひざ・足首・足ＩＫ・つま先ＩＫの左右ボーンがないため、移動補正用比率が測れません", decoration=MLogger.Decoration.BOX)
+        if (MOVE_CHECK_BONE_NAMES - set(src_model.bones.names)) or (MOVE_CHECK_BONE_NAMES - set(dest_model.bones.names)):
             return 1.0, 1.0, MVector3D()
 
         # 足からひざまでの長さ
