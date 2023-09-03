@@ -312,3 +312,45 @@ msgstr "본모션 출력"
 
 msgid "-- ボーンモーション出力 [{i} ({p:.2f}%)]"
 msgstr "-- 본모션 출력 [{i} ({p:.2f}%)]"
+
+msgid "【No.{i}】{d}肩スタンス補正"
+msgstr "【No.{i}】{d} 어깨 자세 교정"
+
+msgid "キーフレ確認"
+msgstr "키프레임 확인"
+
+msgid "-- キーフレ確認 [{i} ({p:.2f}%)]"
+msgstr "-- 키프레 확인 [{i} ({p:.2f}%)]"
+
+msgid "ボーンモーフ計算"
+msgstr "본모프 계산"
+
+msgid "ボーンモーション計算"
+msgstr "본모션 계산"
+
+msgid "ボーン計算"
+msgstr "본 계산"
+
+msgid "-- ボーン計算 [{i} ({p:.2f}%)]"
+msgstr "-- 본 계산 [{i} ({p:.2f}%)]"
+
+msgid "ボーン行列計算"
+msgstr "본 매트릭스 계산"
+
+msgid "ボーン変形行列リストアップ"
+msgstr "본 변형 매트릭스 리스트업"
+
+msgid "-- ボーン変形行列積 [{i}]"
+msgstr "-- 본 변형 행렬곱 [{i}]"
+
+msgid "ボーン行列結果"
+msgstr "본 매트릭스 결과"
+
+msgid "-- ボーン行列結果 [{i} ({p:.2f}%)]"
+msgstr "-- 본행렬 결과 [{i} ({p:.2f}%)]"
+
+msgid "{d}肩補正計算"
+msgstr "{d} 어깨 보정 계산"
+
+msgid "-- {d}肩補正計算 [{i} ({p:.2f}%)]"
+msgstr "-- {d} 어깨 보정 계산 [{i} ({p:.2f}%)]"

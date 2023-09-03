@@ -13,6 +13,7 @@ from service.form.widgets.bone_set import SizingBoneSet
 from service.usecase.io_usecase import IoUsecase
 from service.usecase.move_usecase import MoveUsecase
 from service.usecase.arm_stance_usecase import ArmStanceUsecase
+from service.usecase.shoulder_stance_usecase import ShoulderStanceUsecase
 
 logger = MLogger(os.path.basename(__file__), level=1)
 __ = logger.get_text
@@ -33,10 +34,39 @@ class BoneWorker(BaseWorker):
         # 腕スタンス補正
         self.sizing_arm_stance()
 
+        # 肩スタンス補正
+        self.sizing_shoulder_stance()
+
         # 保存
         self.save()
 
         self.result_data = []
+
+    def sizing_shoulder_stance(self):
+        """肩スタンス補正"""
+        usecase = ShoulderStanceUsecase()
+        bone_panel = self.frame.bone_panel
+
+        with ThreadPoolExecutor(thread_name_prefix="shoulder_stance", max_workers=self.max_worker) as executor:
+            futures: list[Future] = []
+            for sizing_set in bone_panel.sizing_sets:
+                for direction in ("右", "左"):
+                    futures.append(
+                        executor.submit(
+                            usecase.sizing_shoulder_stance,
+                            sizing_set.sizing_idx,
+                            sizing_set.src_model_ctrl.data,
+                            sizing_set.dest_model_ctrl.data,
+                            sizing_set.output_motion_ctrl.data,
+                            direction,
+                        )
+                    )
+
+            for future in as_completed(futures):
+                if future.exception():
+                    raise future.exception()
+                sizing_idx, sizing_motion = future.result()
+                bone_panel.sizing_sets[sizing_idx].output_motion_ctrl.data = sizing_motion
 
     def sizing_arm_stance(self):
         """腕スタンス補正"""

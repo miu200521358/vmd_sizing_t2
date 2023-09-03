@@ -312,3 +312,45 @@ msgstr "骨骼运动输出"
 
 msgid "-- ボーンモーション出力 [{i} ({p:.2f}%)]"
 msgstr "-- 骨骼运动输出 [{i} ({p:.2f}%)]"
+
+msgid "【No.{i}】{d}肩スタンス補正"
+msgstr "[{i}号]{d}肩部姿态修正"
+
+msgid "キーフレ確認"
+msgstr "Keefre确认"
+
+msgid "-- キーフレ確認 [{i} ({p:.2f}%)]"
+msgstr "--Keefre确认[{i}（{p:.2f}%）]"
+
+msgid "ボーンモーフ計算"
+msgstr "骨骼变形计算"
+
+msgid "ボーンモーション計算"
+msgstr "骨骼运动计算"
+
+msgid "ボーン計算"
+msgstr "伯恩计算"
+
+msgid "-- ボーン計算 [{i} ({p:.2f}%)]"
+msgstr "--伯恩计算 [{i} ({p:.2f}%)]"
+
+msgid "ボーン行列計算"
+msgstr "伯恩矩阵计算"
+
+msgid "ボーン変形行列リストアップ"
+msgstr "伯恩变形矩阵列表"
+
+msgid "-- ボーン変形行列積 [{i}]"
+msgstr "--伯恩变形矩阵乘积[{i}]"
+
+msgid "ボーン行列結果"
+msgstr "伯恩矩阵结果"
+
+msgid "-- ボーン行列結果 [{i} ({p:.2f}%)]"
+msgstr "--伯恩矩阵结果 [{i} ({p:.2f}%)]"
+
+msgid "{d}肩補正計算"
+msgstr "{d}肩部修正计算"
+
+msgid "-- {d}肩補正計算 [{i} ({p:.2f}%)]"
+msgstr "--{d}肩部修正计算[{i}（{p:.2f}%）]"

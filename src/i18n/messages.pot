@@ -410,3 +410,59 @@ msgstr ""
 msgid "-- ボーンモーション出力 [{i} ({p:.2f}%)]"
 msgstr ""
 
+
+msgid "【No.{i}】{d}肩スタンス補正"
+msgstr ""
+
+
+msgid "キーフレ確認"
+msgstr ""
+
+
+msgid "-- キーフレ確認 [{i} ({p:.2f}%)]"
+msgstr ""
+
+
+msgid "ボーンモーフ計算"
+msgstr ""
+
+
+msgid "ボーンモーション計算"
+msgstr ""
+
+
+msgid "ボーン計算"
+msgstr ""
+
+
+msgid "-- ボーン計算 [{i} ({p:.2f}%)]"
+msgstr ""
+
+
+msgid "ボーン行列計算"
+msgstr ""
+
+
+msgid "ボーン変形行列リストアップ"
+msgstr ""
+
+
+msgid "-- ボーン変形行列積 [{i}]"
+msgstr ""
+
+
+msgid "ボーン行列結果"
+msgstr ""
+
+
+msgid "-- ボーン行列結果 [{i} ({p:.2f}%)]"
+msgstr ""
+
+
+msgid "{d}肩補正計算"
+msgstr ""
+
+
+msgid "-- {d}肩補正計算 [{i} ({p:.2f}%)]"
+msgstr ""
+

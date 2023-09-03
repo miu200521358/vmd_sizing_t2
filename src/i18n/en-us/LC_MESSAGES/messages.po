@@ -312,3 +312,45 @@ msgstr "Bone Motion Output"
 
 msgid "-- ボーンモーション出力 [{i} ({p:.2f}%)]"
 msgstr "-- Bone motion output [{i} ({p:.2f}%)]"
+
+msgid "【No.{i}】{d}肩スタンス補正"
+msgstr "[No.{i}]{d} shoulder stance correction"
+
+msgid "キーフレ確認"
+msgstr "Keefre confirmation"
+
+msgid "-- キーフレ確認 [{i} ({p:.2f}%)]"
+msgstr "-- Keefre confirmation [{i} ({p:.2f}%)]"
+
+msgid "ボーンモーフ計算"
+msgstr "Bone Morph Calculation"
+
+msgid "ボーンモーション計算"
+msgstr "Bone Motion Calculation"
+
+msgid "ボーン計算"
+msgstr "Bourne Calculation"
+
+msgid "-- ボーン計算 [{i} ({p:.2f}%)]"
+msgstr "-- Bourne calculation [{i} ({p:.2f}%)]"
+
+msgid "ボーン行列計算"
+msgstr "Bourne Matrix Calculation"
+
+msgid "ボーン変形行列リストアップ"
+msgstr "Bourne deformation matrix listing"
+
+msgid "-- ボーン変形行列積 [{i}]"
+msgstr "-- Bourne deformation matrix product [{i}]"
+
+msgid "ボーン行列結果"
+msgstr "Bourne Matrix Results"
+
+msgid "-- ボーン行列結果 [{i} ({p:.2f}%)]"
+msgstr "-- Bourne matrix result [{i} ({p:.2f}%)]"
+
+msgid "{d}肩補正計算"
+msgstr "{d} Shoulder correction calculation"
+
+msgid "-- {d}肩補正計算 [{i} ({p:.2f}%)]"
+msgstr "-- {d} shoulder correction calculation [{i} ({p:.2f}%)]"
