@@ -47,6 +47,10 @@ class ShoulderStanceUsecase:
             | set(motion.bones[f"{direction}肩P"].indexes)
             | set(motion.bones[f"{direction}腕"].indexes)
         )
+
+        if not shoulder_fnos:
+            return sizing_idx, motion
+
         src_matrixes = motion.animate_bone(shoulder_fnos, src_model, [f"{direction}腕"], out_fno_log=True)
         dest_matrixes = motion.animate_bone(shoulder_fnos, dest_model, [f"{direction}腕"], out_fno_log=True)
 
@@ -64,18 +68,20 @@ class ShoulderStanceUsecase:
         for fidx, fno in enumerate(shoulder_fnos):
             logger.count("{d}肩補正計算", d=direction, index=fidx, total_index_count=len(shoulder_fnos), display_block=1000)
 
-            src_local_arm_position = src_matrixes[fno, "首根元"].global_matrix.inverse() * src_matrixes[fno, f"{direction}腕"].position
-            dest_local_arm_position = (
-                dest_matrixes[fno, f"{direction}肩"].global_matrix.inverse() * dest_matrixes[fno, f"{direction}腕"].position
+            src_local_arm_position = (
+                src_matrixes[fno, f"{direction}肩根元"].global_matrix.inverse() * src_matrixes[fno, f"{direction}腕"].position
             )
+            dest_global_arm_position = dest_matrixes[fno, f"{direction}肩根元"].global_matrix * src_local_arm_position
             offset_shoulder_qq = (
-                src_local_arm_position.to_local_matrix4x4() @ dest_local_arm_position.to_local_matrix4x4().inverse()
+                (dest_matrixes[fno, f"{direction}腕"].position - dest_matrixes[fno, f"{direction}肩"].position).to_local_matrix4x4()
+                @ (dest_global_arm_position - dest_matrixes[fno, f"{direction}肩"].position).to_local_matrix4x4().inverse()
             ).to_quaternion()
             logger.debug(
-                f"[{direction}肩][{fno}] 元首根元{src_matrixes[fno, '首根元'].position}, 元肩{src_matrixes[fno, f'{direction}肩'].position}, "
+                f"[{direction}肩][{fno}]"
+                + f"元肩根元{src_matrixes[fno, f'{direction}肩根元'].position}, 元肩{src_matrixes[fno, f'{direction}肩'].position}, "
                 + f"元腕{src_matrixes[fno, f'{direction}腕'].position}, 元ベクトル {src_local_arm_position.normalized()}, "
-                + f"先首根元{dest_matrixes[fno, '首根元'].position}, 先肩{dest_matrixes[fno, f'{direction}肩'].position}, "
-                + f"先腕{dest_matrixes[fno, f'{direction}腕'].position}, 先ベクトル {dest_local_arm_position.normalized()}, "
+                + f"先肩根元{dest_matrixes[fno, f'{direction}肩根元'].position}, 先肩{dest_matrixes[fno, f'{direction}肩'].position}, "
+                + f"先腕{dest_matrixes[fno, f'{direction}腕'].position}, 先腕理想 {dest_global_arm_position}, "
                 + f"offset{offset_shoulder_qq.to_euler_degrees()}"
             )
             offset_rotations.append(offset_shoulder_qq.to_matrix4x4().vector)

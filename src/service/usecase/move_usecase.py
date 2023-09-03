@@ -66,22 +66,23 @@ class MoveUsecase:
                 else:
                     offset_positions.append(np.zeros(3))
 
-        move_sizing_matrixes = np.full((len(move_sizing_positions), 4, 4), np.eye(4))
-        move_sizing_matrixes[..., :3, 3] = np.array(move_sizing_positions)
+        if 0 < len(move_sizing_positions):
+            move_sizing_matrixes = np.full((len(move_sizing_positions), 4, 4), np.eye(4))
+            move_sizing_matrixes[..., :3, 3] = np.array(move_sizing_positions)
 
-        offset_matrixes = np.full((len(offset_positions), 4, 4), np.eye(4))
-        offset_matrixes[..., :3, 3] = np.array(offset_positions)
+            offset_matrixes = np.full((len(offset_positions), 4, 4), np.eye(4))
+            offset_matrixes[..., :3, 3] = np.array(offset_positions)
 
-        scale_mat = np.diag(leg_ratio.vector4)
+            scale_mat = np.diag(leg_ratio.vector4)
 
-        move_scaled_matrixes = offset_matrixes @ scale_mat @ move_sizing_matrixes
-        n = 0
-        for bone_name in MOVE_ALL_BONE_NAMES:
-            if bone_name not in motion.bones:
-                continue
-            for bf in motion.bones[bone_name]:
-                bf.position.vector = move_scaled_matrixes[n, :3, 3]
-                n += 1
+            move_scaled_matrixes = offset_matrixes @ scale_mat @ move_sizing_matrixes
+            n = 0
+            for bone_name in MOVE_ALL_BONE_NAMES:
+                if bone_name not in motion.bones:
+                    continue
+                for bf in motion.bones[bone_name]:
+                    bf.position.vector = move_scaled_matrixes[n, :3, 3]
+                    n += 1
 
         return sizing_idx, motion
 

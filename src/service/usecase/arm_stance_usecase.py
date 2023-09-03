@@ -62,18 +62,19 @@ class ArmStanceUsecase:
                 from_offsets.append(offset_from_slope_matrixes[bone_name])
                 to_offsets.append(offset_to_slope_matrixes[bone_name])
 
-        from_offset_matrixes = np.array(from_offsets)
-        to_offset_matrixes = np.array(to_offsets)
-        rot_matrixes = np.array(rotations)
+        if 0 < len(rotations):
+            from_offset_matrixes = np.array(from_offsets)
+            to_offset_matrixes = np.array(to_offsets)
+            rot_matrixes = np.array(rotations)
 
-        rot_sizing_matrixes = from_offset_matrixes @ rot_matrixes @ to_offset_matrixes
-        n = 0
-        for bone_name in ARM_BONE_NAMES:
-            if bone_name not in motion.bones:
-                continue
-            for bf in motion.bones[bone_name]:
-                bf.rotation = MMatrix4x4(rot_sizing_matrixes[n]).to_quaternion()
-                n += 1
+            rot_sizing_matrixes = from_offset_matrixes @ rot_matrixes @ to_offset_matrixes
+            n = 0
+            for bone_name in ARM_BONE_NAMES:
+                if bone_name not in motion.bones:
+                    continue
+                for bf in motion.bones[bone_name]:
+                    bf.rotation = MMatrix4x4(rot_sizing_matrixes[n]).to_quaternion()
+                    n += 1
 
         return sizing_idx, motion
 
