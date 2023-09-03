@@ -23,10 +23,10 @@ class MainFrame(NotebookFrame):
             history_keys=["vmd", "org_pmx", "rep_pmx", "camera_vmd", "camera_pmx"],
             title=title,
             size=size,
+            is_saving=is_saving,
         )
         self.selected_tab_idx = 0
         self.running_worker = False
-        self.is_saving = is_saving
 
         # ボーンモーションサイジング
         self.bone_panel = BonePanel(self, 0)
