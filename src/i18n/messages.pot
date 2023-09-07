@@ -466,3 +466,31 @@ msgstr ""
 msgid "-- {d}肩補正計算 [{i} ({p:.2f}%)]"
 msgstr ""
 
+
+msgid "頂点データ出力"
+msgstr ""
+
+
+msgid "-- 頂点データ出力 [{i} ({p:.2f}%)]"
+msgstr ""
+
+
+msgid "面データ出力"
+msgstr ""
+
+
+msgid "-- 面データ出力 [{i} ({p:.2f}%)]"
+msgstr ""
+
+
+msgid "ボーンデータ出力"
+msgstr ""
+
+
+msgid "-- ボーンデータ出力 [{i} ({p:.2f}%)]"
+msgstr ""
+
+
+msgid "モデルセットアップ：サイジング用"
+msgstr ""
+

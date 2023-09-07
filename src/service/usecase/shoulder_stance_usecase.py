@@ -51,8 +51,8 @@ class ShoulderStanceUsecase:
         if not shoulder_fnos:
             return sizing_idx, motion
 
-        src_matrixes = motion.animate_bone(shoulder_fnos, src_model, [f"{direction}腕"], out_fno_log=True)
-        dest_matrixes = motion.animate_bone(shoulder_fnos, dest_model, [f"{direction}腕"], out_fno_log=True)
+        src_matrixes = motion.animate_bone(shoulder_fnos, src_model, [f"{direction}手首"], out_fno_log=True)
+        dest_matrixes = motion.animate_bone(shoulder_fnos, dest_model, [f"{direction}手首"], out_fno_log=True)
 
         shoulder_fidxs: dict[int, int] = {}
         shoulder_rotations: list[np.ndarray] = []
