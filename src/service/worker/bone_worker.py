@@ -13,7 +13,7 @@ from service.form.widgets.bone_set import SizingBoneSet
 from service.usecase.io_usecase import IoUsecase
 from service.usecase.move_usecase import MoveUsecase
 from service.usecase.arm_stance_usecase import ArmStanceUsecase
-from service.usecase.shoulder_stance_usecase import ShoulderStanceUsecase
+from service.usecase.arm_align_usecase import ArmAlignUsecase
 
 logger = MLogger(os.path.basename(__file__), level=1)
 __ = logger.get_text
@@ -22,7 +22,7 @@ __ = logger.get_text
 class BoneWorker(BaseWorker):
     def __init__(self, frame: BaseFrame, result_event: wx.Event) -> None:
         super().__init__(frame, result_event)
-        self.max_worker = 1 if frame.is_saving else min(32, (os.cpu_count() or 0) + 4)
+        self.max_worker = 1 if frame.is_saving else max(1, int(min(32, (os.cpu_count() or 0) + 4) / 2))
 
     def thread_execute(self):
         # まずは読み込み
@@ -34,31 +34,35 @@ class BoneWorker(BaseWorker):
         # 腕スタンス補正
         self.sizing_arm_stance()
 
-        # 肩スタンス補正
-        self.sizing_shoulder_stance()
+        # 肩腕位置合わせ
+        self.sizing_arm_align()
 
         # 保存
         self.save()
 
         self.result_data = []
 
-    def sizing_shoulder_stance(self):
-        """肩スタンス補正"""
-        usecase = ShoulderStanceUsecase()
+    def sizing_arm_align(self):
+        """肩腕位置合わせ"""
+        logger.info("肩腕位置合わせ", decoration=MLogger.Decoration.BOX)
+
+        usecase = ArmAlignUsecase()
         bone_panel = self.frame.bone_panel
 
-        with ThreadPoolExecutor(thread_name_prefix="shoulder_stance", max_workers=self.max_worker) as executor:
+        with ThreadPoolExecutor(thread_name_prefix="arm_align", max_workers=self.max_worker) as executor:
             futures: list[Future] = []
             for sizing_set in bone_panel.sizing_sets:
                 for direction in ("右", "左"):
                     futures.append(
                         executor.submit(
-                            usecase.sizing_shoulder_stance,
+                            usecase.sizing_arm_align,
                             sizing_set.sizing_idx,
                             sizing_set.src_model_ctrl.data,
                             sizing_set.dest_model_ctrl.data,
+                            sizing_set.motion_ctrl.data,
                             sizing_set.output_motion_ctrl.data,
                             direction,
+                            self.max_worker,
                         )
                     )
 
@@ -70,6 +74,8 @@ class BoneWorker(BaseWorker):
 
     def sizing_arm_stance(self):
         """腕スタンス補正"""
+        logger.info("腕スタンス補正", decoration=MLogger.Decoration.BOX)
+
         usecase = ArmStanceUsecase()
         bone_panel = self.frame.bone_panel
 
@@ -94,6 +100,9 @@ class BoneWorker(BaseWorker):
 
     def sizing_move(self):
         """移動補正"""
+
+        logger.info("移動補正", decoration=MLogger.Decoration.BOX)
+
         usecase = MoveUsecase()
         bone_panel = self.frame.bone_panel
 
@@ -206,6 +215,7 @@ class BoneWorker(BaseWorker):
                 raise future.exception()
             sizing_idx, digest, original_motion, motion = future.result()
             self.frame.cache_motions[digest] = original_motion
+            bone_panel.sizing_sets[sizing_idx].motion_ctrl.data = original_motion
             bone_panel.sizing_sets[sizing_idx].output_motion_ctrl.data = motion
 
         for future in as_completed(src_model_futures):

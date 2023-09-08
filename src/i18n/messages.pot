@@ -1,23 +1,98 @@
 
-msgid "-- 面データ読み取り [{i} ({p:.2f}%)]"
+msgid "モデルセットアップ：システム用ボーン"
 msgstr ""
 
-ON
-# This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2023.
-#
-msgid ""
+
+msgid "モデルセットアップ：ボーン"
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
-"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-04-06 02:14+0900\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.12.1\n"
+
+
+msgid "-- モデルセットアップ：ボーン [{i} ({p:.2f}%)]"
+msgstr ""
+
+
+msgid "モデルセットアップ：ボーンツリー"
+msgstr ""
+
+
+msgid "モデルセットアップ完了"
+msgstr ""
+
+
+msgid "モデルセットアップ：サイジング用"
+msgstr ""
+
+
+msgid "頂点データ出力"
+msgstr ""
+
+
+msgid "-- 頂点データ出力 [{i} ({p:.2f}%)]"
+msgstr ""
+
+
+msgid "面データ出力"
+msgstr ""
+
+
+msgid "-- 面データ出力 [{i} ({p:.2f}%)]"
+msgstr ""
+
+
+msgid "ボーンデータ出力"
+msgstr ""
+
+
+msgid "-- ボーンデータ出力 [{i} ({p:.2f}%)]"
+msgstr ""
+
+
+msgid "【No.{i}】移動補正  縮尺: XZ[{x:.5f}](元: {ox:.5f}), Y[{y:.5f}] センターオフセット[{c}]"
+msgstr ""
+
+
+msgid "【No.{i}】腕スタンス補正  腕[{a}] ひじ[{e}] 手首[{w}]"
+msgstr ""
+
+
+msgid "【No.{i}】{d}肩腕補正"
+msgstr ""
+
+
+msgid "ボーンモーフ計算"
+msgstr ""
+
+
+msgid "ボーンモーション計算"
+msgstr ""
+
+
+msgid "ボーン計算"
+msgstr ""
+
+
+msgid "-- ボーン計算 [{i} ({p:.2f}%)]"
+msgstr ""
+
+
+msgid "ボーン行列計算"
+msgstr ""
+
+
+msgid "ボーン変形行列リストアップ"
+msgstr ""
+
+
+msgid "【No.{i}】サイジング結果保存"
+msgstr ""
+
+
+msgid "【No.{i}】サイジング結果保存成功\n{p}"
+msgstr ""
+
+
+msgid "サイジング完了"
+msgstr ""
 
 
 msgid "センターXZ補正: 【注目点: 腰あたりの位置】【補正対象: センターXZ】【有効例: ターン】"
@@ -36,7 +111,7 @@ msgid "肩補正:【注目点: 手首の位置】【補正対象: 肩Pを肩に�
 msgstr ""
 
 
-msgid "捩り分散:【注目点: 腕の回転】【補正対象: 腕を腕捩りなどに分散】【有効例: 捩りなしモーション】"
+msgid "親指０補正:【注目点: 親指の位置】【補正対象: 親指０の角度】【有効例: 親指０の傾き違い】"
 msgstr ""
 
 
@@ -45,6 +120,10 @@ msgstr ""
 
 
 msgid "足IK補正:【注目点: 足首の位置】【補正対象: 足IKの位置】【有効例: 低頭身モデル】"
+msgstr ""
+
+
+msgid "足FK補正:【注目点: 足FK系の回転】【補正対象: 足FKの焼き込み】【有効例: 足IK使用モーション】"
 msgstr ""
 
 
@@ -156,6 +235,14 @@ msgid "スタンス追加補正で行う補正を取捨選択することがで�
 msgstr ""
 
 
+msgid "捩り分散"
+msgstr ""
+
+
+msgid "腕を腕捩りなど、捩りボーンに捩り回転を分散させます"
+msgstr ""
+
+
 msgid "手首位置合わせ"
 msgstr ""
 
@@ -180,46 +267,6 @@ msgid "手首の位置が床から沈まないよう合わせます"
 msgstr ""
 
 
-msgid "足IKオフセット"
-msgstr ""
-
-
-msgid "モーションで足が重なってしまう場合などで、足を少し開き気味にするなどのオフセットを追加できます"
-msgstr ""
-
-
-msgid "\nEnterキーを押下したタイミングで値が反映されます。"
-msgstr ""
-
-
-msgid "スタンス追加補正のうち、チェックが入っている補正のみ実施します"
-msgstr ""
-
-
-msgid "スタンス追加補正選択"
-msgstr ""
-
-
-msgid "腕を腕捩りなど、捩りボーンに捩り回転を分散させます"
-msgstr ""
-
-
-msgid "親指０補正:【注目点: 親指の位置】【補正対象: 親指０の角度】【有効例: 親指０の傾き違い】"
-msgstr ""
-
-
-msgid "足FK補正:【注目点: 足FK系の回転】【補正対象: 足FKの焼き込み】【有効例: 足IK使用モーション】"
-msgstr ""
-
-
-msgid "サイジング完了"
-msgstr ""
-
-
-msgid "処理が継続できないため、中断しました\n----------------\nサイジングできないファイルセットが含まれているため、処理を中断します\nファイルパスが正しいか確認してください"
-msgstr ""
-
-
 msgid "ファイルを選んでダブルクリック、またはOKボタンをクリックしてください。"
 msgstr ""
 
@@ -228,43 +275,7 @@ msgid "ファイル履歴選択"
 msgstr ""
 
 
-msgid "モーション作成元モデルが指定されていません。"
-msgstr ""
-
-
-msgid "サイジング先モデルが指定されていません。"
-msgstr ""
-
-
-msgid "出力ファイルパスが有効なパスではないため、デフォルトの出力ファイルパスを再設定します。"
-msgstr ""
-
-
 msgid "【No.{i}】読み込み開始"
-msgstr ""
-
-
-msgid "【No.{i}】サイジングセット保持"
-msgstr ""
-
-
-msgid "【No.{i}】移動補正 [{n}]  縮尺: XZ[{x:.4f}]({ox:.4f}), Y[{y:.4f}]"
-msgstr ""
-
-
-msgid "*** 処理を停止します ***"
-msgstr ""
-
-
-msgid "予期せぬエラーが発生しました"
-msgstr ""
-
-
-msgid "処理を停止しました"
-msgstr ""
-
-
-msgid "【No.{i}】移動補正  縮尺: XZ[{x:.5f}](元: {ox:.5f}), Y[{y:.5f}] センターオフセット[{c}]"
 msgstr ""
 
 
@@ -352,145 +363,14 @@ msgid "モデルセットアップ開始"
 msgstr ""
 
 
-msgid "モデルセットアップ：システム用ボーン"
+msgid "【No.{i}】{d}肩位置合わせ"
 msgstr ""
 
 
-msgid "モデルセットアップ：ボーン"
+msgid "【No.{i}】{d}腕位置合わせ"
 msgstr ""
 
 
-msgid "-- モデルセットアップ：ボーン [{i} ({p:.2f}%)]"
-msgstr ""
-
-
-msgid "モデルセットアップ：ボーンツリー"
-msgstr ""
-
-
-msgid "モデルセットアップ完了"
-msgstr ""
-
-
-msgid "【No.{i}】サイジング結果保存"
-msgstr ""
-
-
-msgid "【No.{i}】サイジング結果保存成功\n{p}"
-msgstr ""
-
-
-msgid "【No.{i}】腕スタンス補正  腕[{a}] ひじ[{e}] 手首[{w}]"
-msgstr ""
-
-
-msgid "【No.{i}】モーション作成元モデルに足・ひざ・足首・足ＩＫ・つま先ＩＫの左右ボーンがないため、移動補正をスキップします"
-msgstr ""
-
-
-msgid "【No.{i}】サイジング先モデルに足・ひざ・足首・足ＩＫ・つま先ＩＫの左右ボーンがないため、移動補正をスキップします"
-msgstr ""
-
-
-msgid "【No.{i}】モーション作成元モデルに腕・ひじ・手首の左右ボーンがないため、腕スタンス補正をスキップします"
-msgstr ""
-
-
-msgid "【No.{i}】サイジング先モデルに腕・ひじ・手首の左右ボーンがないため、腕スタンス補正をスキップします"
-msgstr ""
-
-msgid "-- ボーンデータ読み取り [{i} ({p:.2f}%)]"
-msgstr ""
-
-
-msgid "ボーンモーション出力"
-msgstr ""
-
-
-msgid "-- ボーンモーション出力 [{i} ({p:.2f}%)]"
-msgstr ""
-
-
-msgid "【No.{i}】{d}肩スタンス補正"
-msgstr ""
-
-
-msgid "キーフレ確認"
-msgstr ""
-
-
-msgid "-- キーフレ確認 [{i} ({p:.2f}%)]"
-msgstr ""
-
-
-msgid "ボーンモーフ計算"
-msgstr ""
-
-
-msgid "ボーンモーション計算"
-msgstr ""
-
-
-msgid "ボーン計算"
-msgstr ""
-
-
-msgid "-- ボーン計算 [{i} ({p:.2f}%)]"
-msgstr ""
-
-
-msgid "ボーン行列計算"
-msgstr ""
-
-
-msgid "ボーン変形行列リストアップ"
-msgstr ""
-
-
-msgid "-- ボーン変形行列積 [{i}]"
-msgstr ""
-
-
-msgid "ボーン行列結果"
-msgstr ""
-
-
-msgid "-- ボーン行列結果 [{i} ({p:.2f}%)]"
-msgstr ""
-
-
-msgid "{d}肩補正計算"
-msgstr ""
-
-
-msgid "-- {d}肩補正計算 [{i} ({p:.2f}%)]"
-msgstr ""
-
-
-msgid "頂点データ出力"
-msgstr ""
-
-
-msgid "-- 頂点データ出力 [{i} ({p:.2f}%)]"
-msgstr ""
-
-
-msgid "面データ出力"
-msgstr ""
-
-
-msgid "-- 面データ出力 [{i} ({p:.2f}%)]"
-msgstr ""
-
-
-msgid "ボーンデータ出力"
-msgstr ""
-
-
-msgid "-- ボーンデータ出力 [{i} ({p:.2f}%)]"
-msgstr ""
-
-
-msgid "モデルセットアップ：サイジング用"
+msgid "肩腕位置合わせ"
 msgstr ""
 
