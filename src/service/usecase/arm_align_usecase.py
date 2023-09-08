@@ -2,6 +2,7 @@ from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 import os
 
 from mlib.core.logger import MLogger
+from mlib.core.math import MQuaternion
 from mlib.pmx.pmx_collection import PmxModel
 from mlib.vmd.vmd_collection import VmdMotion
 from mlib.vmd.vmd_part import VmdBoneFrame
@@ -25,7 +26,7 @@ class ArmAlignUsecase:
     ) -> tuple[int, VmdMotion]:
         SHOULDER_BONE_NAMES = [f"{direction}肩", f"{direction}腕", f"{direction}ひじ", f"{direction}手首"]
 
-        """肩腕位置合わせ"""
+        """腕系位置合わせ"""
         if set(SHOULDER_BONE_NAMES) - set(src_model.bones.names):
             logger.warning(
                 "【No.{i}】モーション作成元モデルに肩・腕・ひじ・手首の左右ボーンがないため、肩腕位置合わせをスキップします",
@@ -49,13 +50,22 @@ class ArmAlignUsecase:
             | set(motion.bones[f"{direction}肩P"].indexes)
             | set(motion.bones[f"{direction}腕"].indexes)
             | set(motion.bones[f"{direction}腕捩"].indexes)
+        )
+
+        elbow_fnos = sorted(
+            set(motion.bones[f"{direction}肩"].indexes)
+            | set(motion.bones[f"{direction}肩P"].indexes)
+            | set(motion.bones[f"{direction}腕"].indexes)
+            | set(motion.bones[f"{direction}腕捩"].indexes)
             | set(motion.bones[f"{direction}ひじ"].indexes)
             | set(motion.bones[f"{direction}手捩"].indexes)
             | set(motion.bones[f"{direction}手首"].indexes)
         )
 
-        if not shoulder_fnos and not arm_fnos:
+        if not shoulder_fnos and not arm_fnos and not elbow_fnos:
             return sizing_idx, motion
+
+        # 比率を測る ------------------------
 
         shoulder_ratio = dest_model.bones[f"{direction}肩根元"].position.distance(
             dest_model.bones[f"{direction}腕"].position
@@ -63,16 +73,19 @@ class ArmAlignUsecase:
 
         logger.debug(f"shoulder_ratio[{shoulder_ratio:.3f}]")
 
-        arm_ratio = (
-            dest_model.bones[f"{direction}腕"].position.distance(dest_model.bones[f"{direction}ひじ"].position)
-            + dest_model.bones[f"{direction}ひじ"].position.distance(dest_model.bones[f"{direction}手首"].position)
-        ) / (
-            src_model.bones[f"{direction}腕"].position.distance(src_model.bones[f"{direction}ひじ"].position)
-            + src_model.bones[f"{direction}ひじ"].position.distance(src_model.bones[f"{direction}手首"].position)
-        )
+        arm_ratio = dest_model.bones[f"{direction}腕"].position.distance(dest_model.bones[f"{direction}ひじ"].position) / src_model.bones[
+            f"{direction}腕"
+        ].position.distance(src_model.bones[f"{direction}ひじ"].position)
 
         logger.debug(f"arm_ratio[{arm_ratio:.3f}]")
 
+        elbow_ratio = dest_model.bones[f"{direction}ひじ"].position.distance(dest_model.bones[f"{direction}手首"].position) / src_model.bones[
+            f"{direction}ひじ"
+        ].position.distance(src_model.bones[f"{direction}手首"].position)
+
+        logger.debug(f"elbow_ratio[{elbow_ratio:.3f}]")
+
+        # 肩位置合わせ ----------------------------
         logger.info("【No.{i}】{d}肩位置合わせ", i=sizing_idx + 1, d=direction, decoration=MLogger.Decoration.LINE)
 
         original_motion.cache_clear()
@@ -83,7 +96,7 @@ class ArmAlignUsecase:
             futures.append(
                 executor.submit(
                     original_motion.animate_bone,
-                    arm_fnos,
+                    elbow_fnos,
                     src_model,
                     [f"{direction}肩", f"{direction}腕", f"{direction}手首"],
                     append_ik=False,
@@ -94,7 +107,7 @@ class ArmAlignUsecase:
             futures.append(
                 executor.submit(
                     motion.animate_bone,
-                    arm_fnos,
+                    shoulder_fnos,
                     dest_model,
                     [f"{direction}肩", f"{direction}腕", f"{SIZING_BONE_PREFIX}{direction}肩IK"],
                     append_ik=False,
@@ -130,6 +143,7 @@ class ArmAlignUsecase:
             )
             motion.append_bone_frame(shoulder_ik_bf)
 
+        # 腕位置合わせ ----------------------------
         logger.info("【No.{i}】{d}腕位置合わせ", i=sizing_idx + 1, d=direction, decoration=MLogger.Decoration.LINE)
 
         motion.cache_clear()
@@ -146,21 +160,65 @@ class ArmAlignUsecase:
             )
 
             # 腕IK --------------------
-            src_wrist_local_position = src_matrixes[fno, f"{direction}手首"].position - src_matrixes[fno, f"{direction}腕"].position
-            dest_wrist_global_position = dest_arm_matrixes[fno, f"{direction}腕"].position + (src_wrist_local_position * arm_ratio)
+            src_elbow_local_position = src_matrixes[fno, f"{direction}ひじ"].position - src_matrixes[fno, f"{direction}腕"].position
+            dest_elbow_global_position = dest_arm_matrixes[fno, f"{direction}腕"].position + (src_elbow_local_position * arm_ratio)
 
             logger.debug(
                 f"[{direction}腕][{fno}]"
-                + f"元腕{src_matrixes[fno, f'{direction}腕'].position}, 元手首{src_matrixes[fno, f'{direction}手首'].position}, "
-                + f"元腕ローカル {src_wrist_local_position}, "
-                + f"先腕{dest_arm_matrixes[fno, f'{direction}腕'].position}, 先手首{dest_arm_matrixes[fno, f'{direction}手首'].position}, "
-                + f"先手首グローバル {dest_wrist_global_position}, "
+                + f"元腕{src_matrixes[fno, f'{direction}腕'].position}, 元ひじ{src_matrixes[fno, f'{direction}ひじ'].position}, "
+                + f"元腕ローカル {src_elbow_local_position}, "
+                + f"先腕{dest_arm_matrixes[fno, f'{direction}腕'].position}, 先ひじ{dest_arm_matrixes[fno, f'{direction}ひじ'].position}, "
+                + f"先ひじグローバル {dest_elbow_global_position}, "
             )
 
             arm_ik_bf = VmdBoneFrame(fno, f"{SIZING_BONE_PREFIX}{direction}腕IK")
             arm_ik_bf.position = (
-                dest_arm_matrixes[fno, f"{SIZING_BONE_PREFIX}{direction}腕IK"].global_matrix_no_scale.inverse() * dest_wrist_global_position
+                dest_arm_matrixes[fno, f"{SIZING_BONE_PREFIX}{direction}腕IK"].global_matrix_no_scale.inverse() * dest_elbow_global_position
             )
             motion.append_bone_frame(arm_ik_bf)
+
+        # ひじ位置合わせ ----------------------------
+        logger.info("【No.{i}】{d}ひじ位置合わせ", i=sizing_idx + 1, d=direction, decoration=MLogger.Decoration.LINE)
+
+        motion.cache_clear()
+        dest_elbow_matrixes = motion.animate_bone(
+            elbow_fnos,
+            dest_model,
+            [f"{direction}ひじ", f"{direction}手首", f"{SIZING_BONE_PREFIX}{direction}ひじIK"],
+            out_fno_log=True,
+        )
+
+        for fidx, fno in enumerate(elbow_fnos):
+            logger.count(
+                "【No.{x}】{d}ひじ位置合わせ", x=sizing_idx + 1, d=direction, index=fidx, total_index_count=len(elbow_fnos), display_block=1000
+            )
+
+            # ひじIK --------------------
+            src_wrist_local_position = src_matrixes[fno, f"{direction}手首"].position - src_matrixes[fno, f"{direction}ひじ"].position
+            dest_wrist_global_position = dest_elbow_matrixes[fno, f"{direction}ひじ"].position + (src_wrist_local_position * elbow_ratio)
+
+            logger.debug(
+                f"[{direction}ひじ][{fno}]"
+                + f"元ひじ{src_matrixes[fno, f'{direction}ひじ'].position}, 元手首{src_matrixes[fno, f'{direction}手首'].position}, "
+                + f"元ひじローカル {src_wrist_local_position}, "
+                + f"先ひじ{dest_elbow_matrixes[fno, f'{direction}ひじ'].position}, 先手首{dest_elbow_matrixes[fno, f'{direction}手首'].position}, "
+                + f"先手首グローバル {dest_wrist_global_position}, "
+            )
+
+            elbow_ik_bf = VmdBoneFrame(fno, f"{SIZING_BONE_PREFIX}{direction}ひじIK")
+            elbow_ik_bf.position = (
+                dest_elbow_matrixes[fno, f"{SIZING_BONE_PREFIX}{direction}ひじIK"].global_matrix_no_scale.inverse()
+                * dest_wrist_global_position
+            )
+            motion.append_bone_frame(elbow_ik_bf)
+
+        # IK回転の焼き込み -------------------
+        for bone_name in (f"{direction}ひじ", f"{direction}腕", f"{direction}肩"):
+            for fno in motion.bones[bone_name].indexes:
+                motion.bones[bone_name][fno].rotation *= (
+                    motion.bones[f"{SIZING_BONE_PREFIX}{bone_name}IK"][fno].ik_rotation or MQuaternion()
+                )
+            # 終わったらIKボーンキーフレ削除
+            del motion.bones[f"{SIZING_BONE_PREFIX}{bone_name}IK"]
 
         return sizing_idx, motion

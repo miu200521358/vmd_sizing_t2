@@ -1,24 +1,80 @@
 
-msgid "-- 面データ読み取り [{i} ({p:.2f}%)]"
+msgid "モデルセットアップ：システム用ボーン"
 msgstr ""
 
-ON
-# This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2023.
-#
-msgid ""
-msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
-"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-04-06 02:14+0900\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.12.1\n"
 
+msgid "モデルセットアップ：ボーン"
+msgstr ""
+
+
+msgid "-- モデルセットアップ：ボーン [{i} ({p:.2f}%)]"
+msgstr ""
+
+
+msgid "モデルセットアップ：ボーンツリー"
+msgstr ""
+
+
+msgid "モデルセットアップ完了"
+msgstr ""
+
+
+msgid "モデルセットアップ：サイジング用"
+msgstr "Model setup: for sizing"
+
+msgid "頂点データ出力"
+msgstr "Vertex data output"
+
+msgid "-- 頂点データ出力 [{i} ({p:.2f}%)]"
+msgstr "-- Vertex data output [{i} ({p:.2f}%)]"
+
+msgid "面データ出力"
+msgstr "Surface data output"
+
+msgid "-- 面データ出力 [{i} ({p:.2f}%)]"
+msgstr "-- Surface data output [{i} ({p:.2f}%)]"
+
+msgid "ボーンデータ出力"
+msgstr "Bone data output"
+
+msgid "-- ボーンデータ出力 [{i} ({p:.2f}%)]"
+msgstr "-- Bone data output [{i} ({p:.2f}%)]"
+
+msgid "【No.{i}】移動補正  縮尺: XZ[{x:.5f}](元: {ox:.5f}), Y[{y:.5f}] センターオフセット[{c}]"
+msgstr "[No.{i}] Movement correction Scale: XZ[{x:.5f}](original: {ox:.5f}), Y[{y:.5f}] Center offset[{c}]"
+
+msgid "【No.{i}】腕スタンス補正  腕[{a}] ひじ[{e}] 手首[{w}]"
+msgstr "[No.{i}] Arm stance correction Arm [{a}] Elbow [{e}] Wrist [{w}]"
+
+msgid "【No.{i}】{d}肩腕補正"
+msgstr "[No.{i}]{d} shoulder arm correction"
+
+msgid "ボーンモーフ計算"
+msgstr "Bone Morph Calculation"
+
+msgid "ボーンモーション計算"
+msgstr "Bone Motion Calculation"
+
+msgid "ボーン計算"
+msgstr "Bourne Calculation"
+
+msgid "-- ボーン計算 [{i} ({p:.2f}%)]"
+msgstr "-- Bourne calculation [{i} ({p:.2f}%)]"
+
+msgid "ボーン行列計算"
+msgstr "Bourne Matrix Calculation"
+
+msgid "ボーン変形行列リストアップ"
+msgstr "Bourne deformation matrix listing"
+
+msgid "【No.{i}】サイジング結果保存"
+msgstr "[No.{i}] Save sizing results"
+
+msgid "【No.{i}】サイジング結果保存成功\n{p}"
+msgstr "[No.{i}] Sizing results saved successfully\n{p}"
+
+msgid "サイジング完了"
+msgstr "Sizing complete"
 
 msgid "センターXZ補正: 【注目点: 腰あたりの位置】【補正対象: センターXZ】【有効例: ターン】"
 msgstr "Center XZ correction: [Point of interest: position around the waist] [Correction target: Center XZ] [Effective example: turn]"
@@ -32,14 +88,17 @@ msgstr "Upper body correction: [point of interest: head position] [correction ta
 msgid "肩補正:【注目点: 手首の位置】【補正対象: 肩Pを肩に合併・肩の角度】【有効例: 肩の傾き違い】"
 msgstr "Shoulder correction: [point of interest: wrist position] [correction target: merge shoulder P to shoulder, shoulder angle] [valid examples: different shoulder tilt]"
 
-msgid "捩り分散:【注目点: 腕の回転】【補正対象: 腕を腕捩りなどに分散】【有効例: 捩りなしモーション】"
-msgstr "torsion dispersion: [point of interest: arm rotation] [correction target: arm dispersion for arm torsion, etc.] [valid examples: motion without torsion]"
+msgid "親指０補正:【注目点: 親指の位置】【補正対象: 親指０の角度】【有効例: 親指０の傾き違い】"
+msgstr "Thumb 0 correction: [Point of interest: thumb position] [Correction target: thumb 0 angle] [Valid example: thumb 0 tilt difference]"
 
 msgid "下半身補正:【注目点: 足ボーンの傾き】【補正対象: 下半身の傾き】【有効例: 四つ足モデル】"
 msgstr "Lower Body Correction: [Point of Interest: Foot Bone Tilt] [Correction Target: Lower Body Tilt] [Valid Example: Four-Legged Model]"
 
 msgid "足IK補正:【注目点: 足首の位置】【補正対象: 足IKの位置】【有効例: 低頭身モデル】"
 msgstr "Foot IK correction: [Point of interest: ankle position] [Correction target: foot IK position] [Valid example: low head model]"
+
+msgid "足FK補正:【注目点: 足FK系の回転】【補正対象: 足FKの焼き込み】【有効例: 足IK使用モーション】"
+msgstr "Foot FK correction: [Focus: rotation of foot FK system] [Correction target: burn-in of foot FK] [Effective example: motion using foot IK]"
 
 msgid "足D補正:【注目点: 足D系の回転】【補正対象: 足D系を足に合併】【有効例: 足D使用モーション】"
 msgstr "Foot D correction: [Focus: rotation of foot D system] [Correction target: merge foot D system into foot] [Effective example: motion using foot D]"
@@ -122,6 +181,12 @@ msgstr "Correction Breakdown"
 msgid "スタンス追加補正で行う補正を取捨選択することができます"
 msgstr "You can choose to discard the correction to be made with the additional stance correction"
 
+msgid "捩り分散"
+msgstr "Torsional dispersion"
+
+msgid "腕を腕捩りなど、捩りボーンに捩り回転を分散させます"
+msgstr "Distributes the torsional rotation of the arm into torsional bones, such as arm torsion"
+
 msgid "手首位置合わせ"
 msgstr "Wrist alignment"
 
@@ -140,71 +205,14 @@ msgstr "Floor alignment"
 msgid "手首の位置が床から沈まないよう合わせます"
 msgstr "Align the wrists so that they do not sink through the floor"
 
-msgid "足IKオフセット"
-msgstr "Foot IK offset"
-
-msgid "モーションで足が重なってしまう場合などで、足を少し開き気味にするなどのオフセットを追加できます"
-msgstr "You can add offsets, such as slightly opening the legs, in cases where the legs overlap in motion"
-
-msgid "\nEnterキーを押下したタイミングで値が反映されます。"
-msgstr "The value is reflected at the time the \nEnter key is pressed"
-
-msgid "スタンス追加補正のうち、チェックが入っている補正のみ実施します"
-msgstr "Of the additional stance corrections, only those that are checked will be performed"
-
-msgid "スタンス追加補正選択"
-msgstr "Additional Stance Correction Selection"
-
-msgid "腕を腕捩りなど、捩りボーンに捩り回転を分散させます"
-msgstr "Distributes the torsional rotation of the arm into torsional bones, such as arm torsion"
-
-msgid "親指０補正:【注目点: 親指の位置】【補正対象: 親指０の角度】【有効例: 親指０の傾き違い】"
-msgstr "Thumb 0 correction: [Point of interest: thumb position] [Correction target: thumb 0 angle] [Valid example: thumb 0 tilt difference]"
-
-msgid "足FK補正:【注目点: 足FK系の回転】【補正対象: 足FKの焼き込み】【有効例: 足IK使用モーション】"
-msgstr "Foot FK correction: [Focus: rotation of foot FK system] [Correction target: burn-in of foot FK] [Effective example: motion using foot IK]"
-
-msgid "サイジング完了"
-msgstr "Sizing complete"
-
-msgid "処理が継続できないため、中断しました\n----------------\nサイジングできないファイルセットが含まれているため、処理を中断します\nファイルパスが正しいか確認してください"
-msgstr "Aborted because the process cannot continue!\n----------------\nThe process is aborted because it contains a set of files that cannot be sized.\nPlease check that the file paths are correct"
-
 msgid "ファイルを選んでダブルクリック、またはOKボタンをクリックしてください。"
 msgstr "Please select the file and double click or click the OK button"
 
 msgid "ファイル履歴選択"
 msgstr "File History Selection"
 
-msgid "モーション作成元モデルが指定されていません。"
-msgstr "The model from which motion was created has not been specified"
-
-msgid "サイジング先モデルが指定されていません。"
-msgstr "The model to which you are sizing is not specified"
-
-msgid "出力ファイルパスが有効なパスではないため、デフォルトの出力ファイルパスを再設定します。"
-msgstr "The output file path is not a valid path, reset the default output file path"
-
 msgid "【No.{i}】読み込み開始"
 msgstr "[No.{i}] Start reading"
-
-msgid "【No.{i}】サイジングセット保持"
-msgstr "[No.{i}] Sizing set retention"
-
-msgid "【No.{i}】移動補正 [{n}]  縮尺: XZ[{x:.4f}]({ox:.4f}), Y[{y:.4f}]"
-msgstr "[No.{i}] Movement correction [{n}] Scale: XZ[{x:.4f}]({ox:.4f}), Y[{y:.4f}]"
-
-msgid "*** 処理を停止します ***"
-msgstr "*** Stop processing ***"
-
-msgid "予期せぬエラーが発生しました"
-msgstr "An unexpected error has occurred"
-
-msgid "処理を停止しました"
-msgstr "Processing has been stopped"
-
-msgid "【No.{i}】移動補正  縮尺: XZ[{x:.5f}](元: {ox:.5f}), Y[{y:.5f}] センターオフセット[{c}]"
-msgstr "[No.{i}] Movement correction Scale: XZ[{x:.5f}](original: {ox:.5f}), Y[{y:.5f}] Center offset[{c}]"
 
 msgid "----------------------"
 msgstr "----------------------"
@@ -269,88 +277,14 @@ msgstr "Joint data read complete: {c}"
 msgid "モデルセットアップ開始"
 msgstr "Model setup started"
 
-msgid "モデルセットアップ：システム用ボーン"
-msgstr "Model Setup: bones for systems"
+msgid "【No.{i}】{d}肩位置合わせ"
+msgstr "[No.{i}]{d}Shoulder alignment"
 
-msgid "モデルセットアップ：ボーン"
-msgstr "Model setup: bone"
+msgid "【No.{i}】{d}腕位置合わせ"
+msgstr "[No.{i}]{d} arm positioning"
 
-msgid "-- モデルセットアップ：ボーン [{i} ({p:.2f}%)]"
-msgstr "-- Model setup: bone [{i} ({p:.2f}%)]"
+msgid "肩腕位置合わせ"
+msgstr "Shoulder arm alignment"
 
-msgid "モデルセットアップ：ボーンツリー"
-msgstr "Model Setup: Bone Tree"
-
-msgid "モデルセットアップ完了"
-msgstr "Model setup complete"
-
-msgid "【No.{i}】サイジング結果保存"
-msgstr "[No.{i}] Save sizing results"
-
-msgid "【No.{i}】サイジング結果保存成功\n{p}"
-msgstr "[No.{i}] Sizing results saved successfully\n{p}"
-
-msgid "【No.{i}】腕スタンス補正  腕[{a}] ひじ[{e}] 手首[{w}]"
-msgstr "[No.{i}] Arm stance correction Arm [{a}] Elbow [{e}] Wrist [{w}]"
-
-msgid "【No.{i}】モーション作成元モデルに足・ひざ・足首・足ＩＫ・つま先ＩＫの左右ボーンがないため、移動補正をスキップします"
-msgstr "[No.{i}] Skip the movement correction because there are no left and right bones for foot, knee, ankle, foot IK, and toe IK in the source model for motion creation"
-
-msgid "【No.{i}】サイジング先モデルに足・ひざ・足首・足ＩＫ・つま先ＩＫの左右ボーンがないため、移動補正をスキップします"
-msgstr "[No.{i}] Skip movement correction because the sizing destination model does not have left and right bones for foot, knee, ankle, foot IK, and toe IK"
-
-msgid "【No.{i}】モーション作成元モデルに腕・ひじ・手首の左右ボーンがないため、腕スタンス補正をスキップします"
-msgstr "[No.{i}] Skip arm stance correction because there are no left and right bones for arms, elbows, and wrists in the source model for motion creation"
-
-msgid "【No.{i}】サイジング先モデルに腕・ひじ・手首の左右ボーンがないため、腕スタンス補正をスキップします"
-msgstr "[No.{i}] Skip arm stance correction because the sizing destination model does not have left and right bones for arms, elbows, and wrists"
-msgid "-- ボーンデータ読み取り [{i} ({p:.2f}%)]"
-msgstr "-- Bone data read [{i} ({p:.2f}%)]"
-
-msgid "ボーンモーション出力"
-msgstr "Bone Motion Output"
-
-msgid "-- ボーンモーション出力 [{i} ({p:.2f}%)]"
-msgstr "-- Bone motion output [{i} ({p:.2f}%)]"
-
-msgid "【No.{i}】{d}肩スタンス補正"
-msgstr "[No.{i}]{d} shoulder stance correction"
-
-msgid "キーフレ確認"
-msgstr "Keefre confirmation"
-
-msgid "-- キーフレ確認 [{i} ({p:.2f}%)]"
-msgstr "-- Keefre confirmation [{i} ({p:.2f}%)]"
-
-msgid "ボーンモーフ計算"
-msgstr "Bone Morph Calculation"
-
-msgid "ボーンモーション計算"
-msgstr "Bone Motion Calculation"
-
-msgid "ボーン計算"
-msgstr "Bourne Calculation"
-
-msgid "-- ボーン計算 [{i} ({p:.2f}%)]"
-msgstr "-- Bourne calculation [{i} ({p:.2f}%)]"
-
-msgid "ボーン行列計算"
-msgstr "Bourne Matrix Calculation"
-
-msgid "ボーン変形行列リストアップ"
-msgstr "Bourne deformation matrix listing"
-
-msgid "-- ボーン変形行列積 [{i}]"
-msgstr "-- Bourne deformation matrix product [{i}]"
-
-msgid "ボーン行列結果"
-msgstr "Bourne Matrix Results"
-
-msgid "-- ボーン行列結果 [{i} ({p:.2f}%)]"
-msgstr "-- Bourne matrix result [{i} ({p:.2f}%)]"
-
-msgid "{d}肩補正計算"
-msgstr "{d} Shoulder correction calculation"
-
-msgid "-- {d}肩補正計算 [{i} ({p:.2f}%)]"
-msgstr "-- {d} shoulder correction calculation [{i} ({p:.2f}%)]"
+msgid "【No.{i}】{d}ひじ位置合わせ"
+msgstr "[No.{i}]{d} elbow positioning"

@@ -58,7 +58,7 @@ class IoUsecase:
                 shoulder_ik = Ik()
                 shoulder_ik.bone_index = model.bones[f"{direction}腕"].index
                 shoulder_ik.loop_count = 10
-                shoulder_ik.unit_rotation.radians = MVector3D(0.2, 0, 0)
+                shoulder_ik.unit_rotation.radians = MVector3D(1, 0, 0)
 
                 shoulder_ik_link_shoulder = IkLink()
                 shoulder_ik_link_shoulder.bone_index = model.bones[f"{direction}肩"].index
@@ -69,32 +69,18 @@ class IoUsecase:
                 sizing_display_slot.references.append(DisplaySlotReference(display_index=shoulder_ik_bone.index))
 
                 # 腕IK追加 ---------------
-                arm_ik_bone = Bone(index=model.bones[f"{direction}手首"].index, name=f"{SIZING_BONE_PREFIX}{direction}腕IK")
+                arm_ik_bone = Bone(index=model.bones[f"{direction}ひじ"].index, name=f"{SIZING_BONE_PREFIX}{direction}腕IK")
                 arm_ik_bone.parent_index = model.bones[f"{direction}肩根元"].index
-                arm_ik_bone.position = model.bones[f"{direction}手首"].position.copy()
+                arm_ik_bone.position = model.bones[f"{direction}ひじ"].position.copy()
                 arm_ik_bone.is_system = True
                 arm_ik_bone.bone_flg |= (
                     BoneFlg.IS_IK | BoneFlg.CAN_TRANSLATE | BoneFlg.CAN_ROTATE | BoneFlg.CAN_MANIPULATE | BoneFlg.IS_VISIBLE
                 )
 
                 arm_ik = Ik()
-                arm_ik.bone_index = model.bones[f"{direction}手首"].index
+                arm_ik.bone_index = model.bones[f"{direction}ひじ"].index
                 arm_ik.loop_count = 10
-                arm_ik.unit_rotation.radians = MVector3D(0.2, 0, 0)
-
-                if f"{direction}手捩" in model.bones:
-                    arm_ik_link_wrist_twist = IkLink()
-                    arm_ik_link_wrist_twist.bone_index = model.bones[f"{direction}手捩"].index
-                    arm_ik_link_wrist_twist.angle_limit = True
-                    arm_ik.links.append(arm_ik_link_wrist_twist)
-
-                    for b in model.bones:
-                        if f"{direction}手捩" in b.name and f"{direction}手捩" != b.name:
-                            b.layer += 1
-
-                arm_ik_link_elbow = IkLink()
-                arm_ik_link_elbow.bone_index = model.bones[f"{direction}ひじ"].index
-                arm_ik.links.append(arm_ik_link_elbow)
+                arm_ik.unit_rotation.radians = MVector3D(1, 0, 0)
 
                 if f"{direction}腕捩" in model.bones:
                     arm_ik_link_arm_twist = IkLink()
@@ -113,6 +99,38 @@ class IoUsecase:
                 arm_ik_bone.ik = arm_ik
                 model.insert_bone(arm_ik_bone)
                 sizing_display_slot.references.append(DisplaySlotReference(display_index=arm_ik_bone.index))
+
+                # ひじIK追加 ---------------
+                elbow_ik_bone = Bone(index=model.bones[f"{direction}手首"].index, name=f"{SIZING_BONE_PREFIX}{direction}ひじIK")
+                elbow_ik_bone.parent_index = model.bones[f"{direction}肩根元"].index
+                elbow_ik_bone.position = model.bones[f"{direction}手首"].position.copy()
+                elbow_ik_bone.is_system = True
+                elbow_ik_bone.bone_flg |= (
+                    BoneFlg.IS_IK | BoneFlg.CAN_TRANSLATE | BoneFlg.CAN_ROTATE | BoneFlg.CAN_MANIPULATE | BoneFlg.IS_VISIBLE
+                )
+
+                elbow_ik = Ik()
+                elbow_ik.bone_index = model.bones[f"{direction}手首"].index
+                elbow_ik.loop_count = 10
+                elbow_ik.unit_rotation.radians = MVector3D(1, 0, 0)
+
+                if f"{direction}手捩" in model.bones:
+                    elbow_ik_link_wrist_twist = IkLink()
+                    elbow_ik_link_wrist_twist.bone_index = model.bones[f"{direction}手捩"].index
+                    elbow_ik_link_wrist_twist.angle_limit = True
+                    elbow_ik.links.append(elbow_ik_link_wrist_twist)
+
+                    for b in model.bones:
+                        if f"{direction}手捩" in b.name and f"{direction}手捩" != b.name:
+                            b.layer += 1
+
+                elbow_ik_link_elbow = IkLink()
+                elbow_ik_link_elbow.bone_index = model.bones[f"{direction}ひじ"].index
+                elbow_ik.links.append(elbow_ik_link_elbow)
+
+                elbow_ik_bone.ik = elbow_ik
+                model.insert_bone(elbow_ik_bone)
+                sizing_display_slot.references.append(DisplaySlotReference(display_index=elbow_ik_bone.index))
 
         model.setup()
 

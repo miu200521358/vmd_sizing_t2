@@ -374,3 +374,7 @@ msgstr ""
 msgid "肩腕位置合わせ"
 msgstr ""
 
+
+msgid "【No.{i}】{d}ひじ位置合わせ"
+msgstr ""
+
