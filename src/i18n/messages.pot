@@ -378,3 +378,31 @@ msgstr ""
 msgid "【No.{i}】{d}ひじ位置合わせ"
 msgstr ""
 
+
+msgid "右"
+msgstr ""
+
+
+msgid "【No.{x}】{d}腕位置合わせ：初期位置取得({m})"
+msgstr ""
+
+
+msgid "左"
+msgstr ""
+
+
+msgid "【No.{x}】腕位置合わせ：追加セットアップ({m})"
+msgstr ""
+
+
+msgid "【No.{i}】{d}腕位置計算"
+msgstr ""
+
+
+msgid "【No.{i}】{d}親指０位置合わせ"
+msgstr ""
+
+
+msgid "【No.{x}】腕位置合わせ：追加IKセットアップ({m})"
+msgstr ""
+

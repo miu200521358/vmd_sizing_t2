@@ -9,6 +9,7 @@ from mlib.core.math import MVector3D
 from mlib.service.base_worker import BaseWorker
 from mlib.service.form.base_frame import BaseFrame
 from mlib.utils.file_utils import get_root_dir
+from mlib.vmd.vmd_tree import VmdBoneFrameTrees
 from service.form.widgets.bone_set import SizingBoneSet
 from service.usecase.io_usecase import IoUsecase
 from service.usecase.move_usecase import MoveUsecase
@@ -34,7 +35,7 @@ class BoneWorker(BaseWorker):
         # 腕スタンス補正
         self.sizing_arm_stance()
 
-        # 肩腕位置合わせ
+        # 腕位置合わせ
         self.sizing_arm_align()
 
         # 保存
@@ -42,12 +43,64 @@ class BoneWorker(BaseWorker):
 
         self.result_data = []
 
-    def sizing_arm_align(self):
-        """肩腕位置合わせ"""
-        logger.info("肩腕位置合わせ", decoration=MLogger.Decoration.BOX)
+    def sizing_arm_align(self) -> None:
+        """腕位置合わせ"""
+        logger.info("腕位置合わせ", decoration=MLogger.Decoration.BOX)
 
         usecase = ArmAlignUsecase()
         bone_panel = self.frame.bone_panel
+        initial_matrixes: dict[tuple[int, bool, str], VmdBoneFrameTrees] = {}
+
+        for sizing_set in bone_panel.sizing_sets:
+            if not usecase.validate(
+                sizing_set.sizing_idx,
+                sizing_set.src_model_ctrl.data,
+                sizing_set.dest_model_ctrl.data,
+            ):
+                return
+
+        # セットアップする
+        for sizing_set in bone_panel.sizing_sets:
+            usecase.setup_model(sizing_set.sizing_idx, True, sizing_set.src_model_ctrl.data)
+            usecase.setup_model(sizing_set.sizing_idx, False, sizing_set.dest_model_ctrl.data)
+
+        # 先にIKが無い状態でモーション行列を取得する
+        with ThreadPoolExecutor(thread_name_prefix="arm_align_initial", max_workers=self.max_worker) as executor:
+            futures: list[Future] = []
+            for sizing_set in bone_panel.sizing_sets:
+                for direction in ("右", "左"):
+                    futures.append(
+                        executor.submit(
+                            usecase.get_initial_matrixes,
+                            sizing_set.sizing_idx,
+                            True,
+                            sizing_set.src_model_ctrl.data,
+                            sizing_set.motion_ctrl.data,
+                            direction,
+                        )
+                    )
+
+                    futures.append(
+                        executor.submit(
+                            usecase.get_initial_matrixes,
+                            sizing_set.sizing_idx,
+                            False,
+                            sizing_set.dest_model_ctrl.data,
+                            sizing_set.output_motion_ctrl.data,
+                            direction,
+                        )
+                    )
+
+            for future in as_completed(futures):
+                if future.exception():
+                    raise future.exception()
+                sizing_idx, is_src, direction, matrixes = future.result()
+                initial_matrixes[(sizing_idx, is_src, direction)] = matrixes
+
+        # IKセットアップする
+        for sizing_set in bone_panel.sizing_sets:
+            usecase.setup_model_ik(sizing_set.sizing_idx, True, sizing_set.src_model_ctrl.data)
+            usecase.setup_model_ik(sizing_set.sizing_idx, False, sizing_set.dest_model_ctrl.data)
 
         with ThreadPoolExecutor(thread_name_prefix="arm_align", max_workers=self.max_worker) as executor:
             futures: list[Future] = []
@@ -61,6 +114,8 @@ class BoneWorker(BaseWorker):
                             sizing_set.dest_model_ctrl.data,
                             sizing_set.motion_ctrl.data,
                             sizing_set.output_motion_ctrl.data,
+                            initial_matrixes[(sizing_idx, True, direction)],
+                            initial_matrixes[(sizing_idx, False, direction)],
                             direction,
                             self.max_worker,
                         )
