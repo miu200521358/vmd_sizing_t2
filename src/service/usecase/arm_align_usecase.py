@@ -797,21 +797,118 @@ class ArmAlignUsecase:
                     sizing_display_slot.references.append(DisplaySlotReference(display_index=thumb0_ik_bone.index))
 
         for direction in ("左", "右"):
+            # 肩 -------
             if f"{direction}肩P" in model.bones:
                 model.bones[f"{direction}肩P"].parent_index = model.bones[f"{direction}肩根元"].index
             if f"{direction}肩" in model.bones:
                 model.bones[f"{direction}肩"].parent_index = model.bones[f"{direction}肩根元"].index
+            # 腕 -------
+            if f"{SIZING_BONE_PREFIX}{direction}肩IK親" in model.bones:
+                model.bones[f"{SIZING_BONE_PREFIX}{direction}肩IK親"].parent_index = model.bones[f"{direction}肩根元"].index
+            if f"{SIZING_BONE_PREFIX}{direction}肩IK" in model.bones:
+                model.bones[f"{SIZING_BONE_PREFIX}{direction}肩IK"].parent_index = model.bones[f"{SIZING_BONE_PREFIX}{direction}肩IK親"].index
+                # model.bones[f"{SIZING_BONE_PREFIX}{direction}肩IK"].layer = model.bones[f"{SIZING_BONE_PREFIX}{direction}肩IK親"].layer + 1
+            # if f"{direction}腕" in model.bones and f"{SIZING_BONE_PREFIX}{direction}肩IK" in model.bones:
+            #     model.bones[f"{direction}腕"].parent_index = model.bones[f"{SIZING_BONE_PREFIX}{direction}肩IK"].index
+            # model.bones[f"{direction}腕"].layer = model.bones[f"{SIZING_BONE_PREFIX}{direction}肩IK"].layer + 1
+            # if f"{direction}腕捩" in model.bones:
+            #     model.bones[f"{direction}腕捩"].layer = model.bones[f"{direction}腕"].layer
+
+            #     for b in model.bones:
+            #         if f"{direction}腕捩" in b.name and f"{direction}腕捩" != b.name:
+            #             b.layer = model.bones[f"{direction}腕捩"].layer + 1
+
+            # ひじ -------
+            if f"{SIZING_BONE_PREFIX}{direction}腕IK親" in model.bones:
+                model.bones[f"{SIZING_BONE_PREFIX}{direction}腕IK親"].parent_index = model.bones[f"{direction}肩根元"].index
+                # model.bones[f"{SIZING_BONE_PREFIX}{direction}腕IK親"].layer = (
+                #     model.bones[f"{direction}腕捩"].layer if f"{direction}腕捩" in model.bones else model.bones[f"{direction}腕"].layer
+                # ) + 1
+            if f"{SIZING_BONE_PREFIX}{direction}腕IK" in model.bones:
+                model.bones[f"{SIZING_BONE_PREFIX}{direction}腕IK"].parent_index = model.bones[f"{SIZING_BONE_PREFIX}{direction}腕IK親"].index
+                # model.bones[f"{SIZING_BONE_PREFIX}{direction}腕IK"].layer = model.bones[f"{SIZING_BONE_PREFIX}{direction}腕IK親"].layer + 1
+            # if f"{direction}ひじ" in model.bones and f"{SIZING_BONE_PREFIX}{direction}腕IK" in model.bones:
+            #     model.bones[f"{direction}ひじ"].parent_index = model.bones[f"{SIZING_BONE_PREFIX}{direction}腕IK"].index
+            # model.bones[f"{direction}ひじ"].layer = model.bones[f"{SIZING_BONE_PREFIX}{direction}腕IK"].layer + 1
+
+            # if f"{direction}手捩" in model.bones:
+            #     model.bones[f"{direction}手捩"].layer = model.bones[f"{direction}ひじ"].layer
+
+            #     for b in model.bones:
+            #         if f"{direction}手捩" in b.name and f"{direction}手捩" != b.name:
+            #             b.layer = model.bones[f"{direction}手捩"].layer + 1
+
+            # 手首 -------
             if f"{SIZING_BONE_PREFIX}{direction}ひじIK親" in model.bones:
                 model.bones[f"{SIZING_BONE_PREFIX}{direction}ひじIK親"].parent_index = model.bones[f"{direction}肩根元"].index
+                # model.bones[f"{SIZING_BONE_PREFIX}{direction}ひじIK親"].layer = (
+                #     model.bones[f"{direction}手捩"].layer if f"{direction}手捩" in model.bones else model.bones[f"{direction}ひじ"].layer
+                # ) + 1
+            if f"{SIZING_BONE_PREFIX}{direction}ひじIK" in model.bones:
+                model.bones[f"{SIZING_BONE_PREFIX}{direction}ひじIK"].parent_index = model.bones[
+                    f"{SIZING_BONE_PREFIX}{direction}ひじIK親"
+                ].index
+                # model.bones[f"{SIZING_BONE_PREFIX}{direction}ひじIK"].layer = model.bones[f"{SIZING_BONE_PREFIX}{direction}ひじIK親"].layer + 1
+            # if f"{direction}手首" in model.bones and f"{SIZING_BONE_PREFIX}{direction}ひじIK" in model.bones:
+            #     model.bones[f"{direction}手首"].parent_index = model.bones[f"{SIZING_BONE_PREFIX}{direction}ひじIK"].index
+            # model.bones[f"{direction}手首"].layer = model.bones[f"{SIZING_BONE_PREFIX}{direction}ひじIK"].layer + 1
+            # if f"{SIZING_BONE_PREFIX}{direction}手首先" in model.bones:
+            #     model.bones[f"{SIZING_BONE_PREFIX}{direction}手首先"].layer = model.bones[f"{SIZING_BONE_PREFIX}{direction}手首IK"].layer
+            # 親指０ -------
             if f"{SIZING_BONE_PREFIX}{direction}手首IK親" in model.bones:
                 model.bones[f"{SIZING_BONE_PREFIX}{direction}手首IK親"].parent_index = model.bones[f"{direction}肩根元"].index
+                # model.bones[f"{SIZING_BONE_PREFIX}{direction}手首IK親"].layer = model.bones[f"{direction}手首"].layer + 1
+            if f"{SIZING_BONE_PREFIX}{direction}手首IK" in model.bones:
+                model.bones[f"{SIZING_BONE_PREFIX}{direction}手首IK"].parent_index = model.bones[
+                    f"{SIZING_BONE_PREFIX}{direction}手首IK親"
+                ].index
+                # model.bones[f"{SIZING_BONE_PREFIX}{direction}手首IK"].layer = model.bones[f"{SIZING_BONE_PREFIX}{direction}手首IK親"].layer + 1
+            if f"{direction}親指０" in model.bones:
+                model.bones[f"{direction}親指０"].parent_index = model.bones[f"{direction}手首"].index
+            if f"{direction}親指１" in model.bones:
+                model.bones[f"{direction}親指１"].parent_index = model.bones[f"{direction}親指０"].index
+            # model.bones[f"{direction}親指０"].layer = model.bones[f"{SIZING_BONE_PREFIX}{direction}手首IK"].layer + 1
+            # for bname in ("親指１", "親指２"):
+            #     if f"{direction}{bname}" in model.bones:
+            #         model.bones[f"{direction}{bname}"].layer = (
+            #             model.bones[f"{direction}親指０"].layer
+            #             if f"{direction}親指０" in model.bones
+            #             else model.bones[f"{direction}手首"].layer + 1
+            #         )
+            # 指 -------
+            if f"{SIZING_BONE_PREFIX}{direction}親指０IK親" in model.bones:
+                model.bones[f"{SIZING_BONE_PREFIX}{direction}親指０IK親"].parent_index = model.bones[f"{direction}肩根元"].index
+                # model.bones[f"{SIZING_BONE_PREFIX}{direction}親指０IK親"].layer = model.bones[f"{direction}親指０"].layer + 1
+            if f"{SIZING_BONE_PREFIX}{direction}親指０IK" in model.bones:
+                model.bones[f"{SIZING_BONE_PREFIX}{direction}親指０IK"].parent_index = model.bones[
+                    f"{SIZING_BONE_PREFIX}{direction}親指０IK親"
+                ].index
+                # model.bones[f"{SIZING_BONE_PREFIX}{direction}親指０IK"].layer = model.bones[f"{SIZING_BONE_PREFIX}{direction}親指０IK親"].layer + 1
+            if f"{direction}親指２" in model.bones:
+                model.bones[f"{direction}親指２"].parent_index = model.bones[f"{direction}親指１"].index
+            # model.bones[f"{direction}親指２"].layer = model.bones[f"{SIZING_BONE_PREFIX}{direction}親指０IK"].layer + 1
+            # if model.bones[f"{direction}親指２"].tail_index in model.bones:
+            #     model.bones[model.bones[f"{direction}親指２"].tail_index].layer = model.bones[f"{direction}親指２"].layer
+            for bname in ("人指１", "中指１", "薬指１", "小指１"):
+                if f"{direction}{bname}" in model.bones:
+                    model.bones[f"{direction}{bname}"].parent_index = model.bones[f"{direction}手首"].index
+            if f"{direction}中指２" in model.bones:
+                model.bones[f"{direction}中指２"].parent_index = model.bones[f"{direction}中指１"].index
+                # model.bones[f"{direction}{bname}"].layer = model.bones[f"{direction}手首"].layer + 1
+                # if model.bones[f"{direction}{bname}"].tail_index in model.bones:
+                #     model.bones[model.bones[f"{direction}{bname}"].tail_index].layer = model.bones[f"{direction}{bname}"].layer
+            # for bname in ("人指２", "中指２", "薬指２", "小指２", "人指３", "中指３", "薬指３", "小指３"):
+            #     if f"{direction}{bname}" in model.bones:
+            #         model.bones[f"{direction}{bname}"].layer = model.bones[f"{direction}手首"].layer + 1
+            #         if model.bones[f"{direction}{bname}"].tail_index in model.bones:
+            #             model.bones[model.bones[f"{direction}{bname}"].tail_index].layer = model.bones[f"{direction}{bname}"].layer
 
         model.setup()
 
-        if 10 >= logger.total_level:
-            # デバッグレベルの場合、モデルを出力する
-            from mlib.pmx.pmx_writer import PmxWriter
+        # if 10 >= logger.total_level:
+        #     # デバッグレベルの場合、モデルを出力する
+        #     from mlib.pmx.pmx_writer import PmxWriter
 
-            PmxWriter(
-                model, os.path.join(os.path.dirname(model.path), f"sizing_{os.path.basename(model.path)}"), include_system=True
-            ).save()
+        #     PmxWriter(
+        #         model, os.path.join(os.path.dirname(model.path), f"sizing_{os.path.basename(model.path)}"), include_system=True
+        #     ).save()
