@@ -406,3 +406,7 @@ msgstr ""
 msgid "【No.{x}】腕位置合わせ：追加IKセットアップ({m})"
 msgstr ""
 
+
+msgid "予期せぬエラーが発生しました"
+msgstr ""
+

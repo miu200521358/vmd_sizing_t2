@@ -10,8 +10,6 @@ from mlib.vmd.vmd_writer import VmdWriter
 logger = MLogger(os.path.basename(__file__), level=1)
 __ = logger.get_text
 
-SIZING_BONE_PREFIX = "[SZ]"
-
 
 class IoUsecase:
     def load_motion(self, sizing_idx: int, motion_path: str, cache_motions: dict[str, VmdMotion]) -> tuple[int, str, VmdMotion, VmdMotion]:
