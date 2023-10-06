@@ -366,3 +366,9 @@ msgstr "Bourne Matrix Results"
 
 msgid "-- ボーン行列結果 [{i} ({p:.2f}%)]"
 msgstr "-- Bourne matrix result [{i} ({p:.2f}%)]"
+
+msgid "IK計算結果設定: {b}"
+msgstr "IK calculation result setting: {b}"
+
+msgid "つま先IK追加計算: {b}"
+msgstr "Toe IK additional calculation: {b}"

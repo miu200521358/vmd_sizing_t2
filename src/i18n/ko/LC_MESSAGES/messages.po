@@ -366,3 +366,9 @@ msgstr "본 매트릭스 결과"
 
 msgid "-- ボーン行列結果 [{i} ({p:.2f}%)]"
 msgstr "-- 본행렬 결과 [{i} ({p:.2f}%)]"
+
+msgid "IK計算結果設定: {b}"
+msgstr "IK 계산 결과 설정: {b}"
+
+msgid "つま先IK追加計算: {b}"
+msgstr "발가락 IK 추가 계산: {b}"

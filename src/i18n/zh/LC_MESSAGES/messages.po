@@ -366,3 +366,9 @@ msgstr "伯恩矩阵结果"
 
 msgid "-- ボーン行列結果 [{i} ({p:.2f}%)]"
 msgstr "--伯恩矩阵结果 [{i} ({p:.2f}%)]"
+
+msgid "IK計算結果設定: {b}"
+msgstr "IK 计算结果设置：{b}"
+
+msgid "つま先IK追加計算: {b}"
+msgstr "脚趾 IK 额外计算：{b}"

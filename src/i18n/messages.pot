@@ -482,3 +482,11 @@ msgstr ""
 msgid "-- ボーン行列結果 [{i} ({p:.2f}%)]"
 msgstr ""
 
+
+msgid "IK計算結果設定: {b}"
+msgstr ""
+
+
+msgid "つま先IK追加計算: {b}"
+msgstr ""
+
