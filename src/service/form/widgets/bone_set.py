@@ -146,6 +146,7 @@ class SizingBoneSet:
         self.align_check_ctrl = wx.CheckBox(self.window, wx.ID_ANY, __("手首位置合わせ"), wx.DefaultPosition, wx.DefaultSize, 0)
         self.align_check_ctrl.SetToolTip(__("手首の位置を元モーションと大体同じ位置になるよう合わせます"))
         self.align_check_ctrl.SetBackgroundColour(self.background_color)
+        self.align_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_change_dest_model_pmx)
         self.align_sizer.Add(self.align_check_ctrl, 0, wx.ALL, 2)
 
         self.separate2 = wx.StaticText(self.window, wx.ID_ANY, "     |     ")
@@ -156,6 +157,7 @@ class SizingBoneSet:
         self.align_finger_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_align_ctrl)
         self.align_finger_check_ctrl.SetToolTip(__("指の位置を元モーションと大体同じ位置になるよう合わせます"))
         self.align_finger_check_ctrl.SetBackgroundColour(self.background_color)
+        self.align_finger_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_change_dest_model_pmx)
         self.align_sizer.Add(self.align_finger_check_ctrl, 0, wx.ALL, 2)
 
         self.separate3 = wx.StaticText(self.window, wx.ID_ANY, "     |     ")
@@ -268,6 +270,8 @@ class SizingBoneSet:
             dest_model_dir_path, dest_model_file_name, dest_model_file_ext = self.dest_model_ctrl.separated_path
 
             sizing_types: list[str] = []
+            if self.align_check_ctrl.GetValue():
+                sizing_types.append("P")
             self.output_motion_ctrl.path = os.path.join(
                 motion_dir_path,
                 "".join(

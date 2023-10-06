@@ -288,3 +288,27 @@ msgstr "肩臂对齐"
 
 msgid "【No.{i}】{d}ひじ位置合わせ"
 msgstr "[{i}号]{d}肘定位"
+
+msgid "右"
+msgstr "对"
+
+msgid "【No.{x}】{d}腕位置合わせ：初期位置取得({m})"
+msgstr "[编号{x}]{d}臂定位：初始位置获取（{m}）"
+
+msgid "左"
+msgstr "左"
+
+msgid "【No.{x}】腕位置合わせ：追加セットアップ({m})"
+msgstr "[编号{x}] 臂定位：附加设置（{m}）"
+
+msgid "【No.{i}】{d}腕位置計算"
+msgstr "[编号{i}]{d}臂位置计算"
+
+msgid "【No.{i}】{d}親指０位置合わせ"
+msgstr "[编号{i}]{d}0拇指0对齐"
+
+msgid "【No.{x}】腕位置合わせ：追加IKセットアップ({m})"
+msgstr "[编号{x}] 臂定位：附加 IK 设置（{m}）"
+
+msgid "予期せぬエラーが発生しました"
+msgstr "出现意外错误"

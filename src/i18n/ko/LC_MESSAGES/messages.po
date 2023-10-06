@@ -288,3 +288,27 @@ msgstr "어깨 팔 위치 맞추기"
 
 msgid "【No.{i}】{d}ひじ位置合わせ"
 msgstr "【No.{i}】{d}팔꿈치 정렬"
+
+msgid "右"
+msgstr "오른쪽"
+
+msgid "【No.{x}】{d}腕位置合わせ：初期位置取得({m})"
+msgstr "【No.{x}】{d}팔 위치 맞추기: 초기 위치 획득({m})"
+
+msgid "左"
+msgstr "왼쪽"
+
+msgid "【No.{x}】腕位置合わせ：追加セットアップ({m})"
+msgstr "【No.{x}】팔 정렬: 추가 설정({m})"
+
+msgid "【No.{i}】{d}腕位置計算"
+msgstr "【No.{i}】{d}팔 위치 계산"
+
+msgid "【No.{i}】{d}親指０位置合わせ"
+msgstr "【No.{i}】{d} 엄지손가락 위치 맞추기"
+
+msgid "【No.{x}】腕位置合わせ：追加IKセットアップ({m})"
+msgstr "【No.{x}】팔 정렬: 추가 IK 설정({m})"
+
+msgid "予期せぬエラーが発生しました"
+msgstr "예기치 않은 오류가 발생했습니다"

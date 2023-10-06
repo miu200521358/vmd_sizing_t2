@@ -288,3 +288,27 @@ msgstr "Shoulder arm alignment"
 
 msgid "【No.{i}】{d}ひじ位置合わせ"
 msgstr "[No.{i}]{d} elbow positioning"
+
+msgid "右"
+msgstr "Right"
+
+msgid "【No.{x}】{d}腕位置合わせ：初期位置取得({m})"
+msgstr "[No.{x}]{d}Arm positioning: initial position acquisition ({m})"
+
+msgid "左"
+msgstr "Left"
+
+msgid "【No.{x}】腕位置合わせ：追加セットアップ({m})"
+msgstr "[No.{x}] Arm positioning: additional setup ({m})"
+
+msgid "【No.{i}】{d}腕位置計算"
+msgstr "[No.{i}]{d} arm position calculation"
+
+msgid "【No.{i}】{d}親指０位置合わせ"
+msgstr "[No.{i}]{d}Thumb 0 alignment"
+
+msgid "【No.{x}】腕位置合わせ：追加IKセットアップ({m})"
+msgstr "[No.{x}] Arm positioning: additional IK setup ({m})"
+
+msgid "予期せぬエラーが発生しました"
+msgstr "An unexpected error has occurred"

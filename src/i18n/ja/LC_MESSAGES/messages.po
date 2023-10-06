@@ -288,3 +288,27 @@ msgstr "肩腕位置合わせ"
 
 msgid "【No.{i}】{d}ひじ位置合わせ"
 msgstr "【No.{i}】{d}ひじ位置合わせ"
+
+msgid "右"
+msgstr "右"
+
+msgid "【No.{x}】{d}腕位置合わせ：初期位置取得({m})"
+msgstr "【No.{x}】{d}腕位置合わせ：初期位置取得({m})"
+
+msgid "左"
+msgstr "左"
+
+msgid "【No.{x}】腕位置合わせ：追加セットアップ({m})"
+msgstr "【No.{x}】腕位置合わせ：追加セットアップ({m})"
+
+msgid "【No.{i}】{d}腕位置計算"
+msgstr "【No.{i}】{d}腕位置計算"
+
+msgid "【No.{i}】{d}親指０位置合わせ"
+msgstr "【No.{i}】{d}親指０位置合わせ"
+
+msgid "【No.{x}】腕位置合わせ：追加IKセットアップ({m})"
+msgstr "【No.{x}】腕位置合わせ：追加IKセットアップ({m})"
+
+msgid "予期せぬエラーが発生しました"
+msgstr "予期せぬエラーが発生しました"

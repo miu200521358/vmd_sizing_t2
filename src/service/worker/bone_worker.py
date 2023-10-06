@@ -36,7 +36,8 @@ class BoneWorker(BaseWorker):
         self.sizing_arm_stance()
 
         # 腕位置合わせ
-        self.sizing_arm_align()
+        if self.frame.is_align():
+            self.sizing_arm_align()
 
         # 保存
         self.save()
@@ -51,45 +52,50 @@ class BoneWorker(BaseWorker):
         bone_panel = self.frame.bone_panel
         initial_matrixes: dict[tuple[int, bool, str], VmdBoneFrameTrees] = {}
 
+        # セットアップする
         for sizing_set in bone_panel.sizing_sets:
-            if not usecase.validate(
+            if usecase.validate(
                 sizing_set.sizing_idx,
                 sizing_set.src_model_ctrl.data,
                 sizing_set.dest_model_ctrl.data,
+                sizing_set.align_check_ctrl.GetValue(),
+                show_message=True,
             ):
-                return
-
-        # セットアップする
-        for sizing_set in bone_panel.sizing_sets:
-            usecase.setup_model(sizing_set.sizing_idx, True, sizing_set.src_model_ctrl.data)
-            usecase.setup_model(sizing_set.sizing_idx, False, sizing_set.dest_model_ctrl.data)
+                usecase.setup_model(sizing_set.sizing_idx, True, sizing_set.src_model_ctrl.data)
+                usecase.setup_model(sizing_set.sizing_idx, False, sizing_set.dest_model_ctrl.data)
 
         # 先にIKが無い状態でモーション行列を取得する
         with ThreadPoolExecutor(thread_name_prefix="arm_align_initial", max_workers=self.max_worker) as executor:
             futures: list[Future] = []
             for sizing_set in bone_panel.sizing_sets:
-                for direction in ("右", "左"):
-                    futures.append(
-                        executor.submit(
-                            usecase.get_initial_matrixes,
-                            sizing_set.sizing_idx,
-                            True,
-                            sizing_set.src_model_ctrl.data,
-                            sizing_set.motion_ctrl.data,
-                            direction,
+                if usecase.validate(
+                    sizing_set.sizing_idx,
+                    sizing_set.src_model_ctrl.data,
+                    sizing_set.dest_model_ctrl.data,
+                    sizing_set.align_check_ctrl.GetValue(),
+                ):
+                    for direction in ("右", "左"):
+                        futures.append(
+                            executor.submit(
+                                usecase.get_initial_matrixes,
+                                sizing_set.sizing_idx,
+                                True,
+                                sizing_set.src_model_ctrl.data,
+                                sizing_set.motion_ctrl.data,
+                                direction,
+                            )
                         )
-                    )
 
-                    futures.append(
-                        executor.submit(
-                            usecase.get_initial_matrixes,
-                            sizing_set.sizing_idx,
-                            False,
-                            sizing_set.dest_model_ctrl.data,
-                            sizing_set.output_motion_ctrl.data,
-                            direction,
+                        futures.append(
+                            executor.submit(
+                                usecase.get_initial_matrixes,
+                                sizing_set.sizing_idx,
+                                False,
+                                sizing_set.dest_model_ctrl.data,
+                                sizing_set.output_motion_ctrl.data,
+                                direction,
+                            )
                         )
-                    )
 
             for future in as_completed(futures):
                 if future.exception():
@@ -99,27 +105,39 @@ class BoneWorker(BaseWorker):
 
         # IKセットアップする
         for sizing_set in bone_panel.sizing_sets:
-            usecase.setup_model_ik(sizing_set.sizing_idx, True, sizing_set.src_model_ctrl.data)
-            usecase.setup_model_ik(sizing_set.sizing_idx, False, sizing_set.dest_model_ctrl.data)
+            if usecase.validate(
+                sizing_set.sizing_idx,
+                sizing_set.src_model_ctrl.data,
+                sizing_set.dest_model_ctrl.data,
+                sizing_set.align_check_ctrl.GetValue(),
+            ):
+                usecase.setup_model_ik(sizing_set.sizing_idx, True, sizing_set.src_model_ctrl.data)
+                usecase.setup_model_ik(sizing_set.sizing_idx, False, sizing_set.dest_model_ctrl.data)
 
         with ThreadPoolExecutor(thread_name_prefix="arm_align", max_workers=self.max_worker) as executor:
             futures: list[Future] = []
             for sizing_set in bone_panel.sizing_sets:
-                for direction in ("右", "左"):
-                    futures.append(
-                        executor.submit(
-                            usecase.sizing_arm_align,
-                            sizing_set.sizing_idx,
-                            sizing_set.src_model_ctrl.data,
-                            sizing_set.dest_model_ctrl.data,
-                            sizing_set.motion_ctrl.data,
-                            sizing_set.output_motion_ctrl.data,
-                            initial_matrixes[(sizing_idx, True, direction)],
-                            initial_matrixes[(sizing_idx, False, direction)],
-                            direction,
-                            self.max_worker,
+                if usecase.validate(
+                    sizing_set.sizing_idx,
+                    sizing_set.src_model_ctrl.data,
+                    sizing_set.dest_model_ctrl.data,
+                    sizing_set.align_check_ctrl.GetValue(),
+                ):
+                    for direction in ("右", "左"):
+                        futures.append(
+                            executor.submit(
+                                usecase.sizing_arm_align,
+                                sizing_set.sizing_idx,
+                                sizing_set.src_model_ctrl.data,
+                                sizing_set.dest_model_ctrl.data,
+                                sizing_set.motion_ctrl.data,
+                                sizing_set.output_motion_ctrl.data,
+                                initial_matrixes[(sizing_idx, True, direction)],
+                                initial_matrixes[(sizing_idx, False, direction)],
+                                direction,
+                                self.max_worker,
+                            )
                         )
-                    )
 
             for future in as_completed(futures):
                 if future.exception():
