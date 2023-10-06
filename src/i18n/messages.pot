@@ -410,3 +410,75 @@ msgstr ""
 msgid "予期せぬエラーが発生しました"
 msgstr ""
 
+
+msgid "焼き込み元モデル"
+msgstr ""
+
+
+msgid "モーションを適用させたいモデルを指定してください\nこのモデルに合わせてモーションのIK部分をIK焼き込みします"
+msgstr ""
+
+
+msgid "焼き込み対象モーション"
+msgstr ""
+
+
+msgid "IK焼き込みの対象となるVMDモーションデータを指定してください"
+msgstr ""
+
+
+msgid "IK焼き込みモーション出力先"
+msgstr ""
+
+
+msgid "IK焼き込みモーションの出力ファイルパスです\n任意の値に変更可能です"
+msgstr ""
+
+
+msgid "IK焼き込み実行"
+msgstr ""
+
+
+msgid "IK焼き込み実行停止"
+msgstr ""
+
+
+msgid "IK焼き込みを実行します\nモデルとモーションを設定後、クリックできるようになります"
+msgstr ""
+
+
+msgid "出力ファイルパスが有効なパスではないため、デフォルトの出力ファイルパスを再設定します。"
+msgstr ""
+
+
+msgid "IK焼き込み: {b}"
+msgstr ""
+
+
+msgid "【No.{i}】結果保存"
+msgstr ""
+
+
+msgid "【No.{i}】結果保存成功\n{p}"
+msgstr ""
+
+
+msgid "IK焼き込み完了"
+msgstr ""
+
+
+msgid "キーフレ確認"
+msgstr ""
+
+
+msgid "-- キーフレ確認 [{i} ({p:.2f}%)]"
+msgstr ""
+
+
+msgid "ボーン行列結果"
+msgstr ""
+
+
+msgid "-- ボーン行列結果 [{i} ({p:.2f}%)]"
+msgstr ""
+

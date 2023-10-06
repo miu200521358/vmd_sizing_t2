@@ -36,6 +36,17 @@ class IoUsecase:
 
         return sizing_idx, digest, original_model, model
 
+    def load_model_no_copy(self, sizing_idx: int, model_path: str, cache_models: dict[str, PmxModel]) -> tuple[int, str, PmxModel]:
+        """モデルの読み込み"""
+        reader = PmxReader()
+        digest = reader.read_hash_by_filepath(model_path)
+        original_model = cache_models.get(digest)
+
+        if not original_model:
+            original_model = reader.read_by_filepath(model_path)
+
+        return sizing_idx, digest, original_model
+
     def save(
         self,
         sizing_idx: int,
@@ -43,10 +54,10 @@ class IoUsecase:
         motion: VmdMotion,
         output_path: str,
     ) -> None:
-        """サイジング結果保存"""
-        logger.info("【No.{i}】サイジング結果保存", i=sizing_idx + 1, decoration=MLogger.Decoration.LINE)
+        """結果保存"""
+        logger.info("【No.{i}】結果保存", i=sizing_idx + 1, decoration=MLogger.Decoration.LINE)
 
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
         VmdWriter(motion, output_path, dest_model.name).save()
 
-        logger.info("【No.{i}】サイジング結果保存成功\n{p}", i=sizing_idx + 1, p=output_path, decoration=MLogger.Decoration.BOX)
+        logger.info("【No.{i}】結果保存成功\n{p}", i=sizing_idx + 1, p=output_path, decoration=MLogger.Decoration.BOX)

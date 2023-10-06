@@ -312,3 +312,57 @@ msgstr "[编号{x}] 臂定位：附加 IK 设置（{m}）"
 
 msgid "予期せぬエラーが発生しました"
 msgstr "出现意外错误"
+
+msgid "焼き込み元モデル"
+msgstr "内置源模型"
+
+msgid "モーションを適用させたいモデルを指定してください\nこのモデルに合わせてモーションのIK部分をIK焼き込みします"
+msgstr "指定要应用运动的模型，我们将把运动的 IK 部分 IK 刻录到该模型上"
+
+msgid "焼き込み対象モーション"
+msgstr "运动受限"
+
+msgid "IK焼き込みの対象となるVMDモーションデータを指定してください"
+msgstr "请为 IK 刻录指定 VMD 运动数据"
+
+msgid "IK焼き込みモーション出力先"
+msgstr "IK 预烧运动输出目的地"
+
+msgid "IK焼き込みモーションの出力ファイルパスです\n任意の値に変更可能です"
+msgstr "这是 IK baked-in 运动的输出文件路径（可更改为任意值）"
+
+msgid "IK焼き込み実行"
+msgstr "IK预烧执行"
+
+msgid "IK焼き込み実行停止"
+msgstr "停止 IK 烧入执行"
+
+msgid "IK焼き込みを実行します\nモデルとモーションを設定後、クリックできるようになります"
+msgstr "在设置好模型和动作后，执行 IK 烤漆，然后点击即可。
+
+msgid "出力ファイルパスが有効なパスではないため、デフォルトの出力ファイルパスを再設定します。"
+msgstr "输出文件路径不是有效路径，请重置默认输出文件路径。
+
+msgid "IK焼き込み: {b}"
+msgstr "IK预烧：{b}"
+
+msgid "【No.{i}】結果保存"
+msgstr "[编号{i}] 保存结果"
+
+msgid "【No.{i}】結果保存成功\n{p}"
+msgstr "[编号{i}] 结果保存成功（n{p}）"
+
+msgid "IK焼き込み完了"
+msgstr "IK预烧完成"
+
+msgid "キーフレ確認"
+msgstr "Keefre确认"
+
+msgid "-- キーフレ確認 [{i} ({p:.2f}%)]"
+msgstr "--Keefre确认[{i}（{p:.2f}%）]"
+
+msgid "ボーン行列結果"
+msgstr "伯恩矩阵结果"
+
+msgid "-- ボーン行列結果 [{i} ({p:.2f}%)]"
+msgstr "--伯恩矩阵结果 [{i} ({p:.2f}%)]"

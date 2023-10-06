@@ -312,3 +312,57 @@ msgstr "[No.{x}] Arm positioning: additional IK setup ({m})"
 
 msgid "予期せぬエラーが発生しました"
 msgstr "An unexpected error has occurred"
+
+msgid "焼き込み元モデル"
+msgstr "Baked-in source model"
+
+msgid "モーションを適用させたいモデルを指定してください\nこのモデルに合わせてモーションのIK部分をIK焼き込みします"
+msgstr "Specify the model to which you want to apply the motion.
+
+msgid "焼き込み対象モーション"
+msgstr "Motion to be burned in"
+
+msgid "IK焼き込みの対象となるVMDモーションデータを指定してください"
+msgstr "Please specify the VMD motion data to be IK burned"
+
+msgid "IK焼き込みモーション出力先"
+msgstr "IK burn-in motion output destination"
+
+msgid "IK焼き込みモーションの出力ファイルパスです\n任意の値に変更可能です"
+msgstr "The output file path of the IK burn-in motion.
+
+msgid "IK焼き込み実行"
+msgstr "IK burn-in execution"
+
+msgid "IK焼き込み実行停止"
+msgstr "Stop IK burn-in execution"
+
+msgid "IK焼き込みを実行します\nモデルとモーションを設定後、クリックできるようになります"
+msgstr "Perform IK baking after setting up the model and motion, you will be able to click on it"
+
+msgid "出力ファイルパスが有効なパスではないため、デフォルトの出力ファイルパスを再設定します。"
+msgstr "The output file path is not a valid path, reset the default output file path"
+
+msgid "IK焼き込み: {b}"
+msgstr "IK burn-in: {b}"
+
+msgid "【No.{i}】結果保存"
+msgstr "[No.{i}] Save the results"
+
+msgid "【No.{i}】結果保存成功\n{p}"
+msgstr "[No.{i}] Result saving success\n{p}"
+
+msgid "IK焼き込み完了"
+msgstr IK baking complete.
+
+msgid "キーフレ確認"
+msgstr "Keefre confirmation"
+
+msgid "-- キーフレ確認 [{i} ({p:.2f}%)]"
+msgstr "-- Keefre confirmation [{i} ({p:.2f}%)]"
+
+msgid "ボーン行列結果"
+msgstr "Bourne Matrix Results"
+
+msgid "-- ボーン行列結果 [{i} ({p:.2f}%)]"
+msgstr "-- Bourne matrix result [{i} ({p:.2f}%)]"

@@ -9,6 +9,7 @@ from mlib.pmx.shader import MShader
 from mlib.service.form.base_panel import BasePanel
 from mlib.service.form.notebook_frame import NotebookFrame
 from mlib.vmd.vmd_collection import VmdMotion
+from service.form.panel.bake_panel import BakePanel
 from service.form.panel.bone_panel import BonePanel
 from service.form.widgets.morph_sub_window import MorphSubCanvasWindow
 
@@ -20,7 +21,7 @@ class MainFrame(NotebookFrame):
     def __init__(self, app: wx.App, title: str, size: wx.Size, is_saving: bool, *args, **kw) -> None:
         super().__init__(
             app,
-            history_keys=["vmd", "org_pmx", "rep_pmx", "camera_vmd", "camera_pmx"],
+            history_keys=["vmd", "org_pmx", "rep_pmx", "camera_vmd", "camera_pmx", "ik_pmx"],
             title=title,
             size=size,
             is_saving=is_saving,
@@ -31,6 +32,10 @@ class MainFrame(NotebookFrame):
         # ボーンモーションサイジング
         self.bone_panel = BonePanel(self, 0)
         self.notebook.AddPage(self.bone_panel, __("ボーン"), True)
+
+        # IK焼き込み
+        self.bake_panel = BakePanel(self, 1)
+        self.notebook.AddPage(self.bake_panel, __("IK焼き込み"), True)
 
         self.cache_models: dict[str, PmxModel] = {}
         self.cache_motions: dict[str, VmdMotion] = {}
