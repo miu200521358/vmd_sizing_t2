@@ -490,3 +490,27 @@ msgstr ""
 msgid "つま先IK追加計算: {b}"
 msgstr ""
 
+
+msgid "ボーンモーフ計算[{d}]"
+msgstr ""
+
+
+msgid "ボーンモーション計算[{d}]"
+msgstr ""
+
+
+msgid "ボーン計算[{d}]"
+msgstr ""
+
+
+msgid "-- ボーン計算[{d}] [{i} ({p:.2f}%)]"
+msgstr ""
+
+
+msgid "ボーン行列計算[{d}]"
+msgstr ""
+
+
+msgid "ボーン変形行列リストアップ[{d}]"
+msgstr ""
+

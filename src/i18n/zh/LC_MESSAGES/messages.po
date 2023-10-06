@@ -372,3 +372,21 @@ msgstr "IK 计算结果设置：{b}"
 
 msgid "つま先IK追加計算: {b}"
 msgstr "脚趾 IK 额外计算：{b}"
+
+msgid "ボーンモーフ計算[{d}]"
+msgstr "骨形态计算 [{d}]"
+
+msgid "ボーンモーション計算[{d}]"
+msgstr "骨骼运动计算 [{d}]"
+
+msgid "ボーン計算[{d}]"
+msgstr "骨计算 [{d}]"
+
+msgid "-- ボーン計算[{d}] [{i} ({p:.2f}%)]"
+msgstr "--伯恩计算 [{d}] [{i} ({p:.2f}%)]"
+
+msgid "ボーン行列計算[{d}]"
+msgstr "伯恩矩阵计算 [{d}]"
+
+msgid "ボーン変形行列リストアップ[{d}]"
+msgstr "伯恩变形矩阵列表 [{d}]"

@@ -372,3 +372,21 @@ msgstr "IK 계산 결과 설정: {b}"
 
 msgid "つま先IK追加計算: {b}"
 msgstr "발가락 IK 추가 계산: {b}"
+
+msgid "ボーンモーフ計算[{d}]"
+msgstr "본모프 계산[{d}]"
+
+msgid "ボーンモーション計算[{d}]"
+msgstr "본모션 계산[{d}}"
+
+msgid "ボーン計算[{d}]"
+msgstr "본 계산[{d}}"
+
+msgid "-- ボーン計算[{d}] [{i} ({p:.2f}%)]"
+msgstr "-- 본 계산[{d}] [{i} ({p:.2f}%)]"
+
+msgid "ボーン行列計算[{d}]"
+msgstr "본 매트릭스 계산[{d}]"
+
+msgid "ボーン変形行列リストアップ[{d}]"
+msgstr "본 변형 매트릭스 목록[{d}]"

@@ -372,3 +372,21 @@ msgstr "IK calculation result setting: {b}"
 
 msgid "つま先IK追加計算: {b}"
 msgstr "Toe IK additional calculation: {b}"
+
+msgid "ボーンモーフ計算[{d}]"
+msgstr "Bone Morph Calculation [{d}]"
+
+msgid "ボーンモーション計算[{d}]"
+msgstr "Bone Motion Calculation [{d}]"
+
+msgid "ボーン計算[{d}]"
+msgstr "Bone Calculation [{d}]"
+
+msgid "-- ボーン計算[{d}] [{i} ({p:.2f}%)]"
+msgstr "-- Bourne calculation [{d}] [{i} ({p:.2f}%)]"
+
+msgid "ボーン行列計算[{d}]"
+msgstr "Bourne matrix calculation [{d}]"
+
+msgid "ボーン変形行列リストアップ[{d}]"
+msgstr "Bone deformation matrix listing [{d}]"

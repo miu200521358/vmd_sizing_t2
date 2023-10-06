@@ -25,7 +25,12 @@ class BakeUsecase:
             futures: list[Future] = []
 
             for bone in model.bones:
-                if bone.is_ik and bone.ik.bone_index in model.bones:
+                if (
+                    bone.is_ik
+                    and bone.ik.bone_index in model.bones
+                    and not [bone_index for bone_index in bone.child_bone_indexes if model.bones[bone_index].is_ik]
+                ):
+                    # 自身がIKであること、IKのターゲットが存在している事、子ボーンにIKがいないこと（つま先ＩＫ対策）
                     futures.append(executor.submit(self.bake_ik_bone, model, motion, bone))
 
             for future in as_completed(futures):
@@ -33,25 +38,44 @@ class BakeUsecase:
                     raise future.exception()
 
                 ik_bone_index, fnos, matrixes = future.result()
-                bake_matrixes: VmdBoneFrameTrees = matrixes
-
-                for link in model.bones[ik_bone_index].ik.links:
-                    if link.bone_index not in model.bones:
-                        continue
-
-                    bone_name = model.bones[link.bone_index].name
-                    logger.info("IK計算結果設定: {b}", b=bone_name)
-                    for fidx, fno in enumerate(fnos):
-                        logger.count("IK計算結果設定", fidx, len(fnos), display_block=10000)
-
-                        bf = motion.bones[bone_name][fno]
-                        bf.rotation = bake_matrixes[fno, bone_name].frame_rotation
-                        for effect_bone_index in model.bones[bone_name].effective_target_indexes:
-                            bf.rotation *= motion.bones[model.bones[effect_bone_index].name][fno].rotation.inverse()
-                        bf.register = True
-                        output_motion.insert_bone_frame(bf)
+                self.set_ik_rotations(model, motion, output_motion, ik_bone_index, fnos, matrixes)
 
         return output_motion
+
+    def set_ik_rotations(
+        self,
+        model: PmxModel,
+        motion: VmdMotion,
+        output_motion: VmdMotion,
+        ik_bone_index: int,
+        fnos: list[int],
+        matrixes: VmdBoneFrameTrees,
+    ):
+        for link in model.bones[ik_bone_index].ik.links:
+            if link.bone_index not in model.bones:
+                continue
+
+            bone_name = model.bones[link.bone_index].name
+            logger.info("IK計算結果設定: {b}", b=bone_name)
+            for fidx, fno in enumerate(fnos):
+                logger.count("IK計算結果設定", fidx, len(fnos), display_block=10000)
+
+                bf = motion.bones[bone_name][fno]
+                qq = matrixes[fno, bone_name].frame_rotation
+                x_qq, _, _, yz_qq = qq.separate_by_axis(model.bones[link.bone_index].local_axis)
+                if x_qq.to_degrees() > 90:
+                    # くるんと回転してしまった場合を避けるため、YZのみを採用する
+                    bf.rotation = yz_qq
+                else:
+                    bf.rotation = qq
+                for effect_bone_index in model.bones[bone_name].effective_target_indexes:
+                    bf.rotation *= motion.bones[model.bones[effect_bone_index].name][fno].rotation.inverse()
+                bf.register = True
+                output_motion.insert_bone_frame(bf)
+
+        if model.bones[model.bones[ik_bone_index].parent_index].is_ik:
+            # 親ボーンがIKである場合、親も辿る
+            self.set_ik_rotations(model, motion, output_motion, model.bones[ik_bone_index].parent_index, fnos, matrixes)
 
     def bake_ik_bone(
         self,
@@ -88,4 +112,4 @@ class BakeUsecase:
                 bf = motion.bones[bone_name][fno]
                 motion.insert_bone_frame(bf)
 
-        return ik_bone.index, sorted_fnos, motion.animate_bone(sorted_fnos, model, bone_names, out_fno_log=True)
+        return ik_bone.index, sorted_fnos, motion.animate_bone(sorted_fnos, model, bone_names, out_fno_log=True, description=ik_bone.name)
