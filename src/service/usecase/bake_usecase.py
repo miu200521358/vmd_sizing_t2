@@ -19,7 +19,6 @@ class BakeUsecase:
         max_worker: int,
     ) -> VmdMotion:
         """IK焼き込み"""
-        output_motion = VmdMotion(motion.path)
 
         with ThreadPoolExecutor(thread_name_prefix="bake", max_workers=max_worker) as executor:
             futures: list[Future] = []
@@ -38,15 +37,14 @@ class BakeUsecase:
                     raise future.exception()
 
                 ik_bone_index, fnos, matrixes = future.result()
-                self.set_ik_rotations(model, motion, output_motion, ik_bone_index, fnos, matrixes)
+                self.set_ik_rotations(model, motion, ik_bone_index, fnos, matrixes)
 
-        return output_motion
+        return motion
 
     def set_ik_rotations(
         self,
         model: PmxModel,
         motion: VmdMotion,
-        output_motion: VmdMotion,
         ik_bone_index: int,
         fnos: list[int],
         matrixes: VmdBoneFrameTrees,
@@ -71,11 +69,11 @@ class BakeUsecase:
                 for effect_bone_index in model.bones[bone_name].effective_target_indexes:
                     bf.rotation *= motion.bones[model.bones[effect_bone_index].name][fno].rotation.inverse()
                 bf.register = True
-                output_motion.insert_bone_frame(bf)
+                motion.insert_bone_frame(bf)
 
         if model.bones[model.bones[ik_bone_index].parent_index].is_ik:
             # 親ボーンがIKである場合、親も辿る
-            self.set_ik_rotations(model, motion, output_motion, model.bones[ik_bone_index].parent_index, fnos, matrixes)
+            self.set_ik_rotations(model, motion, model.bones[ik_bone_index].parent_index, fnos, matrixes)
 
     def bake_ik_bone(
         self,
