@@ -31,6 +31,10 @@ for file_path, args in [
         "--verbose 20 --out_log 0 --is_saving 0 --lang ja",
     ),
     (
+        f"dist/{EXE_NAME}.exe - ハイスペックデバッグ版.bat",
+        "--verbose 10 --out_log 1 --is_saving 0 --lang ja",
+    ),
+    (
         f"dist/{EXE_NAME}.exe - ログあり版.bat",
         "--verbose 20 --out_log 1 --lang ja",
     ),

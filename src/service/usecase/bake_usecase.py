@@ -2,6 +2,7 @@ from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 import os
 
 from mlib.core.logger import MLogger
+from mlib.core.math import MQuaternion
 from mlib.pmx.pmx_collection import PmxModel
 from mlib.pmx.pmx_part import Bone
 from mlib.vmd.vmd_collection import VmdMotion
@@ -56,21 +57,53 @@ class BakeUsecase:
 
             bone_name = model.bones[link.bone_index].name
             logger.info("IK計算結果設定: {b}", b=bone_name)
+            prev_fno = 0
+            prev_qq = MQuaternion()
             for fidx, fno in enumerate(fnos):
                 logger.count("IK計算結果設定", fidx, len(fnos), display_block=10000)
 
                 bf = motion.bones[bone_name][fno]
                 qq = matrixes[fno, bone_name].frame_rotation
-                x_qq, _, _, yz_qq = qq.separate_by_axis(model.bones[link.bone_index].local_axis)
-                if x_qq.to_degrees() > 90:
-                    # くるんと回転してしまった場合を避けるため、YZのみを採用する
-                    bf.rotation = yz_qq
-                else:
+                is_register = False
+
+                if fidx == 0:
+                    # 初回はそのまま登録
                     bf.rotation = qq
-                for effect_bone_index in model.bones[bone_name].effective_target_indexes:
-                    bf.rotation *= motion.bones[model.bones[effect_bone_index].name][fno].rotation.inverse()
-                bf.register = True
-                motion.insert_bone_frame(bf)
+                    is_register = True
+                else:
+                    # 2回目以降は前回との内積差が一定以上ある場合のみ登録
+                    logger.debug(
+                        f"[{bone_name}][{fno}][prev: {prev_qq.to_degrees():.3f}][now: {qq.to_degrees():.3f}]"
+                        + f"[dot: {abs(prev_qq.dot(qq)):.3f}]"
+                    )
+
+                    if abs(prev_qq.dot(qq)) < 0.9:
+                        # 前との差が大きい場合、ひとつ前も登録する
+                        prev_fno = fnos[fidx - 1]
+                        prev_bf = motion.bones[bone_name][prev_fno]
+                        prev_qq = matrixes[prev_fno, bone_name].frame_rotation
+                        for effect_bone_index in model.bones[bone_name].effective_target_indexes:
+                            prev_bf.rotation *= motion.bones[model.bones[effect_bone_index].name][prev_fno].rotation.inverse()
+                        prev_bf.register = True
+                        motion.insert_bone_frame(prev_bf)
+
+                    if abs(prev_qq.dot(qq)) < (0.9 + ((fno - prev_fno) ** 1.5 * 0.01)):
+                        bf.rotation = qq
+                        is_register = True
+                # x_qq, _, _, yz_qq = qq.separate_by_axis(model.bones[link.bone_index].local_axis)
+                # if x_qq.to_degrees() > 90:
+                #     # くるんと回転してしまった場合を避けるため、YZのみを採用する
+                #     bf.rotation = yz_qq
+                # else:
+                #     bf.rotation = qq
+                if is_register:
+                    for effect_bone_index in model.bones[bone_name].effective_target_indexes:
+                        bf.rotation *= motion.bones[model.bones[effect_bone_index].name][fno].rotation.inverse()
+                    bf.register = True
+                    motion.insert_bone_frame(bf)
+
+                    prev_fno = fno
+                    prev_qq = bf.rotation
 
         if model.bones[model.bones[ik_bone_index].parent_index].is_ik:
             # 親ボーンがIKである場合、親も辿る
@@ -105,10 +138,10 @@ class BakeUsecase:
 
         sorted_fnos = sorted(fnos)
 
-        for fidx, fno in enumerate(fnos):
-            logger.count("IK事前計算", fidx, len(fnos), display_block=10000)
-            for bone_name in bone_names:
-                bf = motion.bones[bone_name][fno]
-                motion.insert_bone_frame(bf)
+        # for fidx, fno in enumerate(fnos):
+        #     logger.count("IK事前計算", fidx, len(fnos), display_block=10000)
+        #     for bone_name in bone_names:
+        #         bf = motion.bones[bone_name][fno]
+        #         motion.insert_bone_frame(bf)
 
         return ik_bone.index, sorted_fnos, motion.animate_bone(sorted_fnos, model, bone_names, out_fno_log=True, description=ik_bone.name)
