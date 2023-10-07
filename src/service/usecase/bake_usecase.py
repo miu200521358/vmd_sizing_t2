@@ -26,6 +26,7 @@ class BakeUsecase:
             for bone in model.bones:
                 if (
                     bone.is_ik
+                    and bone.can_manipulate
                     and bone.ik.bone_index in model.bones
                     and not [bone_index for bone_index in bone.child_bone_indexes if model.bones[bone_index].is_ik]
                 ):
