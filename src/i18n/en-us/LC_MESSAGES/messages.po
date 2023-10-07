@@ -390,3 +390,18 @@ msgstr "Bourne matrix calculation [{d}]"
 
 msgid "ボーン変形行列リストアップ[{d}]"
 msgstr "Bone deformation matrix listing [{d}]"
+
+msgid "スタンス追加補正のうち、チェックが入っている補正のみ実施します"
+msgstr "Of the additional stance corrections, only those that are checked will be performed"
+
+msgid "スタンス追加補正選択"
+msgstr "Additional Stance Correction Selection"
+
+msgid "*** 処理を停止します ***"
+msgstr "*** Stop processing ***"
+
+msgid "キーフレ確認[{d}]"
+msgstr "Keefre confirmation [{d}]"
+
+msgid "-- キーフレ確認[{d}] [{i} ({p:.2f}%)]"
+msgstr "-- keyfre confirmation [{d}] [{i} ({p:.2f}%)]"

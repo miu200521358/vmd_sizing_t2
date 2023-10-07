@@ -390,3 +390,18 @@ msgstr "伯恩矩阵计算 [{d}]"
 
 msgid "ボーン変形行列リストアップ[{d}]"
 msgstr "伯恩变形矩阵列表 [{d}]"
+
+msgid "スタンス追加補正のうち、チェックが入っている補正のみ実施します"
+msgstr "在额外的立场修正中，只有经过检查的修正才会得到执行"
+
+msgid "スタンス追加補正選択"
+msgstr "立场附加修正选择"
+
+msgid "*** 処理を停止します ***"
+msgstr "***停止处理***"
+
+msgid "キーフレ確認[{d}]"
+msgstr "Keefre确认[{d}]"
+
+msgid "-- キーフレ確認[{d}] [{i} ({p:.2f}%)]"
+msgstr "-- Keefre confirmation [{d}] [{i} ({p:.2f}%)]"

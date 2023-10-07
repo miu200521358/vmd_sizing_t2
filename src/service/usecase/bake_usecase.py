@@ -28,6 +28,7 @@ class BakeUsecase:
                 if (
                     bone.is_ik
                     and bone.can_manipulate
+                    and bone.is_visible
                     and bone.ik.bone_index in model.bones
                     and not [bone_index for bone_index in bone.child_bone_indexes if model.bones[bone_index].is_ik]
                 ):
@@ -56,15 +57,17 @@ class BakeUsecase:
                 continue
 
             bone_name = model.bones[link.bone_index].name
+
             logger.info("IK計算結果設定: {b}", b=bone_name)
             prev_fno = 0
             prev_qq = MQuaternion()
             for fidx, fno in enumerate(fnos):
-                logger.count("IK計算結果設定", fidx, len(fnos), display_block=10000)
+                logger.count("IK計算結果設定", fidx, len(fnos), display_block=1000)
 
                 bf = motion.bones[bone_name][fno]
                 qq = matrixes[fno, bone_name].frame_rotation
                 is_register = False
+                is_prev_register = False
 
                 if fidx == 0:
                     # 初回はそのまま登録
@@ -72,12 +75,7 @@ class BakeUsecase:
                     is_register = True
                 else:
                     # 2回目以降は前回との内積差が一定以上ある場合のみ登録
-                    logger.debug(
-                        f"[{bone_name}][{fno}][prev: {prev_qq.to_degrees():.3f}][now: {qq.to_degrees():.3f}]"
-                        + f"[dot: {abs(prev_qq.dot(qq)):.3f}]"
-                    )
-
-                    if abs(prev_qq.dot(qq)) < 0.9:
+                    if abs(prev_qq.dot(qq)) < 0.95:
                         # 前との差が大きい場合、ひとつ前も登録する
                         prev_fno = fnos[fidx - 1]
                         prev_bf = motion.bones[bone_name][prev_fno]
@@ -86,10 +84,19 @@ class BakeUsecase:
                             prev_bf.rotation *= motion.bones[model.bones[effect_bone_index].name][prev_fno].rotation.inverse()
                         prev_bf.register = True
                         motion.insert_bone_frame(prev_bf)
+                        is_prev_register = True
 
-                    if abs(prev_qq.dot(qq)) < (0.9 + ((fno - prev_fno) ** 1.5 * 0.01)):
+                    if abs(prev_qq.dot(qq)) < 0.99 + ((fno - prev_fno) ** 1.5 * 0.001) and (
+                        not is_prev_register or (is_prev_register and fno - prev_fno > 1)
+                    ):
                         bf.rotation = qq
                         is_register = True
+
+                    logger.debug(
+                        f"[{bone_name}][{prev_fno}][{fno}][prev: {prev_qq.to_degrees():.3f}][now: {qq.to_degrees():.3f}]"
+                        + f"[dot: {abs(prev_qq.dot(qq)):.3f}][prev: {is_prev_register}][now: {is_register}]"
+                    )
+
                 # x_qq, _, _, yz_qq = qq.separate_by_axis(model.bones[link.bone_index].local_axis)
                 # if x_qq.to_degrees() > 90:
                 #     # くるんと回転してしまった場合を避けるため、YZのみを採用する
@@ -104,6 +111,9 @@ class BakeUsecase:
 
                     prev_fno = fno
                     prev_qq = bf.rotation
+                else:
+                    # 登録しない場合、削除しておく
+                    del motion.bones[bone_name][fno]
 
         if model.bones[model.bones[ik_bone_index].parent_index].is_ik:
             # 親ボーンがIKである場合、親も辿る
@@ -117,6 +127,7 @@ class BakeUsecase:
     ) -> tuple[Bone, list[int], VmdBoneFrameTrees]:
         logger.info("IK焼き込み: {b}", b=ik_bone.name, decoration=MLogger.Decoration.LINE)
 
+        ik_bone.ik.unit_rotation.radians.x = 1
         bone_names: list[str] = [model.bones[ik_bone.ik.bone_index].name]
 
         fnos = set(motion.bones[ik_bone.name].register_indexes)

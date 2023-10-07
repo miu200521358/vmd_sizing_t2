@@ -514,3 +514,23 @@ msgstr ""
 msgid "ボーン変形行列リストアップ[{d}]"
 msgstr ""
 
+
+msgid "スタンス追加補正のうち、チェックが入っている補正のみ実施します"
+msgstr ""
+
+
+msgid "スタンス追加補正選択"
+msgstr ""
+
+
+msgid "*** 処理を停止します ***"
+msgstr ""
+
+
+msgid "キーフレ確認[{d}]"
+msgstr ""
+
+
+msgid "-- キーフレ確認[{d}] [{i} ({p:.2f}%)]"
+msgstr ""
+

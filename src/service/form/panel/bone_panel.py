@@ -111,6 +111,7 @@ class BonePanel(NotebookPanel):
         save_histories(self.frame.histories)
 
     def exec(self, event: wx.Event) -> None:
+        MLogger.console_handler = ConsoleHandler(self.console_ctrl.text_ctrl)
         self.frame.running_worker = True
         self.save_histories()
 
