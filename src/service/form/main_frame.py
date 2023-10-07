@@ -27,7 +27,8 @@ class MainFrame(NotebookFrame):
             is_saving=is_saving,
         )
         self.selected_tab_idx = 0
-        self.running_worker = False
+        # タブ追加時に on_change_tab が動かないように一旦True
+        self.running_worker = True
 
         # ボーンモーションサイジング
         self.bone_panel = BonePanel(self, 0)
@@ -42,6 +43,9 @@ class MainFrame(NotebookFrame):
 
         self.morph_sub_window_size = wx.Size(300, 400)
         self.morph_sub_window: Optional[MorphSubCanvasWindow] = None
+
+        # 初期化が終わったらFalseに戻す
+        self.running_worker = False
 
     def show_morph_sub_window(self, event: wx.Event, panel: BasePanel) -> None:
         self.create_morph_sub_window(panel)
