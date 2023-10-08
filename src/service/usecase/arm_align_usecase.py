@@ -279,7 +279,7 @@ class ArmAlignUsecase:
                 - src_initial_matrixes[fno, BoneNames.shoulder_root(direction)].position
             )
             dest_wrist_global_position = dest_initial_matrixes[fno, BoneNames.shoulder_root(direction)].position + (
-                src_wrist_local_position * arm_ratio
+                src_wrist_local_position * arm_ratio * shoulder_ratio
             )
 
             arm_ik_parent_bf = VmdBoneFrame(fno, BoneNames.arm_ik_parent(direction))
