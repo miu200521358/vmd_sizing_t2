@@ -91,6 +91,10 @@ class BoneNames:
         return f"{direction}親指２"
 
     @classmethod
+    def thumb_tail(cls, direction: str):
+        return f"{SIZING_BONE_PREFIX}{direction}親先"
+
+    @classmethod
     def index_1(cls, direction: str):
         return f"{direction}人指１"
 
@@ -101,6 +105,10 @@ class BoneNames:
     @classmethod
     def index_3(cls, direction: str):
         return f"{direction}人指３"
+
+    @classmethod
+    def index_tail(cls, direction: str):
+        return f"{SIZING_BONE_PREFIX}{direction}人先"
 
     @classmethod
     def middle_1(cls, direction: str):
@@ -115,6 +123,10 @@ class BoneNames:
         return f"{direction}中指３"
 
     @classmethod
+    def middle_tail(cls, direction: str):
+        return f"{SIZING_BONE_PREFIX}{direction}中先"
+
+    @classmethod
     def ring_1(cls, direction: str):
         return f"{direction}薬指１"
 
@@ -127,6 +139,10 @@ class BoneNames:
         return f"{direction}薬指３"
 
     @classmethod
+    def ring_tail(cls, direction: str):
+        return f"{SIZING_BONE_PREFIX}{direction}薬先"
+
+    @classmethod
     def pinky_1(cls, direction: str):
         return f"{direction}小指１"
 
@@ -137,3 +153,7 @@ class BoneNames:
     @classmethod
     def pinky_3(cls, direction: str):
         return f"{direction}小指３"
+
+    @classmethod
+    def pinky_tail(cls, direction: str):
+        return f"{SIZING_BONE_PREFIX}{direction}小先"

@@ -9,7 +9,7 @@ from mlib.pmx.pmx_part import Bone, DisplaySlot, DisplaySlotReference, Ik, IkLin
 from mlib.vmd.vmd_collection import VmdMotion
 from mlib.vmd.vmd_part import VmdBoneFrame
 from mlib.vmd.vmd_tree import VmdBoneFrameTrees
-from service.usecase.bone_names import SIZING_BONE_PREFIX, BoneNames
+from service.usecase.bone_names import BoneNames
 
 logger = MLogger(os.path.basename(__file__), level=1)
 __ = logger.get_text
@@ -223,56 +223,26 @@ class ArmAlignUsecase:
 
             # 肩IK --------------------
             shoulder_ik_bf = VmdBoneFrame(fno, BoneNames.shoulder_ik(direction))
-            shoulder_ik_bf.position = dest_initial_matrixes[
-                fno, BoneNames.shoulder_root(direction)
-            ].global_matrix.to_quaternion().inverse() * (
-                dest_initial_matrixes[fno, BoneNames.arm(direction)].position
-                - (
-                    dest_initial_matrixes[fno, BoneNames.shoulder_root(direction)].local_matrix
-                    * dest_model.bones[BoneNames.arm(direction)].position
-                )
-            )
+            shoulder_ik_bf.position = dest_initial_matrixes[fno, BoneNames.arm(direction)].position
             shoulder_ik_bf.register = True
             dest_motion.append_bone_frame(shoulder_ik_bf)
 
             # 腕IK --------------------
             arm_ik_bf = VmdBoneFrame(fno, BoneNames.arm_ik(direction))
-            arm_ik_bf.position = dest_initial_matrixes[fno, BoneNames.shoulder_root(direction)].global_matrix.to_quaternion().inverse() * (
-                dest_initial_matrixes[fno, BoneNames.wrist(direction)].position
-                - (
-                    dest_initial_matrixes[fno, BoneNames.shoulder_root(direction)].local_matrix
-                    * dest_model.bones[BoneNames.wrist(direction)].position
-                )
-            )
+            arm_ik_bf.position = dest_initial_matrixes[fno, BoneNames.wrist(direction)].position
             arm_ik_bf.register = True
             dest_motion.append_bone_frame(arm_ik_bf)
 
             # 手首IK --------------------
             wrist_ik_bf = VmdBoneFrame(fno, BoneNames.wrist_ik(direction))
-            wrist_ik_bf.position = dest_initial_matrixes[
-                fno, BoneNames.shoulder_root(direction)
-            ].global_matrix.to_quaternion().inverse() * (
-                dest_initial_matrixes[fno, BoneNames.wrist_tail(direction)].position
-                - (
-                    dest_initial_matrixes[fno, BoneNames.shoulder_root(direction)].local_matrix
-                    * dest_model.bones[BoneNames.wrist_tail(direction)].position
-                )
-            )
+            wrist_ik_bf.position = dest_initial_matrixes[fno, BoneNames.wrist_tail(direction)].position
             wrist_ik_bf.register = True
             dest_motion.append_bone_frame(wrist_ik_bf)
 
             if BoneNames.thumb_0(direction) in dest_model.bones:
                 # 親指０IK --------------------
                 thumb0_ik_bf = VmdBoneFrame(fno, BoneNames.thumb_0_ik(direction))
-                thumb0_ik_bf.position = dest_initial_matrixes[
-                    fno, BoneNames.shoulder_root(direction)
-                ].global_matrix.to_quaternion().inverse() * (
-                    dest_initial_matrixes[fno, BoneNames.thumb_2(direction)].position
-                    - (
-                        dest_initial_matrixes[fno, BoneNames.shoulder_root(direction)].local_matrix
-                        * dest_model.bones[BoneNames.thumb_2(direction)].position
-                    )
-                )
+                thumb0_ik_bf.position = dest_initial_matrixes[fno, BoneNames.thumb_tail(direction)].position
                 thumb0_ik_bf.register = True
                 dest_motion.append_bone_frame(thumb0_ik_bf)
 
@@ -286,10 +256,10 @@ class ArmAlignUsecase:
 
             # 肩IK親 --------------------
             src_arm_local_position = (
-                src_initial_matrixes[fno, BoneNames.shoulder_root(direction)].global_matrix_no_scale.inverse()
-                * src_initial_matrixes[fno, BoneNames.arm(direction)].position
+                src_initial_matrixes[fno, BoneNames.arm(direction)].position
+                - src_initial_matrixes[fno, BoneNames.shoulder_root(direction)].position
             )
-            dest_arm_global_position = dest_initial_matrixes[fno, BoneNames.shoulder_root(direction)].global_matrix_no_scale * (
+            dest_arm_global_position = dest_initial_matrixes[fno, BoneNames.shoulder_root(direction)].position + (
                 src_arm_local_position * shoulder_ratio
             )
 
@@ -305,15 +275,19 @@ class ArmAlignUsecase:
 
             # 腕IK親 --------------------
             src_wrist_local_position = (
-                src_initial_matrixes[fno, BoneNames.shoulder_root(direction)].global_matrix_no_scale.inverse()
-                * src_initial_matrixes[fno, BoneNames.wrist(direction)].position
+                src_initial_matrixes[fno, BoneNames.wrist(direction)].position
+                - src_initial_matrixes[fno, BoneNames.shoulder_root(direction)].position
             )
-            dest_wrist_global_position = dest_initial_matrixes[fno, BoneNames.shoulder_root(direction)].global_matrix_no_scale * (
+            dest_wrist_global_position = dest_initial_matrixes[fno, BoneNames.shoulder_root(direction)].position + (
                 src_wrist_local_position * arm_ratio
             )
 
             arm_ik_parent_bf = VmdBoneFrame(fno, BoneNames.arm_ik_parent(direction))
-            arm_ik_parent_bf.position = dest_wrist_global_position - dest_initial_matrixes[fno, BoneNames.wrist(direction)].position
+            arm_ik_parent_bf.position = (
+                dest_wrist_global_position
+                - dest_initial_matrixes[fno, BoneNames.wrist(direction)].position
+                + shoulder_ik_parent_bf.position
+            )
             arm_ik_parent_bf.register = True
             dest_motion.append_bone_frame(arm_ik_parent_bf)
 
@@ -325,17 +299,17 @@ class ArmAlignUsecase:
 
             # 手首IK親 --------------------
             src_wrist_tail_local_position = (
-                src_initial_matrixes[fno, BoneNames.wrist(direction)].global_matrix_no_scale.inverse()
-                * src_initial_matrixes[fno, BoneNames.wrist_tail(direction)].position
+                src_initial_matrixes[fno, BoneNames.wrist_tail(direction)].position
+                - src_initial_matrixes[fno, BoneNames.wrist(direction)].position
             )
-            dest_wrist_tail_global_position = dest_initial_matrixes[fno, BoneNames.wrist(direction)].global_matrix_no_scale * (
+            dest_wrist_tail_global_position = dest_initial_matrixes[fno, BoneNames.wrist(direction)].position + (
                 src_wrist_tail_local_position * wrist_ratio
             )
 
             wrist_ik_parent_bf = VmdBoneFrame(fno, BoneNames.wrist_ik_parent(direction))
             wrist_ik_parent_bf.position = (
                 dest_wrist_tail_global_position - dest_initial_matrixes[fno, BoneNames.wrist_tail(direction)].position
-            )
+            ) + arm_ik_parent_bf.position
             wrist_ik_parent_bf.register = True
             dest_motion.append_bone_frame(wrist_ik_parent_bf)
 
@@ -345,24 +319,24 @@ class ArmAlignUsecase:
                 + f"[initial_wrist_tail_global={dest_initial_matrixes[fno, BoneNames.wrist_tail(direction)].position}]"
             )
 
-        #     if BoneNames.thumb_0(direction) in src_model.bones and BoneNames.thumb_0(direction) in dest_model.bones:
-        #         # 親指０IK親 --------------------
-        #         src_thumb2_local_position = (
-        #             src_initial_matrixes[fno, BoneNames.thumb_0(direction)].global_matrix_no_scale.inverse()
-        #             * src_initial_matrixes[fno, BoneNames.thumb_2(direction)].position
-        #         )
-        #         dest_thumb2_global_position = dest_initial_matrixes[fno, BoneNames.thumb_0(direction)].global_matrix_no_scale * MVector3D(
-        #             src_thumb2_local_position.x * thumb0_ratio, src_thumb2_local_position.y, src_thumb2_local_position.z
-        #         )
+            if is_align_thumb0 and BoneNames.thumb_0(direction) in src_model.bones and BoneNames.thumb_0(direction) in dest_model.bones:
+                # 親指０IK親 --------------------
+                src_thumb2_local_position = (
+                    src_initial_matrixes[fno, BoneNames.thumb_0(direction)].global_matrix_no_scale.inverse()
+                    * src_initial_matrixes[fno, BoneNames.thumb_2(direction)].position
+                )
+                dest_thumb2_global_position = dest_initial_matrixes[fno, BoneNames.thumb_0(direction)].global_matrix_no_scale * MVector3D(
+                    src_thumb2_local_position.x * thumb0_ratio, src_thumb2_local_position.y, src_thumb2_local_position.z
+                )
 
-        #         thumb0_ik_parent_bf = VmdBoneFrame(fno, BoneNames.thumb_0_ik_parent(direction))
-        #         thumb0_ik_parent_bf.position = dest_initial_matrixes[
-        #             fno, BoneNames.shoulder_root(direction)
-        #         ].global_matrix.to_quaternion().inverse() * (
-        #             dest_thumb2_global_position - dest_initial_matrixes[fno, BoneNames.thumb_2(direction)].position
-        #         )
-        #         thumb0_ik_parent_bf.register = True
-        #         dest_motion.append_bone_frame(thumb0_ik_parent_bf)
+                thumb0_ik_parent_bf = VmdBoneFrame(fno, BoneNames.thumb_0_ik_parent(direction))
+                thumb0_ik_parent_bf.position = dest_initial_matrixes[
+                    fno, BoneNames.shoulder_root(direction)
+                ].global_matrix.to_quaternion().inverse() * (
+                    dest_thumb2_global_position - dest_initial_matrixes[fno, BoneNames.thumb_2(direction)].position
+                )
+                thumb0_ik_parent_bf.register = True
+                dest_motion.append_bone_frame(thumb0_ik_parent_bf)
 
         # if not (
         #     {
@@ -548,11 +522,16 @@ class ArmAlignUsecase:
                 continue
             for fno in dest_motion.bones[bone_name].register_indexes:
                 dest_motion.bones[bone_name][fno].rotation = dest_ik_result_matrixes[fno, bone_name].frame_rotation
-            # 終わったらIKボーンキーフレ削除
-        #     del dest_motion.bones[f"{SIZING_BONE_PREFIX}{bone_name}IK親"]
-        #     del dest_motion.bones[f"{SIZING_BONE_PREFIX}{bone_name}IK"]
-        # del dest_motion.bones[BoneNames.thumb_0_ik_parent(direction)]
-        # del dest_motion.bones[BoneNames.thumb_0_ik(direction)]
+
+        # 終わったらIKボーンキーフレ削除
+        del dest_motion.bones[BoneNames.shoulder_ik_parent(direction)]
+        del dest_motion.bones[BoneNames.shoulder_ik(direction)]
+        del dest_motion.bones[BoneNames.arm_ik_parent(direction)]
+        del dest_motion.bones[BoneNames.arm_ik(direction)]
+        del dest_motion.bones[BoneNames.wrist_ik_parent(direction)]
+        del dest_motion.bones[BoneNames.wrist_ik(direction)]
+        del dest_motion.bones[BoneNames.thumb_0_ik_parent(direction)]
+        del dest_motion.bones[BoneNames.thumb_0_ik(direction)]
 
         return sizing_idx, dest_motion
 
@@ -661,6 +640,77 @@ class ArmAlignUsecase:
                 model.insert_bone(wrist_tail_bone)
                 sizing_display_slot.references.append(DisplaySlotReference(display_index=wrist_tail_bone.index))
 
+                # 親指先 ---------------
+                if BoneNames.thumb_2(direction) in model.bones:
+                    thumb_tail_bone = Bone(index=model.bones[BoneNames.thumb_2(direction)].index + 1, name=BoneNames.thumb_tail(direction))
+                    thumb_tail_bone.parent_index = model.bones[BoneNames.thumb_2(direction)].index
+                    thumb_tail_bone.position = (
+                        model.bones[BoneNames.thumb_2(direction)].position
+                        + model.bones[BoneNames.thumb_2(direction)].tail_relative_position
+                    )
+                    thumb_tail_bone.is_system = True
+                    thumb_tail_bone.bone_flg |= BoneFlg.CAN_TRANSLATE | BoneFlg.CAN_ROTATE | BoneFlg.CAN_MANIPULATE | BoneFlg.IS_VISIBLE
+
+                    model.insert_bone(thumb_tail_bone)
+                    sizing_display_slot.references.append(DisplaySlotReference(display_index=thumb_tail_bone.index))
+
+                # 人指先 ---------------
+                if BoneNames.index_3(direction) in model.bones:
+                    index_tail_bone = Bone(index=model.bones[BoneNames.index_3(direction)].index + 1, name=BoneNames.index_tail(direction))
+                    index_tail_bone.parent_index = model.bones[BoneNames.index_3(direction)].index
+                    index_tail_bone.position = (
+                        model.bones[BoneNames.index_3(direction)].position
+                        + model.bones[BoneNames.index_3(direction)].tail_relative_position
+                    )
+                    index_tail_bone.is_system = True
+                    index_tail_bone.bone_flg |= BoneFlg.CAN_TRANSLATE | BoneFlg.CAN_ROTATE | BoneFlg.CAN_MANIPULATE | BoneFlg.IS_VISIBLE
+
+                    model.insert_bone(index_tail_bone)
+                    sizing_display_slot.references.append(DisplaySlotReference(display_index=index_tail_bone.index))
+
+                # 中指先 ---------------
+                if BoneNames.middle_3(direction) in model.bones:
+                    middle_tail_bone = Bone(
+                        index=model.bones[BoneNames.middle_3(direction)].index + 1, name=BoneNames.middle_tail(direction)
+                    )
+                    middle_tail_bone.parent_index = model.bones[BoneNames.middle_3(direction)].index
+                    middle_tail_bone.position = (
+                        model.bones[BoneNames.middle_3(direction)].position
+                        + model.bones[BoneNames.middle_3(direction)].tail_relative_position
+                    )
+                    middle_tail_bone.is_system = True
+                    middle_tail_bone.bone_flg |= BoneFlg.CAN_TRANSLATE | BoneFlg.CAN_ROTATE | BoneFlg.CAN_MANIPULATE | BoneFlg.IS_VISIBLE
+
+                    model.insert_bone(middle_tail_bone)
+                    sizing_display_slot.references.append(DisplaySlotReference(display_index=middle_tail_bone.index))
+
+                # 薬指先 ---------------
+                if BoneNames.ring_3(direction) in model.bones:
+                    ring_tail_bone = Bone(index=model.bones[BoneNames.ring_3(direction)].index + 1, name=BoneNames.ring_tail(direction))
+                    ring_tail_bone.parent_index = model.bones[BoneNames.ring_3(direction)].index
+                    ring_tail_bone.position = (
+                        model.bones[BoneNames.ring_3(direction)].position + model.bones[BoneNames.ring_3(direction)].tail_relative_position
+                    )
+                    ring_tail_bone.is_system = True
+                    ring_tail_bone.bone_flg |= BoneFlg.CAN_TRANSLATE | BoneFlg.CAN_ROTATE | BoneFlg.CAN_MANIPULATE | BoneFlg.IS_VISIBLE
+
+                    model.insert_bone(ring_tail_bone)
+                    sizing_display_slot.references.append(DisplaySlotReference(display_index=ring_tail_bone.index))
+
+                # 小指先 ---------------
+                if BoneNames.pinky_3(direction) in model.bones:
+                    pinky_tail_bone = Bone(index=model.bones[BoneNames.pinky_3(direction)].index + 1, name=BoneNames.pinky_tail(direction))
+                    pinky_tail_bone.parent_index = model.bones[BoneNames.pinky_3(direction)].index
+                    pinky_tail_bone.position = (
+                        model.bones[BoneNames.pinky_3(direction)].position
+                        + model.bones[BoneNames.pinky_3(direction)].tail_relative_position
+                    )
+                    pinky_tail_bone.is_system = True
+                    pinky_tail_bone.bone_flg |= BoneFlg.CAN_TRANSLATE | BoneFlg.CAN_ROTATE | BoneFlg.CAN_MANIPULATE | BoneFlg.IS_VISIBLE
+
+                    model.insert_bone(pinky_tail_bone)
+                    sizing_display_slot.references.append(DisplaySlotReference(display_index=pinky_tail_bone.index))
+
         model.setup()
 
         for direction in ("左", "右"):
@@ -670,6 +720,16 @@ class ArmAlignUsecase:
                 model.bones[BoneNames.shoulder(direction)].parent_index = model.bones[BoneNames.shoulder_root(direction)].index
             if BoneNames.wrist_tail(direction) in model.bones:
                 model.bones[BoneNames.wrist_tail(direction)].parent_index = model.bones[BoneNames.wrist(direction)].index
+            if BoneNames.thumb_tail(direction) in model.bones:
+                model.bones[BoneNames.thumb_tail(direction)].parent_index = model.bones[BoneNames.thumb_2(direction)].index
+            if BoneNames.index_tail(direction) in model.bones:
+                model.bones[BoneNames.index_tail(direction)].parent_index = model.bones[BoneNames.index_3(direction)].index
+            if BoneNames.middle_tail(direction) in model.bones:
+                model.bones[BoneNames.middle_tail(direction)].parent_index = model.bones[BoneNames.middle_3(direction)].index
+            if BoneNames.ring_tail(direction) in model.bones:
+                model.bones[BoneNames.ring_tail(direction)].parent_index = model.bones[BoneNames.ring_3(direction)].index
+            if BoneNames.pinky_tail(direction) in model.bones:
+                model.bones[BoneNames.pinky_tail(direction)].parent_index = model.bones[BoneNames.pinky_3(direction)].index
 
     def setup_model_ik(
         self,
@@ -755,7 +815,7 @@ class ArmAlignUsecase:
                 arm_ik = Ik()
                 arm_ik.bone_index = model.bones[BoneNames.wrist(direction)].index
                 arm_ik.loop_count = 12
-                arm_ik.unit_rotation.radians = MVector3D(1, 0, 0)
+                arm_ik.unit_rotation.radians = MVector3D(0.1, 0, 0)
 
                 if BoneNames.hand_twist(direction) in model.bones:
                     arm_ik_link_wrist_twist = IkLink()
@@ -866,6 +926,8 @@ class ArmAlignUsecase:
                 sizing_display_slot.references.append(DisplaySlotReference(display_index=thumb0_ik_bone.index))
 
         for direction in ("左", "右"):
+            if "全ての親" in model.bones:
+                model.bones["全ての親"].parent_index = model.bones[BoneNames.root()].index
             # 肩 -------
             if BoneNames.shoulder_p(direction) in model.bones:
                 model.bones[BoneNames.shoulder_p(direction)].parent_index = model.bones[BoneNames.shoulder_root(direction)].index
@@ -974,7 +1036,7 @@ class ArmAlignUsecase:
 
         model.setup()
 
-        if 10 >= logger.total_level:
+        if 1 >= logger.total_level:
             # デバッグレベルの場合、モデルを出力する
             from mlib.pmx.pmx_writer import PmxWriter
 
