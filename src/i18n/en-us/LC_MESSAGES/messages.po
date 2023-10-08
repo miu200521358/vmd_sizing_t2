@@ -405,3 +405,6 @@ msgstr "Keefre confirmation [{d}]"
 
 msgid "-- キーフレ確認[{d}] [{i} ({p:.2f}%)]"
 msgstr "-- keyfre confirmation [{d}] [{i} ({p:.2f}%)]"
+
+msgid "親指の位置を元モーションと大体同じ位置になるよう合わせます"
+msgstr "Align the thumbs so that they are roughly in the same position as the original motion"

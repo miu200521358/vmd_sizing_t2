@@ -279,7 +279,7 @@ class ArmAlignUsecase:
                 - src_initial_matrixes[fno, BoneNames.shoulder_root(direction)].position
             )
             dest_wrist_global_position = dest_initial_matrixes[fno, BoneNames.shoulder_root(direction)].position + (
-                src_wrist_local_position * arm_ratio * shoulder_ratio
+                src_wrist_local_position * arm_ratio
             )
 
             arm_ik_parent_bf = VmdBoneFrame(fno, BoneNames.arm_ik_parent(direction))
@@ -493,45 +493,45 @@ class ArmAlignUsecase:
         #         finger_bf.position = dest_finger_global_position - far_dest_finger_position
         #         dest_motion.append_bone_frame(finger_bf)
 
-        # IK計算
-        dest_ik_result_matrixes = dest_motion.animate_bone(
-            fnos,
-            dest_model,
-            [
-                BoneNames.shoulder_root(direction),
-                BoneNames.shoulder(direction),
-                BoneNames.arm(direction),
-                BoneNames.elbow(direction),
-                BoneNames.wrist(direction),
-                BoneNames.thumb_2(direction),
-            ],
-            clear_ik=True,
-            out_fno_log=True,
-            description=f"{sizing_idx + 1}|{__(direction)}|{__('IK計算')}",
-        )
+        # # IK計算
+        # dest_ik_result_matrixes = dest_motion.animate_bone(
+        #     fnos,
+        #     dest_model,
+        #     [
+        #         BoneNames.shoulder_root(direction),
+        #         BoneNames.shoulder(direction),
+        #         BoneNames.arm(direction),
+        #         BoneNames.elbow(direction),
+        #         BoneNames.wrist(direction),
+        #         BoneNames.thumb_2(direction),
+        #     ],
+        #     clear_ik=True,
+        #     out_fno_log=True,
+        #     description=f"{sizing_idx + 1}|{__(direction)}|{__('IK計算')}",
+        # )
 
-        # IK回転の焼き込み -------------------
-        for bone_name in (
-            BoneNames.thumb_0(direction),
-            BoneNames.wrist(direction),
-            BoneNames.elbow(direction),
-            BoneNames.arm(direction),
-            BoneNames.shoulder(direction),
-        ):
-            if bone_name not in dest_motion.bones or (BoneNames.thumb_0(direction) == bone_name and not is_align_thumb0):
-                continue
-            for fno in dest_motion.bones[bone_name].register_indexes:
-                dest_motion.bones[bone_name][fno].rotation = dest_ik_result_matrixes[fno, bone_name].frame_rotation
+        # # IK回転の焼き込み -------------------
+        # for bone_name in (
+        #     BoneNames.thumb_0(direction),
+        #     BoneNames.wrist(direction),
+        #     BoneNames.elbow(direction),
+        #     BoneNames.arm(direction),
+        #     BoneNames.shoulder(direction),
+        # ):
+        #     if bone_name not in dest_motion.bones or (BoneNames.thumb_0(direction) == bone_name and not is_align_thumb0):
+        #         continue
+        #     for fno in dest_motion.bones[bone_name].register_indexes:
+        #         dest_motion.bones[bone_name][fno].rotation = dest_ik_result_matrixes[fno, bone_name].frame_rotation
 
-        # 終わったらIKボーンキーフレ削除
-        del dest_motion.bones[BoneNames.shoulder_ik_parent(direction)]
-        del dest_motion.bones[BoneNames.shoulder_ik(direction)]
-        del dest_motion.bones[BoneNames.arm_ik_parent(direction)]
-        del dest_motion.bones[BoneNames.arm_ik(direction)]
-        del dest_motion.bones[BoneNames.wrist_ik_parent(direction)]
-        del dest_motion.bones[BoneNames.wrist_ik(direction)]
-        del dest_motion.bones[BoneNames.thumb_0_ik_parent(direction)]
-        del dest_motion.bones[BoneNames.thumb_0_ik(direction)]
+        # # 終わったらIKボーンキーフレ削除
+        # del dest_motion.bones[BoneNames.shoulder_ik_parent(direction)]
+        # del dest_motion.bones[BoneNames.shoulder_ik(direction)]
+        # del dest_motion.bones[BoneNames.arm_ik_parent(direction)]
+        # del dest_motion.bones[BoneNames.arm_ik(direction)]
+        # del dest_motion.bones[BoneNames.wrist_ik_parent(direction)]
+        # del dest_motion.bones[BoneNames.wrist_ik(direction)]
+        # del dest_motion.bones[BoneNames.thumb_0_ik_parent(direction)]
+        # del dest_motion.bones[BoneNames.thumb_0_ik(direction)]
 
         return sizing_idx, dest_motion
 
@@ -1036,7 +1036,7 @@ class ArmAlignUsecase:
 
         model.setup()
 
-        if 1 >= logger.total_level:
+        if 10 >= logger.total_level:
             # デバッグレベルの場合、モデルを出力する
             from mlib.pmx.pmx_writer import PmxWriter
 
