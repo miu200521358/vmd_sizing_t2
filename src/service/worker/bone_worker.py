@@ -59,6 +59,8 @@ class BoneWorker(BaseWorker):
                 sizing_set.src_model_ctrl.data,
                 sizing_set.dest_model_ctrl.data,
                 sizing_set.align_check_ctrl.GetValue(),
+                sizing_set.align_finger_check_ctrl.GetValue(),
+                sizing_set.align_thumb0_check_ctrl.GetValue(),
                 show_message=True,
             ):
                 usecase.setup_model(sizing_set.sizing_idx, True, sizing_set.src_model_ctrl.data)
@@ -73,6 +75,8 @@ class BoneWorker(BaseWorker):
                     sizing_set.src_model_ctrl.data,
                     sizing_set.dest_model_ctrl.data,
                     sizing_set.align_check_ctrl.GetValue(),
+                    sizing_set.align_finger_check_ctrl.GetValue(),
+                    sizing_set.align_thumb0_check_ctrl.GetValue(),
                 ):
                     for direction in ("右", "左"):
                         futures.append(
@@ -109,10 +113,24 @@ class BoneWorker(BaseWorker):
                 sizing_set.sizing_idx,
                 sizing_set.src_model_ctrl.data,
                 sizing_set.dest_model_ctrl.data,
-                sizing_set.align_check_ctrl.GetValue(),
+                    sizing_set.align_check_ctrl.GetValue(),
+                    sizing_set.align_finger_check_ctrl.GetValue(),
+                    sizing_set.align_thumb0_check_ctrl.GetValue(),
             ):
-                usecase.setup_model_ik(sizing_set.sizing_idx, True, sizing_set.src_model_ctrl.data)
-                usecase.setup_model_ik(sizing_set.sizing_idx, False, sizing_set.dest_model_ctrl.data)
+                usecase.setup_model_ik(
+                    sizing_set.sizing_idx,
+                    True,
+                    sizing_set.src_model_ctrl.data,
+                    sizing_set.align_finger_check_ctrl.GetValue(),
+                    sizing_set.align_thumb0_check_ctrl.GetValue(),
+                )
+                usecase.setup_model_ik(
+                    sizing_set.sizing_idx,
+                    False,
+                    sizing_set.dest_model_ctrl.data,
+                    sizing_set.align_finger_check_ctrl.GetValue(),
+                    sizing_set.align_thumb0_check_ctrl.GetValue(),
+                )
 
         with ThreadPoolExecutor(thread_name_prefix="arm_align", max_workers=self.max_worker) as executor:
             futures: list[Future] = []
@@ -122,6 +140,8 @@ class BoneWorker(BaseWorker):
                     sizing_set.src_model_ctrl.data,
                     sizing_set.dest_model_ctrl.data,
                     sizing_set.align_check_ctrl.GetValue(),
+                    sizing_set.align_finger_check_ctrl.GetValue(),
+                    sizing_set.align_thumb0_check_ctrl.GetValue(),
                 ):
                     for direction in ("右", "左"):
                         futures.append(
@@ -135,7 +155,8 @@ class BoneWorker(BaseWorker):
                                 initial_matrixes[(sizing_idx, True, direction)],
                                 initial_matrixes[(sizing_idx, False, direction)],
                                 direction,
-                                self.max_worker,
+                                sizing_set.align_finger_check_ctrl.GetValue(),
+                                sizing_set.align_thumb0_check_ctrl.GetValue(),
                             )
                         )
 

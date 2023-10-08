@@ -124,6 +124,7 @@ class BonePanel(NotebookPanel):
         self.console_ctrl.write(f"\n----------------\n{elapsed_time}")
 
         self.Enable(True)
+        self.frame.running_worker = False
         self.frame.on_sound()
 
         logger.info("サイジング完了", decoration=MLogger.Decoration.BOX)

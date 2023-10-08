@@ -3,6 +3,10 @@ SIZING_BONE_PREFIX = "[SZ]"
 
 class BoneNames:
     @classmethod
+    def root(cls):
+        return f"{SIZING_BONE_PREFIX}ROOT"
+
+    @classmethod
     def shoulder_root(cls, direction: str):
         return f"{direction}肩根元"
 

@@ -125,6 +125,7 @@ class BakePanel(NotebookPanel):
 
     def exec(self, event: wx.Event) -> None:
         MLogger.console_handler = ConsoleHandler(self.console_ctrl.text_ctrl)
+        self.frame.running_worker = True
         self.save_histories()
 
         self.Enable(False)
@@ -136,6 +137,7 @@ class BakePanel(NotebookPanel):
         self.console_ctrl.write(f"\n----------------\n{elapsed_time}")
 
         self.Enable(True)
+        self.frame.running_worker = False
         self.frame.on_sound()
 
         logger.info("IK焼き込み完了", decoration=MLogger.Decoration.BOX)

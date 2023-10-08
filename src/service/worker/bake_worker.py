@@ -20,8 +20,6 @@ class BakeWorker(BaseWorker):
         self.max_worker = 1 if frame.is_saving else max(1, int(min(32, (os.cpu_count() or 0) + 4) / 2))
 
     def thread_execute(self):
-        self.frame.running_worker = True
-
         # まずは読み込み
         self.load()
 
@@ -32,8 +30,6 @@ class BakeWorker(BaseWorker):
         self.save()
 
         self.result_data = []
-
-        self.frame.running_worker = False
 
     def bake_ik(self):
         """IK焼き込み"""

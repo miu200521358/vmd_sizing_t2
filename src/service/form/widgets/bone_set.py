@@ -107,7 +107,7 @@ class SizingBoneSet:
         self.output_motion_ctrl.set_parent_sizer(self.file_sizer)
         self.output_motion_ctrl.set_color(self.background_color)
 
-        self.box_sizer.Add(self.file_sizer, 6, wx.ALL, 2)
+        self.box_sizer.Add(self.file_sizer, 5, wx.ALL, 2)
 
         # ----------------------------------
         self.config_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -157,18 +157,17 @@ class SizingBoneSet:
         self.align_finger_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_align_ctrl)
         self.align_finger_check_ctrl.SetToolTip(__("指の位置を元モーションと大体同じ位置になるよう合わせます"))
         self.align_finger_check_ctrl.SetBackgroundColour(self.background_color)
-        self.align_finger_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_change_dest_model_pmx)
         self.align_sizer.Add(self.align_finger_check_ctrl, 0, wx.ALL, 2)
 
         self.separate3 = wx.StaticText(self.window, wx.ID_ANY, "     |     ")
         self.separate3.SetBackgroundColour(self.background_color)
         self.align_sizer.Add(self.separate3)
 
-        self.align_floor_check_ctrl = wx.CheckBox(self.window, wx.ID_ANY, __("床位置合わせ"), wx.DefaultPosition, wx.DefaultSize, 0)
-        self.align_floor_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_align_ctrl)
-        self.align_floor_check_ctrl.SetToolTip(__("手首の位置が床から沈まないよう合わせます"))
-        self.align_floor_check_ctrl.SetBackgroundColour(self.background_color)
-        self.align_sizer.Add(self.align_floor_check_ctrl, 0, wx.ALL, 2)
+        self.align_thumb0_check_ctrl = wx.CheckBox(self.window, wx.ID_ANY, __("親指０位置合わせ"), wx.DefaultPosition, wx.DefaultSize, 0)
+        self.align_thumb0_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_align_ctrl)
+        self.align_thumb0_check_ctrl.SetToolTip(__("親指の位置を元モーションと大体同じ位置になるよう合わせます"))
+        self.align_thumb0_check_ctrl.SetBackgroundColour(self.background_color)
+        self.align_sizer.Add(self.align_thumb0_check_ctrl, 0, wx.ALL, 2)
 
         self.config_sizer.Add(self.align_sizer, 0, wx.ALL, 2)
 
@@ -198,14 +197,15 @@ class SizingBoneSet:
 
         # self.config_sizer.Add(self.offset_sizer, 0, wx.ALL, 2)
 
-        self.box_sizer.Add(self.config_sizer, 4, wx.ALL, 0)
+        self.box_sizer.Add(self.config_sizer, 5, wx.ALL, 0)
         self.sizer.Add(self.box_sizer, 1, wx.EXPAND | wx.ALL, 0)
 
     def on_check_align_ctrl(self, event: wx.Event) -> None:
-        if not self.align_finger_check_ctrl.GetValue() and not self.align_floor_check_ctrl.GetValue():
+        if not self.align_finger_check_ctrl.GetValue() and not self.align_thumb0_check_ctrl.GetValue():
             self.align_check_ctrl.SetValue(0)
         else:
             self.align_check_ctrl.SetValue(1)
+        self.on_change_dest_model_pmx(event)
 
     def on_check_stance_correct(self, event: wx.Event) -> None:
         if self.stance_correct_check_ctrl.GetValue():
@@ -270,7 +270,7 @@ class SizingBoneSet:
             dest_model_dir_path, dest_model_file_name, dest_model_file_ext = self.dest_model_ctrl.separated_path
 
             sizing_types: list[str] = []
-            if self.align_check_ctrl.GetValue():
+            if self.align_check_ctrl.GetValue() or self.align_finger_check_ctrl.GetValue() or self.align_thumb0_check_ctrl.GetValue():
                 sizing_types.append("P")
             self.output_motion_ctrl.path = os.path.join(
                 motion_dir_path,
@@ -339,4 +339,4 @@ class SizingBoneSet:
         self.twist_check_ctrl.Enable(enable)
         self.align_check_ctrl.Enable(enable)
         self.align_finger_check_ctrl.Enable(enable)
-        self.align_floor_check_ctrl.Enable(enable)
+        self.align_thumb0_check_ctrl.Enable(enable)
