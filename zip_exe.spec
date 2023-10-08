@@ -14,6 +14,7 @@ binary_keys = [(path, os.path.dirname(path.replace("mmd_base\\", ""))) for path 
 
 data_keys = [
     ('src/resources/logo.ico', 'resources'),
+    ('src/resources/bone.pmx', 'resources'),
     ('src/resources/icon/*.*', 'resources/icon'),
     ('src/i18n/en-us/LC_MESSAGES/messages.mo', 'i18n/en-us/LC_MESSAGES'),
     ('src/i18n/ja/LC_MESSAGES/messages.mo', 'i18n/ja/LC_MESSAGES'),

@@ -132,6 +132,8 @@ class BonePanel(NotebookPanel):
     def Enable(self, enable: bool) -> None:
         for sizing_set in self.sizing_sets:
             sizing_set.Enable(enable)
+        self.add_ctrl.Enable(enable)
+        self.clear_ctrl.Enable(enable)
         self.EnableExec(enable)
 
     def EnableExec(self, enable: bool) -> None:

@@ -1,8 +1,10 @@
 import os
 
 from mlib.core.logger import MLogger
+from mlib.core.math import MVector3D
 from mlib.pmx.pmx_collection import PmxModel
 from mlib.pmx.pmx_reader import PmxReader
+from mlib.utils.file_utils import get_path
 from mlib.vmd.vmd_collection import VmdMotion
 from mlib.vmd.vmd_reader import VmdReader
 from mlib.vmd.vmd_writer import VmdWriter
@@ -31,8 +33,30 @@ class IoUsecase:
 
         if not original_model:
             original_model = reader.read_by_filepath(model_path)
+            original_model.setup()
 
-        model = original_model.copy()
+        original_matrixes = VmdMotion().animate_bone([0], original_model, original_model.bones.names)
+
+        # サイジング用モデルをベースに位置などを置き換えて作り直す
+        model = reader.read_by_filepath(get_path("resources/bone.pmx"))
+        model.path = original_model.path
+        model.model_name = original_model.name
+
+        for bone in model.bones:
+            if bone.name in original_model.bones:
+                original_bone = original_model.bones[bone.name]
+                bone.position = original_matrixes[0, original_bone.name].position
+                tail_relative_position = original_model.bones.get_tail_relative_position(original_bone.index)
+                if 0 < tail_relative_position.length() and not bone.is_tail_bone:
+                    bone.tail_position = (
+                        original_matrixes[0, original_bone.name].global_matrix * tail_relative_position
+                        - original_matrixes[0, original_bone.name].position
+                    )
+                else:
+                    bone.tail_position = MVector3D()
+                bone.fixed_axis = original_bone.fixed_axis.copy()
+                bone.local_x_vector = original_bone.local_x_vector.copy()
+                bone.local_z_vector = original_bone.local_z_vector.copy()
 
         return sizing_idx, digest, original_model, model
 
