@@ -71,23 +71,23 @@ class BoneNames:
         return f"{SIZING_BONE_PREFIX}{direction}手首IK"
 
     @classmethod
-    def thumb_0(cls, direction: str):
+    def thumb0(cls, direction: str):
         return f"{direction}親指０"
 
     @classmethod
-    def thumb_0_ik_parent(cls, direction: str):
+    def thumb_ik_parent(cls, direction: str):
         return f"{SIZING_BONE_PREFIX}{direction}親０IK親"
 
     @classmethod
-    def thumb_0_ik(cls, direction: str):
+    def thumb_ik(cls, direction: str):
         return f"{SIZING_BONE_PREFIX}{direction}親０IK"
 
     @classmethod
-    def thumb_1(cls, direction: str):
+    def thumb1(cls, direction: str):
         return f"{direction}親指１"
 
     @classmethod
-    def thumb_2(cls, direction: str):
+    def thumb2(cls, direction: str):
         return f"{direction}親指２"
 
     @classmethod
@@ -95,15 +95,15 @@ class BoneNames:
         return f"{SIZING_BONE_PREFIX}{direction}親先"
 
     @classmethod
-    def index_1(cls, direction: str):
+    def index1(cls, direction: str):
         return f"{direction}人指１"
 
     @classmethod
-    def index_2(cls, direction: str):
+    def index2(cls, direction: str):
         return f"{direction}人指２"
 
     @classmethod
-    def index_3(cls, direction: str):
+    def index3(cls, direction: str):
         return f"{direction}人指３"
 
     @classmethod
@@ -111,15 +111,15 @@ class BoneNames:
         return f"{SIZING_BONE_PREFIX}{direction}人先"
 
     @classmethod
-    def middle_1(cls, direction: str):
+    def middle1(cls, direction: str):
         return f"{direction}中指１"
 
     @classmethod
-    def middle_2(cls, direction: str):
+    def middle2(cls, direction: str):
         return f"{direction}中指２"
 
     @classmethod
-    def middle_3(cls, direction: str):
+    def middle3(cls, direction: str):
         return f"{direction}中指３"
 
     @classmethod
@@ -127,15 +127,15 @@ class BoneNames:
         return f"{SIZING_BONE_PREFIX}{direction}中先"
 
     @classmethod
-    def ring_1(cls, direction: str):
+    def ring1(cls, direction: str):
         return f"{direction}薬指１"
 
     @classmethod
-    def ring_2(cls, direction: str):
+    def ring2(cls, direction: str):
         return f"{direction}薬指２"
 
     @classmethod
-    def ring_3(cls, direction: str):
+    def ring3(cls, direction: str):
         return f"{direction}薬指３"
 
     @classmethod
@@ -143,15 +143,15 @@ class BoneNames:
         return f"{SIZING_BONE_PREFIX}{direction}薬先"
 
     @classmethod
-    def pinky_1(cls, direction: str):
+    def pinky1(cls, direction: str):
         return f"{direction}小指１"
 
     @classmethod
-    def pinky_2(cls, direction: str):
+    def pinky2(cls, direction: str):
         return f"{direction}小指２"
 
     @classmethod
-    def pinky_3(cls, direction: str):
+    def pinky3(cls, direction: str):
         return f"{direction}小指３"
 
     @classmethod
