@@ -22,6 +22,10 @@ class BoneNames:
     def shoulder_c(cls, direction: str):
         return f"{direction}肩C"
 
+    # @classmethod
+    # def shoulder_center(cls, direction: str):
+    #     return f"{SIZING_BONE_PREFIX}{direction}肩中点"
+
     @classmethod
     def shoulder_ik_parent(cls, direction: str):
         return f"{SIZING_BONE_PREFIX}{direction}肩IK親"
