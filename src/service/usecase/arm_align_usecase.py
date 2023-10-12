@@ -76,9 +76,9 @@ class ArmAlignUsecase:
 
         logger.debug(f"shoulder_ratio[{shoulder_ratio:.3f}]")
 
-        arm_ratio = dest_model.bones[BoneNames.shoulder_root(direction)].position.distance(
+        arm_ratio = dest_model.bones[BoneNames.shoulder_center(direction)].position.distance(
             dest_model.bones[BoneNames.wrist(direction)].position
-        ) / src_model.bones[BoneNames.shoulder_root(direction)].position.distance(src_model.bones[BoneNames.wrist(direction)].position)
+        ) / src_model.bones[BoneNames.shoulder_center(direction)].position.distance(src_model.bones[BoneNames.wrist(direction)].position)
 
         logger.debug(f"arm_ratio[{arm_ratio:.3f}]")
 
@@ -279,14 +279,14 @@ class ArmAlignUsecase:
             # 腕IK親 --------------------
             src_wrist_local_position = (
                 src_initial_matrixes[fno, BoneNames.wrist(direction)].position
-                - src_initial_matrixes[fno, BoneNames.shoulder_root(direction)].position
-                # src_initial_matrixes[fno, BoneNames.shoulder_root(direction)].global_matrix.inverse()
+                - src_initial_matrixes[fno, BoneNames.shoulder_center(direction)].position
+                # src_initial_matrixes[fno, BoneNames.shoulder_center(direction)].global_matrix.inverse()
                 # * src_initial_matrixes[fno, BoneNames.wrist(direction)].position
             )
-            dest_wrist_global_position = dest_initial_matrixes[fno, BoneNames.shoulder_root(direction)].position + (
+            dest_wrist_global_position = dest_initial_matrixes[fno, BoneNames.shoulder_center(direction)].position + (
                 src_wrist_local_position * arm_ratio
             )
-            # dest_wrist_global_position = dest_initial_matrixes[fno, BoneNames.shoulder_root(direction)].global_matrix * MVector3D(
+            # dest_wrist_global_position = dest_initial_matrixes[fno, BoneNames.shoulder_center(direction)].global_matrix * MVector3D(
             #     src_wrist_local_position.x * arm_ratio,
             #     src_wrist_local_position.y * shoulder_ratio,
             #     src_wrist_local_position.z * shoulder_ratio,
@@ -537,7 +537,10 @@ class ArmAlignUsecase:
             from mlib.vmd.vmd_writer import VmdWriter
 
             ik_dest_motion = dest_motion.copy()
-            ik_dest_motion.path = os.path.join(os.path.dirname(dest_motion.path), f"IK_{direction}_{os.path.basename(dest_motion.path)}")
+            ik_dest_motion.path = os.path.join(
+                os.path.dirname(dest_motion.path),
+                f"IK_{os.path.basename(dest_model.path)}_{direction}_{os.path.basename(dest_motion.path)}",
+            )
 
             os.makedirs(os.path.dirname(ik_dest_motion.path), exist_ok=True)
             VmdWriter(ik_dest_motion, ik_dest_motion.path, dest_model.name).save()
@@ -548,6 +551,7 @@ class ArmAlignUsecase:
             dest_model,
             [
                 BoneNames.shoulder_root(direction),
+                BoneNames.shoulder_center(direction),
                 BoneNames.shoulder(direction),
                 BoneNames.arm(direction),
                 BoneNames.elbow(direction),
@@ -560,16 +564,26 @@ class ArmAlignUsecase:
         )
 
         # IK回転の焼き込み -------------------
-        for bone_name in (
-            BoneNames.thumb0(direction),
-            BoneNames.wrist(direction),
-            BoneNames.elbow(direction),
-            BoneNames.arm(direction),
-            BoneNames.shoulder(direction),
+        for bone_name, tail_bone_name in (
+            (BoneNames.thumb0(direction), BoneNames.thumb_tail(direction)),
+            (BoneNames.wrist(direction), BoneNames.wrist_tail(direction)),
+            (BoneNames.elbow(direction), BoneNames.wrist(direction)),
+            (BoneNames.arm(direction), BoneNames.wrist(direction)),
+            (BoneNames.shoulder(direction), BoneNames.arm(direction)),
         ):
             if bone_name not in dest_motion.bones or (BoneNames.thumb0(direction) == bone_name and not is_align_thumb0):
                 continue
-            for fno in dest_motion.bones[bone_name].register_indexes:
+            fnos = dest_motion.bones[bone_name].register_indexes
+            for fidx, fno in enumerate(fnos):
+                logger.count(
+                    "【No.{x}】{b}位置合わせ",
+                    x=sizing_idx + 1,
+                    b=__(bone_name),
+                    index=fidx,
+                    total_index_count=len(fnos),
+                    display_block=1000,
+                )
+
                 bf = dest_motion.bones[bone_name][fno]
                 bf.rotation = dest_ik_result_matrixes[fno, bone_name].frame_rotation
                 if bone_name == BoneNames.shoulder(direction):
@@ -673,28 +687,28 @@ class ArmAlignUsecase:
                 }
                 - set(model.bones.names)
             ):
-                # # 肩中点追加 ---------------
+                # 肩中点追加 ---------------
 
-                # shoulder_center_bone = Bone(
-                #     index=model.bones[BoneNames.shoulder(direction)].index + 1, name=BoneNames.shoulder_center(direction)
-                # )
-                # shoulder_center_bone.parent_index = model.bones[BoneNames.shoulder(direction)].index
-                # shoulder_center_bone.position = (
-                #     model.bones[BoneNames.shoulder_root(direction)].position + model.bones[BoneNames.arm(direction)].position
-                # ) / 2
+                shoulder_center_bone = Bone(
+                    index=model.bones[BoneNames.shoulder(direction)].index + 1, name=BoneNames.shoulder_center(direction)
+                )
+                shoulder_center_bone.parent_index = model.bones[BoneNames.shoulder(direction)].index
+                shoulder_center_bone.position = (
+                    model.bones[BoneNames.shoulder_root(direction)].position + model.bones[BoneNames.arm(direction)].position
+                ) / 2
 
-                # shoulder_center_bone.is_system = True
-                # shoulder_center_bone.bone_flg |= BoneFlg.CAN_TRANSLATE | BoneFlg.CAN_ROTATE | BoneFlg.CAN_MANIPULATE | BoneFlg.IS_VISIBLE
+                shoulder_center_bone.is_system = True
+                shoulder_center_bone.bone_flg |= BoneFlg.CAN_TRANSLATE | BoneFlg.CAN_ROTATE | BoneFlg.CAN_MANIPULATE | BoneFlg.IS_VISIBLE
 
-                # model.insert_bone(shoulder_center_bone)
-                # sizing_display_slot.references.append(DisplaySlotReference(display_index=shoulder_center_bone.index))
+                model.insert_bone(shoulder_center_bone)
+                sizing_display_slot.references.append(DisplaySlotReference(display_index=shoulder_center_bone.index))
 
                 # 手首先追加 ---------------
 
                 wrist_tail_bone = Bone(index=model.bones[BoneNames.wrist(direction)].index + 1, name=BoneNames.wrist_tail(direction))
                 wrist_tail_bone.parent_index = model.bones[BoneNames.wrist(direction)].index
                 wrist_tail_bone.position = model.bones[BoneNames.wrist(direction)].position + (
-                    (model.bones[BoneNames.wrist(direction)].position - model.bones[BoneNames.elbow(direction)].position) / 2
+                    (model.bones[BoneNames.wrist(direction)].position - model.bones[BoneNames.elbow(direction)].position) * 0.3
                 )
                 wrist_tail_bone.is_system = True
                 wrist_tail_bone.bone_flg |= BoneFlg.CAN_TRANSLATE | BoneFlg.CAN_ROTATE | BoneFlg.CAN_MANIPULATE | BoneFlg.IS_VISIBLE
@@ -840,8 +854,8 @@ class ArmAlignUsecase:
 
                 shoulder_ik = Ik()
                 shoulder_ik.bone_index = model.bones[BoneNames.arm(direction)].index
-                shoulder_ik.loop_count = 4
-                shoulder_ik.unit_rotation.radians = MVector3D(1, 0, 0)
+                shoulder_ik.loop_count = 12
+                shoulder_ik.unit_rotation.radians = MVector3D(0.1, 0, 0)
 
                 shoulder_ik_link_shoulder = IkLink()
                 shoulder_ik_link_shoulder.bone_index = model.bones[BoneNames.shoulder(direction)].index
@@ -889,8 +903,8 @@ class ArmAlignUsecase:
                 arm_ik_link_elbow = IkLink()
                 arm_ik_link_elbow.bone_index = model.bones[BoneNames.elbow(direction)].index
                 arm_ik_link_elbow.angle_limit = True
-                arm_ik_link_elbow.local_min_angle_limit.degrees = MVector3D(-180, 0, 0)
-                arm_ik_link_elbow.local_max_angle_limit.degrees = MVector3D(3, 0, 0)
+                arm_ik_link_elbow.local_min_angle_limit.degrees = MVector3D(0, -180, 0)
+                arm_ik_link_elbow.local_max_angle_limit.degrees = MVector3D(0, 3, 0)
                 arm_ik.links.append(arm_ik_link_elbow)
 
                 if BoneNames.arm_twist(direction) in model.bones:
@@ -936,8 +950,8 @@ class ArmAlignUsecase:
 
                 wrist_ik = Ik()
                 wrist_ik.bone_index = model.bones[BoneNames.wrist_tail(direction)].index
-                wrist_ik.loop_count = 4
-                wrist_ik.unit_rotation.radians = MVector3D(1, 0, 0)
+                wrist_ik.loop_count = 12
+                wrist_ik.unit_rotation.radians = MVector3D(0.1, 0, 0)
 
                 wrist_ik_link_wrist = IkLink()
                 wrist_ik_link_wrist.bone_index = model.bones[BoneNames.wrist(direction)].index
@@ -971,8 +985,8 @@ class ArmAlignUsecase:
 
                 thumb0_ik = Ik()
                 thumb0_ik.bone_index = model.bones[BoneNames.thumb2(direction)].index
-                thumb0_ik.loop_count = 4
-                thumb0_ik.unit_rotation.radians = MVector3D(1, 0, 0)
+                thumb0_ik.loop_count = 12
+                thumb0_ik.unit_rotation.radians = MVector3D(0.1, 0, 0)
 
                 thumb0_ik_link_thumb1 = IkLink()
                 thumb0_ik_link_thumb1.bone_index = model.bones[BoneNames.thumb1(direction)].index

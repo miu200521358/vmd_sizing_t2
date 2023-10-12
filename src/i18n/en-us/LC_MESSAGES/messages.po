@@ -408,3 +408,33 @@ msgstr "-- keyfre confirmation [{d}] [{i} ({p:.2f}%)]"
 
 msgid "親指の位置を元モーションと大体同じ位置になるよう合わせます"
 msgstr "Align the thumbs so that they are roughly in the same position as the original motion"
+
+msgid "右手首"
+msgstr "Right wrist"
+
+msgid "【No.{i}】{b}位置合わせ失敗 ({d})"
+msgstr "[No.{i}]{b}Alignment failure ({d})"
+
+msgid "右ひじ"
+msgstr "Right elbow"
+
+msgid "右腕"
+msgstr "The Right Arm"
+
+msgid "右肩"
+msgstr "Right shoulder"
+
+msgid "左手首"
+msgstr "Left wrist"
+
+msgid "左ひじ"
+msgstr "Left elbow"
+
+msgid "左腕"
+msgstr "Left arm"
+
+msgid "左肩"
+msgstr "Left shoulder"
+
+msgid "【No.{i}】[{f}F] {b}位置合わせ失敗 ({d:.3f}:{s}:{e})"
+msgstr "[No.{i}][{f}F] {b}Positioning failure ({d:.3f}:{s}:{e})"

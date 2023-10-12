@@ -2,6 +2,7 @@ import os
 
 from mlib.core.logger import MLogger
 from mlib.core.math import MVector3D
+from mlib.pmx.bone_setting import BoneFlg
 from mlib.pmx.pmx_collection import PmxModel
 from mlib.pmx.pmx_reader import PmxReader
 from mlib.utils.file_utils import get_path
@@ -47,16 +48,27 @@ class IoUsecase:
                 original_bone = original_model.bones[bone.name]
                 bone.position = original_matrixes[0, original_bone.name].position
                 tail_relative_position = original_model.bones.get_tail_relative_position(original_bone.index)
-                if 0 < tail_relative_position.length() and not bone.is_tail_bone:
+                if 0 < tail_relative_position.length() and not original_bone.is_tail_bone:
+                    bone.bone_flg &= ~BoneFlg.TAIL_IS_BONE
                     bone.tail_position = (
                         original_matrixes[0, original_bone.name].global_matrix * tail_relative_position
                         - original_matrixes[0, original_bone.name].position
                     )
                 else:
                     bone.tail_position = MVector3D()
-                bone.fixed_axis = original_bone.fixed_axis.copy()
-                bone.local_x_vector = original_bone.local_x_vector.copy()
-                bone.local_z_vector = original_bone.local_z_vector.copy()
+                if original_bone.has_fixed_axis:
+                    bone.fixed_axis = original_bone.fixed_axis.copy()
+                    bone.bone_flg |= BoneFlg.HAS_FIXED_AXIS
+                if original_bone.has_local_coordinate:
+                    bone.local_x_vector = original_bone.local_x_vector.copy()
+                    bone.local_z_vector = original_bone.local_z_vector.copy()
+                    bone.bone_flg |= BoneFlg.HAS_LOCAL_COORDINATE
+
+        if 10 >= logger.total_level:
+            # デバッグレベルの場合、モデルを出力する
+            from mlib.pmx.pmx_writer import PmxWriter
+
+            PmxWriter(model, os.path.join(os.path.dirname(model.path), f"io_{os.path.basename(model.path)}"), include_system=True).save()
 
         return sizing_idx, digest, original_model, model
 

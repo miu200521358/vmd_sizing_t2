@@ -408,3 +408,33 @@ msgstr "-- Keefre confirmation [{d}] [{i} ({p:.2f}%)]"
 
 msgid "親指の位置を元モーションと大体同じ位置になるよう合わせます"
 msgstr "对齐拇指，使其位置与原动作大致相同"
+
+msgid "右手首"
+msgstr "右手腕
+
+msgid "【No.{i}】{b}位置合わせ失敗 ({d})"
+msgstr "[编号{i}]{b} 定位失败 ({d})"
+
+msgid "右ひじ"
+msgstr 右肘
+
+msgid "右腕"
+msgstr 右臂
+
+msgid "右肩"
+msgstr 右肩
+
+msgid "左手首"
+msgstr "左腕"
+
+msgid "左ひじ"
+msgstr "左肘"
+
+msgid "左腕"
+msgstr "左臂"
+
+msgid "左肩"
+msgstr "左肩"
+
+msgid "【No.{i}】[{f}F] {b}位置合わせ失敗 ({d:.3f}:{s}:{e})"
+msgstr "[编号{i}][{f}F] {b}定位失败（{d:.3f}:{s}:{e}）"
