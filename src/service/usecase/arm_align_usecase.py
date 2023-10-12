@@ -585,6 +585,26 @@ class ArmAlignUsecase:
                 )
 
                 bf = dest_motion.bones[bone_name][fno]
+                # src_vector = (
+                #     src_initial_matrixes[fno, tail_bone_name].position - src_initial_matrixes[fno, bone_name].position
+                # ).normalized()
+                # dest_vector = (
+                #     dest_ik_result_matrixes[fno, tail_bone_name].position - dest_ik_result_matrixes[fno, bone_name].position
+                # ).normalized()
+                # vector_dot = src_vector.dot(dest_vector)
+
+                # if vector_dot < 0.8:
+                #     logger.info(
+                #         "【No.{i}】[{f}F] {b}位置合わせ失敗 ({d:.3f}:{s}:{e})",
+                #         i=sizing_idx + 1,
+                #         f=fno,
+                #         b=__(bone_name),
+                #         d=vector_dot,
+                #         s=src_vector,
+                #         e=dest_vector,
+                #         decoration=MLogger.Decoration.LINE,
+                #     )
+                # else:
                 bf.rotation = dest_ik_result_matrixes[fno, bone_name].frame_rotation
                 if bone_name == BoneNames.shoulder(direction):
                     bf.rotation *= dest_motion.bones[BoneNames.shoulder_p(direction)][fno].rotation.inverse()
