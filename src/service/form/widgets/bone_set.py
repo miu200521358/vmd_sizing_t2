@@ -200,9 +200,7 @@ class SizingBoneSet:
         self.sizer.Add(self.box_sizer, 1, wx.EXPAND | wx.ALL, 0)
 
     def on_check_align_ctrl(self, event: wx.Event) -> None:
-        if not self.align_finger_check_ctrl.GetValue() and not self.align_thumb0_check_ctrl.GetValue():
-            self.align_check_ctrl.SetValue(0)
-        else:
+        if self.align_finger_check_ctrl.GetValue() or self.align_thumb0_check_ctrl.GetValue():
             self.align_check_ctrl.SetValue(1)
         self.on_change_dest_model_pmx(event)
 
