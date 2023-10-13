@@ -447,3 +447,6 @@ msgstr "右拇指 0"
 
 msgid "左親指０"
 msgstr "左手拇指 0"
+
+msgid "処理を停止しました"
+msgstr "处理已停止"

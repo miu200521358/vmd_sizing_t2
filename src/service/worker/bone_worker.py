@@ -1,5 +1,5 @@
 import os
-from concurrent.futures import Future, ThreadPoolExecutor, as_completed
+from concurrent.futures import FIRST_EXCEPTION, Future, ThreadPoolExecutor, as_completed, wait
 
 import wx
 
@@ -101,6 +101,8 @@ class BoneWorker(BaseWorker):
                             )
                         )
 
+            wait(futures, return_when=FIRST_EXCEPTION)
+
             for future in as_completed(futures):
                 if future.exception():
                     raise future.exception()
@@ -113,9 +115,9 @@ class BoneWorker(BaseWorker):
                 sizing_set.sizing_idx,
                 sizing_set.src_model_ctrl.data,
                 sizing_set.dest_model_ctrl.data,
-                    sizing_set.align_check_ctrl.GetValue(),
-                    sizing_set.align_finger_check_ctrl.GetValue(),
-                    sizing_set.align_thumb0_check_ctrl.GetValue(),
+                sizing_set.align_check_ctrl.GetValue(),
+                sizing_set.align_finger_check_ctrl.GetValue(),
+                sizing_set.align_thumb0_check_ctrl.GetValue(),
             ):
                 usecase.setup_model_ik(
                     sizing_set.sizing_idx,
@@ -160,6 +162,8 @@ class BoneWorker(BaseWorker):
                             )
                         )
 
+            wait(futures, return_when=FIRST_EXCEPTION)
+
             for future in as_completed(futures):
                 if future.exception():
                     raise future.exception()
@@ -185,6 +189,8 @@ class BoneWorker(BaseWorker):
                         sizing_set.output_motion_ctrl.data,
                     )
                 )
+
+            wait(futures, return_when=FIRST_EXCEPTION)
 
             for future in as_completed(futures):
                 if future.exception():
@@ -237,6 +243,8 @@ class BoneWorker(BaseWorker):
                     )
                 )
 
+            wait(futures, return_when=FIRST_EXCEPTION)
+
             for future in as_completed(futures):
                 if future.exception():
                     raise future.exception()
@@ -259,6 +267,8 @@ class BoneWorker(BaseWorker):
                 )
                 for sizing_set in bone_panel.sizing_sets
             ]
+
+        wait(futures, return_when=FIRST_EXCEPTION)
 
         for future in as_completed(futures):
             if future.exception():
@@ -304,6 +314,8 @@ class BoneWorker(BaseWorker):
                 for sizing_idx, model_path in enumerate(loadable_dest_model_paths)
             ]
 
+        wait(motion_futures, return_when=FIRST_EXCEPTION)
+
         for future in as_completed(motion_futures):
             if future.exception():
                 raise future.exception()
@@ -312,12 +324,16 @@ class BoneWorker(BaseWorker):
             bone_panel.sizing_sets[sizing_idx].motion_ctrl.data = original_motion
             bone_panel.sizing_sets[sizing_idx].output_motion_ctrl.data = motion
 
+        wait(src_model_futures, return_when=FIRST_EXCEPTION)
+
         for future in as_completed(src_model_futures):
             if future.exception():
                 raise future.exception()
             sizing_idx, digest, original_model, model = future.result()
             self.frame.cache_models[digest] = original_model
             bone_panel.sizing_sets[sizing_idx].src_model_ctrl.data = model
+
+        wait(dest_model_futures, return_when=FIRST_EXCEPTION)
 
         for future in as_completed(dest_model_futures):
             if future.exception():

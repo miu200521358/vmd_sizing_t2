@@ -590,3 +590,7 @@ msgstr ""
 msgid "左親指０"
 msgstr ""
 
+
+msgid "処理を停止しました"
+msgstr ""
+

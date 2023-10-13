@@ -447,3 +447,6 @@ msgstr "Right thumb 0"
 
 msgid "左親指０"
 msgstr "Left thumb 0"
+
+msgid "処理を停止しました"
+msgstr "Processing has been stopped"
