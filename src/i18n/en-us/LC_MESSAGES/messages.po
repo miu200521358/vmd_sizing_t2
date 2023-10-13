@@ -468,3 +468,27 @@ msgstr "Left hand wrench"
 
 msgid "左腕捩"
 msgstr "Wrist left arm"
+
+msgid "詳しい解説ページをデフォルトブラウザで開きます"
+msgstr "Open the detailed explanation page in your default browser"
+
+msgid "全追加補正OFF"
+msgstr "All additional corrections OFF"
+
+msgid "全ての追加補正を無効にします"
+msgstr "Disable all additional corrections"
+
+msgid "全追加補正ON"
+msgstr "All additional corrections ON"
+
+msgid "全ての追加補正を有効にします"
+msgstr "Enable all additional corrections"
+
+msgid "全親統合"
+msgstr "All parent integration"
+
+msgid "全ての親の移動や回転をセンター・上半身・下半身に振り分けます"
+msgstr "All parental moves and rotations are distributed to the center, upper body, and lower body"
+
+msgid "親指０位置合わせ"
+msgstr "Thumb 0 alignment"

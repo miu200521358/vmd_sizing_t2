@@ -648,6 +648,11 @@ class ArmAlignUsecase:
                 if bone_name == BoneNames.shoulder(direction):
                     bf.rotation *= dest_motion.bones[BoneNames.shoulder_p(direction)][fno].rotation.inverse()
 
+                if not bf.register:
+                    # 捩りとかは登録されてない可能性があるので挿入する
+                    bf.register = True
+                    dest_motion.insert_bone_frame(bf)
+
         # 終わったらIKボーンキーフレ削除
         del dest_motion.bones[BoneNames.shoulder_ik_parent(direction)]
         del dest_motion.bones[BoneNames.shoulder_ik(direction)]
@@ -914,8 +919,8 @@ class ArmAlignUsecase:
 
                 shoulder_ik = Ik()
                 shoulder_ik.bone_index = model.bones[BoneNames.arm(direction)].index
-                shoulder_ik.loop_count = 12
-                shoulder_ik.unit_rotation.radians = MVector3D(0.1, 0, 0)
+                shoulder_ik.loop_count = 8
+                shoulder_ik.unit_rotation.radians = MVector3D(1, 0, 0)
 
                 shoulder_ik_link_shoulder = IkLink()
                 shoulder_ik_link_shoulder.bone_index = model.bones[BoneNames.shoulder(direction)].index
@@ -947,8 +952,8 @@ class ArmAlignUsecase:
 
                 arm_ik = Ik()
                 arm_ik.bone_index = model.bones[BoneNames.wrist(direction)].index
-                arm_ik.loop_count = 24 if is_twist else 12
-                arm_ik.unit_rotation.radians = MVector3D(0.1, 0, 0)
+                arm_ik.loop_count = 16 if is_twist else 8
+                arm_ik.unit_rotation.radians = MVector3D(1, 0, 0)
 
                 if BoneNames.hand_twist(direction) in model.bones:
                     arm_ik_link_wrist_twist = IkLink()
@@ -1012,8 +1017,8 @@ class ArmAlignUsecase:
 
                 wrist_ik = Ik()
                 wrist_ik.bone_index = model.bones[BoneNames.wrist_tail(direction)].index
-                wrist_ik.loop_count = 12
-                wrist_ik.unit_rotation.radians = MVector3D(0.1, 0, 0)
+                wrist_ik.loop_count = 8
+                wrist_ik.unit_rotation.radians = MVector3D(1, 0, 0)
 
                 wrist_ik_link_wrist = IkLink()
                 wrist_ik_link_wrist.bone_index = model.bones[BoneNames.wrist(direction)].index
@@ -1047,8 +1052,8 @@ class ArmAlignUsecase:
 
                 thumb0_ik = Ik()
                 thumb0_ik.bone_index = model.bones[BoneNames.thumb_tail(direction)].index
-                thumb0_ik.loop_count = 12
-                thumb0_ik.unit_rotation.radians = MVector3D(0.1, 0, 0)
+                thumb0_ik.loop_count = 8
+                thumb0_ik.unit_rotation.radians = MVector3D(1, 0, 0)
 
                 thumb0_ik_link_thumb2 = IkLink()
                 thumb0_ik_link_thumb2.bone_index = model.bones[BoneNames.thumb2(direction)].index

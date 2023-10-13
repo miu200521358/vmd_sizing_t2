@@ -618,3 +618,34 @@ msgstr ""
 msgid "左腕捩"
 msgstr ""
 
+
+msgid "詳しい解説ページをデフォルトブラウザで開きます"
+msgstr ""
+
+
+msgid "全追加補正OFF"
+msgstr ""
+
+
+msgid "全ての追加補正を無効にします"
+msgstr ""
+
+
+msgid "全追加補正ON"
+msgstr ""
+
+
+msgid "全ての追加補正を有効にします"
+msgstr ""
+
+
+msgid "全親統合"
+msgstr ""
+
+
+msgid "全ての親の移動や回転をセンター・上半身・下半身に振り分けます"
+msgstr ""
+
+
+msgid "親指０位置合わせ"
+msgstr ""

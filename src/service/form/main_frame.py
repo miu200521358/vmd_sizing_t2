@@ -90,10 +90,3 @@ class MainFrame(NotebookFrame):
 
     def Enable(self, enable: bool):
         self.bone_panel.Enable(enable)
-
-    def is_align(self):
-        """セットのどれかに位置合わせが入っているか"""
-        for sizing_set in self.bone_panel.sizing_sets:
-            if sizing_set.align_check_ctrl.GetValue():
-                return True
-        return False
