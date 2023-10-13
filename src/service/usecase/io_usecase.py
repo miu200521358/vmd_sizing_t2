@@ -49,6 +49,7 @@ class IoUsecase:
                 bone.position = original_matrixes[0, original_bone.name].position
                 tail_relative_position = original_model.bones.get_tail_relative_position(original_bone.index)
                 if 0 < tail_relative_position.length() and not original_bone.is_tail_bone:
+                    # 表示先
                     bone.bone_flg &= ~BoneFlg.TAIL_IS_BONE
                     bone.tail_position = (
                         original_matrixes[0, original_bone.name].global_matrix * tail_relative_position
@@ -57,12 +58,19 @@ class IoUsecase:
                 else:
                     bone.tail_position = MVector3D()
                 if original_bone.has_fixed_axis:
+                    # 軸制限
                     bone.fixed_axis = original_bone.fixed_axis.copy()
                     bone.bone_flg |= BoneFlg.HAS_FIXED_AXIS
                 if original_bone.has_local_coordinate:
+                    # ローカル軸
                     bone.local_x_vector = original_bone.local_x_vector.copy()
                     bone.local_z_vector = original_bone.local_z_vector.copy()
                     bone.bone_flg |= BoneFlg.HAS_LOCAL_COORDINATE
+                if original_bone.is_external_rotation or original_bone.is_external_translation:
+                    # 付与親
+                    bone.bone_flg |= BoneFlg.IS_EXTERNAL_ROTATION if original_bone.is_external_rotation else BoneFlg.IS_EXTERNAL_TRANSLATION
+                    bone.effect_index = model.bones[original_model.bones[original_bone.effect_index].name].index
+                    bone.effect_factor = original_bone.effect_factor
 
         if 10 >= logger.total_level:
             # デバッグレベルの場合、モデルを出力する
