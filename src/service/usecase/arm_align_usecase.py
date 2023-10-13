@@ -88,10 +88,10 @@ class ArmAlignUsecase:
 
         logger.debug(f"wrist_ratio[{wrist_ratio:.3f}]")
 
-        if BoneNames.thumb0(direction) in src_model.bones and BoneNames.thumb0(direction) in dest_model.bones:
-            thumb0_ratio = dest_model.bones[BoneNames.thumb0(direction)].position.distance(
-                dest_model.bones[BoneNames.thumb_tail(direction)].position
-            ) / src_model.bones[BoneNames.thumb0(direction)].position.distance(src_model.bones[BoneNames.thumb_tail(direction)].position)
+        if is_align_thumb0 and BoneNames.thumb0(direction) in src_model.bones and BoneNames.thumb0(direction) in dest_model.bones:
+            thumb0_ratio = dest_model.bones[BoneNames.wrist(direction)].position.distance(
+                dest_model.bones[BoneNames.thumb1(direction)].position
+            ) / src_model.bones[BoneNames.wrist(direction)].position.distance(src_model.bones[BoneNames.thumb1(direction)].position)
         else:
             thumb0_ratio = 1.0
 
@@ -240,7 +240,7 @@ class ArmAlignUsecase:
             if BoneNames.thumb0(direction) in dest_model.bones:
                 # 親指０IK --------------------
                 thumb0_ik_bf = VmdBoneFrame(fno, BoneNames.thumb_ik(direction))
-                thumb0_ik_bf.position = dest_initial_matrixes[fno, BoneNames.thumb_tail(direction)].position
+                thumb0_ik_bf.position = dest_initial_matrixes[fno, BoneNames.thumb1(direction)].position
                 thumb0_ik_bf.register = True
                 dest_motion.append_bone_frame(thumb0_ik_bf)
 
@@ -339,26 +339,47 @@ class ArmAlignUsecase:
             if is_align_thumb0 and BoneNames.thumb0(direction) in src_model.bones and BoneNames.thumb0(direction) in dest_model.bones:
                 # 親指０IK親 --------------------
 
-                src_thumb_tail_local_position = (
-                    src_initial_matrixes[fno, BoneNames.thumb_tail(direction)].position
-                    - src_initial_matrixes[fno, BoneNames.thumb0(direction)].position
+                src_thumb1_local_position = (
+                    src_initial_matrixes[fno, BoneNames.thumb1(direction)].position
+                    - src_initial_matrixes[fno, BoneNames.wrist(direction)].position
                 )
-                dest_thumb_tail_global_position = dest_initial_matrixes[fno, BoneNames.thumb0(direction)].position + (
-                    src_thumb_tail_local_position * thumb_ratio
+                dest_thumb1_global_position = dest_initial_matrixes[fno, BoneNames.wrist(direction)].position + (
+                    src_thumb1_local_position * thumb0_ratio
                 )
 
-                thumb_ik_parent_bf = VmdBoneFrame(fno, BoneNames.thumb_ik_parent(direction))
-                thumb_ik_parent_bf.position = (
-                    dest_thumb_tail_global_position - dest_initial_matrixes[fno, BoneNames.thumb_tail(direction)].position
-                ) + wrist_ik_parent_bf.position
-                thumb_ik_parent_bf.register = True
-                dest_motion.append_bone_frame(thumb_ik_parent_bf)
+                thumb0_ik_parent_bf = VmdBoneFrame(fno, BoneNames.thumb_ik_parent(direction))
+                thumb0_ik_parent_bf.position = (
+                    dest_thumb1_global_position - dest_initial_matrixes[fno, BoneNames.thumb1(direction)].position
+                ) + arm_ik_parent_bf.position
+                thumb0_ik_parent_bf.register = True
+                dest_motion.append_bone_frame(thumb0_ik_parent_bf)
 
                 logger.debug(
-                    f"[{direction}親指][{fno}][src_thumb_tail_local={src_thumb_tail_local_position}]"
-                    + f"[dest_thumb_tail_global={dest_thumb_tail_global_position}]"
-                    + f"[initial_thumb_tail_global={dest_initial_matrixes[fno, BoneNames.thumb_tail(direction)].position}]"
+                    f"[{direction}親指０][{fno}][src_thumb1_local={src_thumb1_local_position}]"
+                    + f"[dest_thumb1_global={dest_thumb1_global_position}]"
+                    + f"[initial_thumb1_global={dest_initial_matrixes[fno, BoneNames.thumb1(direction)].position}]"
                 )
+
+                # src_thumb_tail_local_position = (
+                #     src_initial_matrixes[fno, BoneNames.thumb_tail(direction)].position
+                #     - src_initial_matrixes[fno, BoneNames.thumb0(direction)].position
+                # )
+                # dest_thumb_tail_global_position = dest_initial_matrixes[fno, BoneNames.thumb0(direction)].position + (
+                #     src_thumb_tail_local_position * thumb_ratio
+                # )
+
+                # thumb_ik_parent_bf = VmdBoneFrame(fno, BoneNames.thumb_ik_parent(direction))
+                # thumb_ik_parent_bf.position = (
+                #     dest_thumb_tail_global_position - dest_initial_matrixes[fno, BoneNames.thumb_tail(direction)].position
+                # ) + wrist_ik_parent_bf.position
+                # thumb_ik_parent_bf.register = True
+                # dest_motion.append_bone_frame(thumb_ik_parent_bf)
+
+                # logger.debug(
+                #     f"[{direction}親指][{fno}][src_thumb_tail_local={src_thumb_tail_local_position}]"
+                #     + f"[dest_thumb_tail_global={dest_thumb_tail_global_position}]"
+                #     + f"[initial_thumb_tail_global={dest_initial_matrixes[fno, BoneNames.thumb_tail(direction)].position}]"
+                # )
 
         # src_thumb2_local_position = (
         #     src_initial_matrixes[fno, BoneNames.thumb0(direction)].global_matrix_no_scale.inverse()
@@ -564,12 +585,12 @@ class ArmAlignUsecase:
         )
 
         # IK回転の焼き込み -------------------
-        for bone_name, tail_bone_name in (
-            (BoneNames.thumb0(direction), BoneNames.thumb_tail(direction)),
-            (BoneNames.wrist(direction), BoneNames.wrist_tail(direction)),
-            (BoneNames.elbow(direction), BoneNames.wrist(direction)),
-            (BoneNames.arm(direction), BoneNames.wrist(direction)),
-            (BoneNames.shoulder(direction), BoneNames.arm(direction)),
+        for bone_name in (
+            BoneNames.thumb0(direction),
+            BoneNames.wrist(direction),
+            BoneNames.elbow(direction),
+            BoneNames.arm(direction),
+            BoneNames.shoulder(direction),
         ):
             if bone_name not in dest_motion.bones or (BoneNames.thumb0(direction) == bone_name and not is_align_thumb0):
                 continue
@@ -984,7 +1005,7 @@ class ArmAlignUsecase:
             if is_align_thumb0 and BoneNames.thumb0(direction) in model.bones:
                 # 親指０IK親 追加 ---------------
                 thumb0_ik_parent_bone = Bone(
-                    index=model.bones[BoneNames.thumb2(direction)].index, name=BoneNames.thumb_ik_parent(direction)
+                    index=model.bones[BoneNames.thumb1(direction)].index, name=BoneNames.thumb_ik_parent(direction)
                 )
                 thumb0_ik_parent_bone.parent_index = model.bones[BoneNames.root()].index
                 thumb0_ik_parent_bone.position = MVector3D()
@@ -995,7 +1016,7 @@ class ArmAlignUsecase:
                 sizing_display_slot.references.append(DisplaySlotReference(display_index=thumb0_ik_parent_bone.index))
 
                 # 親指０IK追加 ---------------
-                thumb0_ik_bone = Bone(index=model.bones[BoneNames.thumb2(direction)].index, name=BoneNames.thumb_ik(direction))
+                thumb0_ik_bone = Bone(index=model.bones[BoneNames.thumb1(direction)].index, name=BoneNames.thumb_ik(direction))
                 thumb0_ik_bone.parent_index = thumb0_ik_parent_bone.index
                 thumb0_ik_bone.position = MVector3D()
                 thumb0_ik_bone.is_system = True
@@ -1004,14 +1025,14 @@ class ArmAlignUsecase:
                 )
 
                 thumb0_ik = Ik()
-                thumb0_ik.bone_index = model.bones[BoneNames.thumb2(direction)].index
+                thumb0_ik.bone_index = model.bones[BoneNames.thumb1(direction)].index
                 thumb0_ik.loop_count = 12
                 thumb0_ik.unit_rotation.radians = MVector3D(0.1, 0, 0)
 
-                thumb0_ik_link_thumb1 = IkLink()
-                thumb0_ik_link_thumb1.bone_index = model.bones[BoneNames.thumb1(direction)].index
-                thumb0_ik_link_thumb1.angle_limit = True
-                thumb0_ik.links.append(thumb0_ik_link_thumb1)
+                # thumb0_ik_link_thumb1 = IkLink()
+                # thumb0_ik_link_thumb1.bone_index = model.bones[BoneNames.thumb1(direction)].index
+                # thumb0_ik_link_thumb1.angle_limit = True
+                # thumb0_ik.links.append(thumb0_ik_link_thumb1)
 
                 thumb0_ik_link_thumb0 = IkLink()
                 thumb0_ik_link_thumb0.bone_index = model.bones[BoneNames.thumb0(direction)].index
