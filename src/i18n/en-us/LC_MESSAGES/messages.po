@@ -450,3 +450,21 @@ msgstr "Left thumb 0"
 
 msgid "処理を停止しました"
 msgstr "Processing has been stopped"
+
+msgid "ボーン行列結果[{d}]"
+msgstr "Bourne Matrix Result [{d}]"
+
+msgid "-- ボーン行列結果[{d}] [{i} ({p:.2f}%)]"
+msgstr "-- Bourne matrix result [{d}] [{i} ({p:.2f}%)]"
+
+msgid "右手捩"
+msgstr "Right hand wrench"
+
+msgid "右腕捩"
+msgstr "Right arm wrench"
+
+msgid "左手捩"
+msgstr "Left hand wrench"
+
+msgid "左腕捩"
+msgstr "Wrist left arm"

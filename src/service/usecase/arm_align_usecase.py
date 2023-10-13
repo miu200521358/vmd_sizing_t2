@@ -24,11 +24,12 @@ class ArmAlignUsecase:
         is_align: bool,
         is_align_finger: bool,
         is_align_thumb0: bool,
+        is_twist: bool,
         show_message: bool = False,
     ) -> bool:
         BONE_NAMES = ["右肩", "右腕", "右ひじ", "右手首", "左肩", "左腕", "左ひじ", "左手首"]
 
-        if not (src_model and dest_model) or (not is_align and not is_align_finger and not is_align_thumb0):
+        if not (src_model and dest_model) or (not is_align and not is_align_finger and not is_align_thumb0 and not is_twist):
             # モデルが揃ってない、チェックが入ってない場合、スルー
             return False
 
@@ -65,6 +66,7 @@ class ArmAlignUsecase:
         direction: str,
         is_align_finger: bool,
         is_align_thumb0: bool,
+        is_twist: bool,
     ) -> tuple[int, VmdMotion]:
         fnos = dest_initial_matrixes.indexes
 
@@ -588,13 +590,29 @@ class ArmAlignUsecase:
         for bone_name in (
             BoneNames.thumb0(direction),
             BoneNames.wrist(direction),
+            BoneNames.hand_twist(direction),
             BoneNames.elbow(direction),
+            BoneNames.arm_twist(direction),
             BoneNames.arm(direction),
             BoneNames.shoulder(direction),
         ):
-            if bone_name not in dest_motion.bones or (BoneNames.thumb0(direction) == bone_name and not is_align_thumb0):
+            if (
+                bone_name not in dest_motion.bones
+                or (BoneNames.thumb0(direction) == bone_name and not is_align_thumb0)
+                or (bone_name in (BoneNames.hand_twist(direction), BoneNames.arm_twist(direction)) and not is_twist)
+            ):
                 continue
+
             fnos = dest_motion.bones[bone_name].register_indexes
+            if bone_name == BoneNames.hand_twist(direction):
+                fnos = sorted(
+                    set(dest_motion.bones[bone_name].register_indexes) | set(dest_motion.bones[BoneNames.elbow(direction)].register_indexes)
+                )
+            elif bone_name == BoneNames.arm_twist(direction):
+                fnos = sorted(
+                    set(dest_motion.bones[bone_name].register_indexes) | set(dest_motion.bones[BoneNames.arm(direction)].register_indexes)
+                )
+
             for fidx, fno in enumerate(fnos):
                 logger.count(
                     "【No.{x}】{b}位置合わせ",
@@ -744,11 +762,13 @@ class ArmAlignUsecase:
 
                 # 手首先追加 ---------------
 
+                wrist_vector = model.bones[BoneNames.wrist(direction)].position - model.bones[BoneNames.elbow(direction)].position
+                # 真っ直ぐ伸ばしただけだと手首の回転が正常に検知できないので、外積分を加算する
+                wrist_cross_vector = wrist_vector.cross(MVector3D(0, -1, 0)).normalized()
+
                 wrist_tail_bone = Bone(index=model.bones[BoneNames.wrist(direction)].index + 1, name=BoneNames.wrist_tail(direction))
                 wrist_tail_bone.parent_index = model.bones[BoneNames.wrist(direction)].index
-                wrist_tail_bone.position = model.bones[BoneNames.wrist(direction)].position + (
-                    (model.bones[BoneNames.wrist(direction)].position - model.bones[BoneNames.elbow(direction)].position) * 0.3
-                )
+                wrist_tail_bone.position = model.bones[BoneNames.wrist(direction)].position + (wrist_vector * 0.3) + wrist_cross_vector
                 wrist_tail_bone.is_system = True
                 wrist_tail_bone.bone_flg |= BoneFlg.CAN_TRANSLATE | BoneFlg.CAN_ROTATE | BoneFlg.CAN_MANIPULATE | BoneFlg.IS_VISIBLE
 
@@ -850,6 +870,7 @@ class ArmAlignUsecase:
         model: PmxModel,
         is_align_finger: bool,
         is_align_thumb0: bool,
+        is_twist: bool,
     ) -> None:
         logger.info(
             "【No.{x}】腕位置合わせ：追加IKセットアップ({m})",
@@ -926,13 +947,14 @@ class ArmAlignUsecase:
 
                 arm_ik = Ik()
                 arm_ik.bone_index = model.bones[BoneNames.wrist(direction)].index
-                arm_ik.loop_count = 12
+                arm_ik.loop_count = 24 if is_twist else 12
                 arm_ik.unit_rotation.radians = MVector3D(0.1, 0, 0)
 
                 if BoneNames.hand_twist(direction) in model.bones:
                     arm_ik_link_wrist_twist = IkLink()
                     arm_ik_link_wrist_twist.bone_index = model.bones[BoneNames.hand_twist(direction)].index
-                    arm_ik_link_wrist_twist.angle_limit = True
+                    if not is_twist:
+                        arm_ik_link_wrist_twist.angle_limit = True
                     arm_ik.links.append(arm_ik_link_wrist_twist)
 
                     for b in model.bones:
@@ -949,7 +971,8 @@ class ArmAlignUsecase:
                 if BoneNames.arm_twist(direction) in model.bones:
                     arm_ik_link_arm_twist = IkLink()
                     arm_ik_link_arm_twist.bone_index = model.bones[BoneNames.arm_twist(direction)].index
-                    arm_ik_link_arm_twist.angle_limit = True
+                    if not is_twist:
+                        arm_ik_link_arm_twist.angle_limit = True
                     arm_ik.links.append(arm_ik_link_arm_twist)
 
                     for b in model.bones:

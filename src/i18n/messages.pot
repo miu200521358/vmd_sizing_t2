@@ -594,3 +594,27 @@ msgstr ""
 msgid "処理を停止しました"
 msgstr ""
 
+
+msgid "ボーン行列結果[{d}]"
+msgstr ""
+
+
+msgid "-- ボーン行列結果[{d}] [{i} ({p:.2f}%)]"
+msgstr ""
+
+
+msgid "右手捩"
+msgstr ""
+
+
+msgid "右腕捩"
+msgstr ""
+
+
+msgid "左手捩"
+msgstr ""
+
+
+msgid "左腕捩"
+msgstr ""
+

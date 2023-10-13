@@ -450,3 +450,21 @@ msgstr "左親指０"
 
 msgid "処理を停止しました"
 msgstr "処理を停止しました"
+
+msgid "ボーン行列結果[{d}]"
+msgstr "ボーン行列結果[{d}]"
+
+msgid "-- ボーン行列結果[{d}] [{i} ({p:.2f}%)]"
+msgstr "-- ボーン行列結果[{d}] [{i} ({p:.2f}%)]"
+
+msgid "右手捩"
+msgstr "右手捩"
+
+msgid "右腕捩"
+msgstr "右腕捩"
+
+msgid "左手捩"
+msgstr "左手捩"
+
+msgid "左腕捩"
+msgstr "左腕捩"

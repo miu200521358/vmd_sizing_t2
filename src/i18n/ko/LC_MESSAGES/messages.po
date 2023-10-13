@@ -450,3 +450,21 @@ msgstr "왼손 엄지손가락을 들어라"
 
 msgid "処理を停止しました"
 msgstr "처리 중단"
+
+msgid "ボーン行列結果[{d}]"
+msgstr "본 매트릭스 결과[{d}}"
+
+msgid "-- ボーン行列結果[{d}] [{i} ({p:.2f}%)]"
+msgstr "-- 본행렬 결과[{d}] [{i} ({p:.2f}%)]"
+
+msgid "右手捩"
+msgstr "오른손 비틀기"
+
+msgid "右腕捩"
+msgstr "오른팔 비틀기"
+
+msgid "左手捩"
+msgstr "왼손 비틀기"
+
+msgid "左腕捩"
+msgstr "왼팔 비틀기"

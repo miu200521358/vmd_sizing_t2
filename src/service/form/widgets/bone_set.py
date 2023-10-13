@@ -269,6 +269,8 @@ class SizingBoneSet:
             sizing_types: list[str] = []
             if self.align_check_ctrl.GetValue() or self.align_finger_check_ctrl.GetValue() or self.align_thumb0_check_ctrl.GetValue():
                 sizing_types.append("P")
+            if self.twist_check_ctrl.GetValue():
+                sizing_types.append("T")
             self.output_motion_ctrl.path = os.path.join(
                 motion_dir_path,
                 "".join(

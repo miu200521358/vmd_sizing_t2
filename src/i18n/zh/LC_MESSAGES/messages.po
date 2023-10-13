@@ -450,3 +450,21 @@ msgstr "左手拇指 0"
 
 msgid "処理を停止しました"
 msgstr "处理已停止"
+
+msgid "ボーン行列結果[{d}]"
+msgstr "伯恩矩阵结果 [{d}]"
+
+msgid "-- ボーン行列結果[{d}] [{i} ({p:.2f}%)]"
+msgstr "--伯恩矩阵结果 [{d}] [{i} ({p:.2f}%)]"
+
+msgid "右手捩"
+msgstr "右手扳手"
+
+msgid "右腕捩"
+msgstr "右臂扳手
+
+msgid "左手捩"
+msgstr "左手扳手
+
+msgid "左腕捩"
+msgstr "左臂扳手"
