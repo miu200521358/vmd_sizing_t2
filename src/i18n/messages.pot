@@ -649,3 +649,15 @@ msgstr ""
 
 msgid "親指０位置合わせ"
 msgstr ""
+
+msgid "【No.{i}】{b}:捩り分散事前準備"
+msgstr ""
+
+
+msgid "モデル名に日本語・英語で判読できない文字が含まれているため、仮モデル名を設定します。 {m}"
+msgstr ""
+
+
+msgid "(読取失敗)"
+msgstr ""
+

@@ -1,8 +1,11 @@
 import os
+from re import T
 from typing import Optional
 
+import numpy as np
+
 from mlib.core.logger import MLogger
-from mlib.core.math import MVector3D
+from mlib.core.math import MQuaternion, MVector3D
 from mlib.pmx.bone_setting import BoneFlg
 from mlib.pmx.pmx_collection import PmxModel
 from mlib.pmx.pmx_part import Bone, DisplaySlot, DisplaySlotReference, Ik, IkLink
@@ -555,18 +558,37 @@ class ArmAlignUsecase:
         #         finger_bf.position = dest_finger_global_position - far_dest_finger_position
         #         dest_motion.append_bone_frame(finger_bf)
 
+        if is_twist:
+            # 腕捩
+            self.prepare_twist(
+                sizing_idx,
+                dest_model,
+                dest_motion,
+                BoneNames.arm(direction),
+                BoneNames.arm_twist(direction),
+                BoneNames.elbow(direction),
+            )
+            # 手捩
+            self.prepare_twist(
+                sizing_idx,
+                dest_model,
+                dest_motion,
+                BoneNames.elbow(direction),
+                BoneNames.hand_twist(direction),
+                BoneNames.wrist(direction),
+            )
+
         if 10 >= logger.total_level:
             # デバッグレベルの場合、IKのみのVMDも出力する
             from mlib.vmd.vmd_writer import VmdWriter
 
-            ik_dest_motion = dest_motion.copy()
-            ik_dest_motion.path = os.path.join(
+            path = os.path.join(
                 os.path.dirname(dest_motion.path),
                 f"IK_{os.path.basename(dest_model.path)}_{direction}_{os.path.basename(dest_motion.path)}",
             )
 
-            os.makedirs(os.path.dirname(ik_dest_motion.path), exist_ok=True)
-            VmdWriter(ik_dest_motion, ik_dest_motion.path, dest_model.name).save()
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            VmdWriter(dest_motion, path, dest_model.name).save()
 
         # IK計算
         dest_ik_result_matrixes = dest_motion.animate_bone(
@@ -579,7 +601,7 @@ class ArmAlignUsecase:
                 BoneNames.arm(direction),
                 BoneNames.elbow(direction),
                 BoneNames.wrist(direction),
-                BoneNames.thumb2(direction),
+                BoneNames.thumb_tail(direction),
             ],
             clear_ik=True,
             out_fno_log=True,
@@ -664,6 +686,66 @@ class ArmAlignUsecase:
         del dest_motion.bones[BoneNames.thumb_ik(direction)]
 
         return sizing_idx, dest_motion
+
+    def prepare_twist(
+        self,
+        sizing_idx: int,
+        dest_model: PmxModel,
+        dest_motion: VmdMotion,
+        above_bone_name: str,
+        twist_bone_name: str,
+        bellow_bone_name: str,
+    ) -> None:
+        if not (twist_bone_name in dest_model.bones and above_bone_name in dest_model.bones and bellow_bone_name in dest_model.bones):
+            return
+
+        logger.info("【No.{i}】{b}:捩り分散事前準備", i=sizing_idx + 1, b=twist_bone_name, decoration=MLogger.Decoration.LINE)
+
+        fnos = sorted(
+            set(dest_motion.bones[twist_bone_name].register_indexes)
+            | set(dest_motion.bones[above_bone_name].register_indexes)
+            | set(dest_motion.bones[bellow_bone_name].register_indexes)
+        )
+        above_local_x_axis = dest_model.bones[above_bone_name].corrected_local_x_vector
+        above_local_y_axis = dest_model.bones[above_bone_name].corrected_local_y_vector
+        # twist_fixed_axis = dest_model.bones[twist_bone_name].corrected_fixed_axis
+        bellow_local_x_axis = dest_model.bones[bellow_bone_name].corrected_local_x_vector
+
+        for fidx, fno in enumerate(fnos):
+            logger.count(
+                "【No.{x}】{b}:捩り分散事前準備",
+                x=sizing_idx + 1,
+                b=twist_bone_name,
+                index=fidx,
+                total_index_count=len(fnos),
+                display_block=1000,
+            )
+
+            above_bf = dest_motion.bones[above_bone_name][fno]
+            # twist_bf = dest_motion.bones[twist_bone_name][fno]
+            bellow_bf = dest_motion.bones[bellow_bone_name][fno]
+
+            _, _, _, above_yz_qq = above_bf.rotation.separate_by_axis(above_local_x_axis)
+            _, _, _, bellow_yz_qq = bellow_bf.rotation.separate_by_axis(bellow_local_x_axis)
+
+            if "ひじ" in above_bone_name:
+                above_signed_degree = above_yz_qq.to_signed_degrees(above_local_y_axis)
+                above_bf.rotation = MQuaternion.from_axis_angles(
+                    above_local_y_axis, abs(above_signed_degree) * np.sign(dest_model.bones[above_bone_name].position.x)
+                )
+            else:
+                above_bf.rotation = above_yz_qq
+            above_bf.register = True
+            dest_motion.insert_bone_frame(above_bf)
+
+            bellow_bf.rotation = bellow_yz_qq
+            bellow_bf.register = True
+            dest_motion.insert_bone_frame(bellow_bf)
+
+            # twist_qq: MQuaternion = above_x_qq * twist_bf.rotation
+            # twist_bf.rotation = twist_qq.to_fixed_axis_rotation(twist_fixed_axis)
+            # twist_bf.register = True
+            # dest_motion.insert_bone_frame(twist_bf)
 
     def get_initial_matrixes(
         self, sizing_idx: int, is_src: bool, model: PmxModel, motion: VmdMotion, direction: str
@@ -952,7 +1034,7 @@ class ArmAlignUsecase:
 
                 arm_ik = Ik()
                 arm_ik.bone_index = model.bones[BoneNames.wrist(direction)].index
-                arm_ik.loop_count = 16 if is_twist else 8
+                arm_ik.loop_count = 32 if is_twist else 8
                 arm_ik.unit_rotation.radians = MVector3D(1, 0, 0)
 
                 if BoneNames.hand_twist(direction) in model.bones:
@@ -969,8 +1051,12 @@ class ArmAlignUsecase:
                 arm_ik_link_elbow = IkLink()
                 arm_ik_link_elbow.bone_index = model.bones[BoneNames.elbow(direction)].index
                 arm_ik_link_elbow.angle_limit = True
-                arm_ik_link_elbow.local_min_angle_limit.degrees = MVector3D(0, -180, 0)
-                arm_ik_link_elbow.local_max_angle_limit.degrees = MVector3D(0, 3, 0)
+                if direction == "右":
+                    arm_ik_link_elbow.local_min_angle_limit.degrees = MVector3D(0, -180, 0)
+                    arm_ik_link_elbow.local_max_angle_limit.degrees = MVector3D(0, 3, 0)
+                else:
+                    arm_ik_link_elbow.local_min_angle_limit.degrees = MVector3D(0, -3, 0)
+                    arm_ik_link_elbow.local_max_angle_limit.degrees = MVector3D(0, 180, 0)
                 arm_ik.links.append(arm_ik_link_elbow)
 
                 if BoneNames.arm_twist(direction) in model.bones:
