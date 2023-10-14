@@ -55,6 +55,18 @@ class BoneNames:
         return f"{direction}ひじ"
 
     @classmethod
+    def elbow_ik_parent(cls, direction: str):
+        return f"{SIZING_BONE_PREFIX}{direction}ひじIK親"
+
+    @classmethod
+    def elbow_ik(cls, direction: str):
+        return f"{SIZING_BONE_PREFIX}{direction}ひじIK"
+
+    @classmethod
+    def elbow_center(cls, direction: str):
+        return f"{SIZING_BONE_PREFIX}{direction}ひじ中点"
+
+    @classmethod
     def hand_twist(cls, direction: str, index: int = 0):
         return f"{direction}手捩" if index == 0 else f"{direction}手捩{index}"
 
