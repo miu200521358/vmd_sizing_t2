@@ -2,174 +2,195 @@ SIZING_BONE_PREFIX = "[SZ]"
 
 
 class BoneNames:
-    @classmethod
-    def root(cls):
+    @staticmethod
+    def root():
         return f"{SIZING_BONE_PREFIX}ROOT"
 
-    @classmethod
-    def shoulder_root(cls, direction: str):
+    @staticmethod
+    def shoulder_root(direction: str) -> str:
         return f"{direction}肩根元"
 
-    @classmethod
-    def shoulder_p(cls, direction: str):
+    @staticmethod
+    def shoulder_p(direction: str) -> str:
         return f"{direction}肩P"
 
-    @classmethod
-    def shoulder(cls, direction: str):
+    @staticmethod
+    def shoulder(direction: str) -> str:
         return f"{direction}肩"
 
-    @classmethod
-    def shoulder_c(cls, direction: str):
+    @staticmethod
+    def shoulder_c(direction: str) -> str:
         return f"{direction}肩C"
 
-    @classmethod
-    def shoulder_center(cls, direction: str):
+    @staticmethod
+    def shoulder_center(direction: str) -> str:
         return f"{SIZING_BONE_PREFIX}{direction}肩中点"
 
-    @classmethod
-    def shoulder_ik_parent(cls, direction: str):
+    @staticmethod
+    def shoulder_ik_parent(direction: str) -> str:
         return f"{SIZING_BONE_PREFIX}{direction}肩IK親"
 
-    @classmethod
-    def shoulder_ik(cls, direction: str):
+    @staticmethod
+    def shoulder_ik(direction: str) -> str:
         return f"{SIZING_BONE_PREFIX}{direction}肩IK"
 
-    @classmethod
-    def arm(cls, direction: str):
+    @staticmethod
+    def arm(direction: str) -> str:
         return f"{direction}腕"
 
-    @classmethod
-    def arm_twist(cls, direction: str, index: int = 0):
+    @staticmethod
+    def arm_twist(direction: str, index: int = 0):
         return f"{direction}腕捩" if index == 0 else f"{direction}腕捩{index}"
 
-    @classmethod
-    def arm_ik_parent(cls, direction: str):
+    @staticmethod
+    def arm_ik_parent(direction: str) -> str:
         return f"{SIZING_BONE_PREFIX}{direction}腕IK親"
 
-    @classmethod
-    def arm_ik(cls, direction: str):
+    @staticmethod
+    def arm_ik(direction: str) -> str:
         return f"{SIZING_BONE_PREFIX}{direction}腕IK"
 
-    @classmethod
-    def elbow(cls, direction: str):
+    @staticmethod
+    def elbow(direction: str) -> str:
         return f"{direction}ひじ"
 
-    @classmethod
-    def elbow_ik_parent(cls, direction: str):
+    @staticmethod
+    def elbow_ik_parent(direction: str) -> str:
         return f"{SIZING_BONE_PREFIX}{direction}ひじIK親"
 
-    @classmethod
-    def elbow_ik(cls, direction: str):
+    @staticmethod
+    def elbow_ik(direction: str) -> str:
         return f"{SIZING_BONE_PREFIX}{direction}ひじIK"
 
-    @classmethod
-    def elbow_center(cls, direction: str):
+    @staticmethod
+    def elbow_center(direction: str) -> str:
         return f"{SIZING_BONE_PREFIX}{direction}ひじ中点"
 
-    @classmethod
-    def hand_twist(cls, direction: str, index: int = 0):
+    @staticmethod
+    def hand_twist(direction: str, index: int = 0):
         return f"{direction}手捩" if index == 0 else f"{direction}手捩{index}"
 
-    @classmethod
-    def wrist(cls, direction: str):
+    @staticmethod
+    def wrist(direction: str) -> str:
         return f"{direction}手首"
 
-    @classmethod
-    def wrist_tail(cls, direction: str):
+    @staticmethod
+    def wrist_tail(direction: str) -> str:
         return f"{SIZING_BONE_PREFIX}{direction}手首先"
 
-    @classmethod
-    def wrist_ik_parent(cls, direction: str):
+    @staticmethod
+    def wrist_ik_parent(direction: str) -> str:
         return f"{SIZING_BONE_PREFIX}{direction}手首IK親"
 
-    @classmethod
-    def wrist_ik(cls, direction: str):
+    @staticmethod
+    def wrist_ik(direction: str) -> str:
         return f"{SIZING_BONE_PREFIX}{direction}手首IK"
 
-    @classmethod
-    def thumb0(cls, direction: str):
+    @staticmethod
+    def thumb0(direction: str) -> str:
         return f"{direction}親指０"
 
-    @classmethod
-    def thumb_ik_parent(cls, direction: str):
+    @staticmethod
+    def thumb_ik_parent(direction: str) -> str:
         return f"{SIZING_BONE_PREFIX}{direction}親０IK親"
 
-    @classmethod
-    def thumb_ik(cls, direction: str):
+    @staticmethod
+    def thumb_ik(direction: str) -> str:
         return f"{SIZING_BONE_PREFIX}{direction}親０IK"
 
-    @classmethod
-    def thumb1(cls, direction: str):
+    @staticmethod
+    def thumb1(direction: str) -> str:
         return f"{direction}親指１"
 
-    @classmethod
-    def thumb2(cls, direction: str):
+    @staticmethod
+    def thumb2(direction: str) -> str:
         return f"{direction}親指２"
 
-    @classmethod
-    def thumb_tail(cls, direction: str):
+    @staticmethod
+    def thumb_tail(direction: str) -> str:
         return f"{SIZING_BONE_PREFIX}{direction}親先"
 
-    @classmethod
-    def index1(cls, direction: str):
+    @staticmethod
+    def index1(direction: str) -> str:
         return f"{direction}人指１"
 
-    @classmethod
-    def index2(cls, direction: str):
+    @staticmethod
+    def index2(direction: str) -> str:
         return f"{direction}人指２"
 
-    @classmethod
-    def index3(cls, direction: str):
+    @staticmethod
+    def index3(direction: str) -> str:
         return f"{direction}人指３"
 
-    @classmethod
-    def index_tail(cls, direction: str):
+    @staticmethod
+    def index_tail(direction: str) -> str:
         return f"{SIZING_BONE_PREFIX}{direction}人先"
 
-    @classmethod
-    def middle1(cls, direction: str):
+    @staticmethod
+    def middle1(direction: str) -> str:
         return f"{direction}中指１"
 
-    @classmethod
-    def middle2(cls, direction: str):
+    @staticmethod
+    def middle2(direction: str) -> str:
         return f"{direction}中指２"
 
-    @classmethod
-    def middle3(cls, direction: str):
+    @staticmethod
+    def middle3(direction: str) -> str:
         return f"{direction}中指３"
 
-    @classmethod
-    def middle_tail(cls, direction: str):
+    @staticmethod
+    def middle_tail(direction: str) -> str:
         return f"{SIZING_BONE_PREFIX}{direction}中先"
 
-    @classmethod
-    def ring1(cls, direction: str):
+    @staticmethod
+    def ring1(direction: str) -> str:
         return f"{direction}薬指１"
 
-    @classmethod
-    def ring2(cls, direction: str):
+    @staticmethod
+    def ring2(direction: str) -> str:
         return f"{direction}薬指２"
 
-    @classmethod
-    def ring3(cls, direction: str):
+    @staticmethod
+    def ring3(direction: str) -> str:
         return f"{direction}薬指３"
 
-    @classmethod
-    def ring_tail(cls, direction: str):
+    @staticmethod
+    def ring_tail(direction: str) -> str:
         return f"{SIZING_BONE_PREFIX}{direction}薬先"
 
-    @classmethod
-    def pinky1(cls, direction: str):
+    @staticmethod
+    def pinky1(direction: str) -> str:
         return f"{direction}小指１"
 
-    @classmethod
-    def pinky2(cls, direction: str):
+    @staticmethod
+    def pinky2(direction: str) -> str:
         return f"{direction}小指２"
 
-    @classmethod
-    def pinky3(cls, direction: str):
+    @staticmethod
+    def pinky3(direction: str) -> str:
         return f"{direction}小指３"
 
-    @classmethod
-    def pinky_tail(cls, direction: str):
+    @staticmethod
+    def pinky_tail(direction: str) -> str:
         return f"{SIZING_BONE_PREFIX}{direction}小先"
+
+    @staticmethod
+    def fingers4(direction: str) -> list[str]:
+        return [
+            BoneNames.index1(direction),
+            BoneNames.index2(direction),
+            BoneNames.index3(direction),
+            BoneNames.index_tail(direction),
+            BoneNames.middle1(direction),
+            BoneNames.middle2(direction),
+            BoneNames.middle3(direction),
+            BoneNames.middle_tail(direction),
+            BoneNames.ring1(direction),
+            BoneNames.ring2(direction),
+            BoneNames.ring3(direction),
+            BoneNames.ring_tail(direction),
+            BoneNames.pinky1(direction),
+            BoneNames.pinky2(direction),
+            BoneNames.pinky3(direction),
+            BoneNames.pinky_tail(direction),
+        ]

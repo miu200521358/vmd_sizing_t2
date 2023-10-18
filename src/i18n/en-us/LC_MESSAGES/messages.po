@@ -491,4 +491,24 @@ msgid "全ての親の移動や回転をセンター・上半身・下半身に�
 msgstr "All parental moves and rotations are distributed to the center, upper body, and lower body"
 
 msgid "親指０位置合わせ"
-msgstr "Thumb 0 alignment"
+msgstr "Thumb 0 alignment
+msgid "【No.{i}】{b}:捩り分散事前準備"
+msgstr "[No.{i}]{b}:Preparation for torsional dispersion"
+
+msgid "モデル名に日本語・英語で判読できない文字が含まれているため、仮モデル名を設定します。 {m}"
+msgstr "Set a temporary model name because the model name contains characters that are illegible in Japanese or English. {m}"
+
+msgid "(読取失敗)"
+msgstr "(Reading Failure)"
+
+msgid "【No.{x}】モーション読み込み"
+msgstr "[No.{x}] Motion loading"
+
+msgid "-- ボーンデータ読み取り [{i} ({p:.2f}%)]"
+msgstr "-- Bone data read [{i} ({p:.2f}%)]"
+
+msgid "【No.{x}】モデル読み込み({m})"
+msgstr "[No.{x}] Model loading ({m})"
+
+msgid "【No.{x}】サイジング追加セットアップ({m})"
+msgstr "[No.{x}] Sizing additional setup ({m})"

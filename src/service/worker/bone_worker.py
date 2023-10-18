@@ -54,21 +54,6 @@ class BoneWorker(BaseWorker):
         bone_panel = self.frame.bone_panel
         initial_matrixes: dict[tuple[int, bool, str], VmdBoneFrameTrees] = {}
 
-        # セットアップする
-        for sizing_set in bone_panel.sizing_sets:
-            if usecase.validate(
-                sizing_set.sizing_idx,
-                sizing_set.src_model_ctrl.data,
-                sizing_set.dest_model_ctrl.data,
-                bone_panel.align_check_ctrl.GetValue(),
-                bone_panel.align_finger_check_ctrl.GetValue(),
-                bone_panel.align_thumb0_check_ctrl.GetValue(),
-                bone_panel.twist_check_ctrl.GetValue(),
-                show_message=True,
-            ):
-                usecase.setup_model(sizing_set.sizing_idx, True, sizing_set.src_model_ctrl.data)
-                usecase.setup_model(sizing_set.sizing_idx, False, sizing_set.dest_model_ctrl.data)
-
         # 先にIKが無い状態でモーション行列を取得する
         with ThreadPoolExecutor(thread_name_prefix="arm_align_initial", max_workers=self.max_worker) as executor:
             futures: list[Future] = []
@@ -315,11 +300,11 @@ class BoneWorker(BaseWorker):
                 for sizing_idx, motion_path in enumerate(loadable_motion_paths)
             ]
             src_model_futures = [
-                executor.submit(usecase.load_model, sizing_idx, model_path, self.frame.cache_models)
+                executor.submit(usecase.load_model, sizing_idx, model_path, self.frame.cache_models, True)
                 for sizing_idx, model_path in enumerate(loadable_src_model_paths)
             ]
             dest_model_futures = [
-                executor.submit(usecase.load_model, sizing_idx, model_path, self.frame.cache_models)
+                executor.submit(usecase.load_model, sizing_idx, model_path, self.frame.cache_models, False)
                 for sizing_idx, model_path in enumerate(loadable_dest_model_paths)
             ]
 

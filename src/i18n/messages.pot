@@ -661,3 +661,19 @@ msgstr ""
 msgid "(読取失敗)"
 msgstr ""
 
+
+msgid "【No.{x}】モーション読み込み"
+msgstr ""
+
+
+msgid "-- ボーンデータ読み取り [{i} ({p:.2f}%)]"
+msgstr ""
+
+
+msgid "【No.{x}】モデル読み込み({m})"
+msgstr ""
+
+
+msgid "【No.{x}】サイジング追加セットアップ({m})"
+msgstr ""
+
