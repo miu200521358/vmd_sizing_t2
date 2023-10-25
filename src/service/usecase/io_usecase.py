@@ -65,7 +65,7 @@ class IoUsecase:
                 original_bone = original_model.bones[bone.name]
                 bone.position = original_matrixes[0, original_bone.name].position
                 tail_relative_position = original_model.bones.get_tail_relative_position(original_bone.index)
-                if 0 < tail_relative_position.length() and not original_bone.is_tail_bone:
+                if original_bone.is_tail_bone:
                     # 表示先
                     bone.bone_flg &= ~BoneFlg.TAIL_IS_BONE
                     bone.tail_position = (
@@ -189,8 +189,8 @@ class IoUsecase:
                 if BoneNames.thumb2(direction) in model.bones:
                     thumb_tail_bone = Bone(index=model.bones[BoneNames.thumb2(direction)].index + 1, name=BoneNames.thumb_tail(direction))
                     thumb_tail_bone.parent_index = model.bones[BoneNames.thumb2(direction)].index
-                    thumb_tail_bone.position = (
-                        model.bones[BoneNames.thumb2(direction)].position + model.bones[BoneNames.thumb2(direction)].tail_relative_position
+                    thumb_tail_bone.position = model.bones[BoneNames.thumb2(direction)].position + model.bones.get_tail_relative_position(
+                        model.bones[BoneNames.thumb2(direction)].index
                     )
                     thumb_tail_bone.is_system = True
                     thumb_tail_bone.bone_flg |= BoneFlg.CAN_TRANSLATE | BoneFlg.CAN_ROTATE | BoneFlg.CAN_MANIPULATE | BoneFlg.IS_VISIBLE
@@ -202,8 +202,8 @@ class IoUsecase:
                 if BoneNames.index3(direction) in model.bones:
                     index_tail_bone = Bone(index=model.bones[BoneNames.index3(direction)].index + 1, name=BoneNames.index_tail(direction))
                     index_tail_bone.parent_index = model.bones[BoneNames.index3(direction)].index
-                    index_tail_bone.position = (
-                        model.bones[BoneNames.index3(direction)].position + model.bones[BoneNames.index3(direction)].tail_relative_position
+                    index_tail_bone.position = model.bones[BoneNames.index3(direction)].position + model.bones.get_tail_relative_position(
+                        model.bones[BoneNames.index3(direction)].index
                     )
                     index_tail_bone.is_system = True
                     index_tail_bone.bone_flg |= BoneFlg.CAN_TRANSLATE | BoneFlg.CAN_ROTATE | BoneFlg.CAN_MANIPULATE | BoneFlg.IS_VISIBLE
@@ -217,9 +217,8 @@ class IoUsecase:
                         index=model.bones[BoneNames.middle3(direction)].index + 1, name=BoneNames.middle_tail(direction)
                     )
                     middle_tail_bone.parent_index = model.bones[BoneNames.middle3(direction)].index
-                    middle_tail_bone.position = (
-                        model.bones[BoneNames.middle3(direction)].position
-                        + model.bones[BoneNames.middle3(direction)].tail_relative_position
+                    middle_tail_bone.position = model.bones[BoneNames.middle3(direction)].position + model.bones.get_tail_relative_position(
+                        model.bones[BoneNames.middle3(direction)].index
                     )
                     middle_tail_bone.is_system = True
                     middle_tail_bone.bone_flg |= BoneFlg.CAN_TRANSLATE | BoneFlg.CAN_ROTATE | BoneFlg.CAN_MANIPULATE | BoneFlg.IS_VISIBLE
@@ -231,8 +230,8 @@ class IoUsecase:
                 if BoneNames.ring3(direction) in model.bones:
                     ring_tail_bone = Bone(index=model.bones[BoneNames.ring3(direction)].index + 1, name=BoneNames.ring_tail(direction))
                     ring_tail_bone.parent_index = model.bones[BoneNames.ring3(direction)].index
-                    ring_tail_bone.position = (
-                        model.bones[BoneNames.ring3(direction)].position + model.bones[BoneNames.ring3(direction)].tail_relative_position
+                    ring_tail_bone.position = model.bones[BoneNames.ring3(direction)].position + model.bones.get_tail_relative_position(
+                        model.bones[BoneNames.ring3(direction)].index
                     )
                     ring_tail_bone.is_system = True
                     ring_tail_bone.bone_flg |= BoneFlg.CAN_TRANSLATE | BoneFlg.CAN_ROTATE | BoneFlg.CAN_MANIPULATE | BoneFlg.IS_VISIBLE
@@ -244,16 +243,14 @@ class IoUsecase:
                 if BoneNames.pinky3(direction) in model.bones:
                     pinky_tail_bone = Bone(index=model.bones[BoneNames.pinky3(direction)].index + 1, name=BoneNames.pinky_tail(direction))
                     pinky_tail_bone.parent_index = model.bones[BoneNames.pinky3(direction)].index
-                    pinky_tail_bone.position = (
-                        model.bones[BoneNames.pinky3(direction)].position + model.bones[BoneNames.pinky3(direction)].tail_relative_position
+                    pinky_tail_bone.position = model.bones[BoneNames.pinky3(direction)].position + model.bones.get_tail_relative_position(
+                        model.bones[BoneNames.pinky3(direction)].index
                     )
                     pinky_tail_bone.is_system = True
                     pinky_tail_bone.bone_flg |= BoneFlg.CAN_TRANSLATE | BoneFlg.CAN_ROTATE | BoneFlg.CAN_MANIPULATE | BoneFlg.IS_VISIBLE
 
                     model.insert_bone(pinky_tail_bone)
                     sizing_display_slot.references.append(DisplaySlotReference(display_index=pinky_tail_bone.index))
-
-        model.setup()
 
         for direction in ("左", "右"):
             if BoneNames.shoulder_p(direction) in model.bones:
@@ -276,6 +273,8 @@ class IoUsecase:
                 model.bones[BoneNames.ring_tail(direction)].parent_index = model.bones[BoneNames.ring3(direction)].index
             if BoneNames.pinky_tail(direction) in model.bones:
                 model.bones[BoneNames.pinky_tail(direction)].parent_index = model.bones[BoneNames.pinky3(direction)].index
+
+        model.setup()
 
     def load_model_no_copy(self, sizing_idx: int, model_path: str, cache_models: dict[str, PmxModel]) -> tuple[int, str, PmxModel]:
         """モデルの読み込み"""

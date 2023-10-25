@@ -512,3 +512,12 @@ msgstr "[No.{x}] Model loading ({m})"
 
 msgid "【No.{x}】サイジング追加セットアップ({m})"
 msgstr "[No.{x}] Sizing additional setup ({m})"
+
+msgid "鎖骨あたりに対する指の位置を元モーションと大体同じ位置になるよう合わせます"
+msgstr "Align the position of the fingers in relation to the collarbone so that they are roughly in the same position as the original motion"
+
+msgid "指先位置合わせ"
+msgstr "Fingertip alignment"
+
+msgid "手のひらに対する指先の位置を元モーションと大体同じ位置になるよう合わせます"
+msgstr "Align the fingertips in relation to the palm of the hand so that they are in roughly the same position as the original motion"
