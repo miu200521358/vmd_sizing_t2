@@ -159,11 +159,11 @@ class SizingBoneSet:
         # self.separate3.SetBackgroundColour(self.background_color)
         # self.align_sizer.Add(self.separate3)
 
-        # self.align_thumb0_check_ctrl = wx.CheckBox(self.window, wx.ID_ANY, __("親指０位置合わせ"), wx.DefaultPosition, wx.DefaultSize, 0)
-        # self.align_thumb0_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_align_ctrl)
-        # self.align_thumb0_check_ctrl.SetToolTip(__("親指の位置を元モーションと大体同じ位置になるよう合わせます"))
-        # self.align_thumb0_check_ctrl.SetBackgroundColour(self.background_color)
-        # self.align_sizer.Add(self.align_thumb0_check_ctrl, 0, wx.ALL, 2)
+        # self.align_finger_tail_check_ctrl = wx.CheckBox(self.window, wx.ID_ANY, __("親指０位置合わせ"), wx.DefaultPosition, wx.DefaultSize, 0)
+        # self.align_finger_tail_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_align_ctrl)
+        # self.align_finger_tail_check_ctrl.SetToolTip(__("親指の位置を元モーションと大体同じ位置になるよう合わせます"))
+        # self.align_finger_tail_check_ctrl.SetBackgroundColour(self.background_color)
+        # self.align_sizer.Add(self.align_finger_tail_check_ctrl, 0, wx.ALL, 2)
 
         # self.config_sizer.Add(self.align_sizer, 0, wx.ALL, 2)
 
@@ -197,7 +197,7 @@ class SizingBoneSet:
         self.sizer.Add(self.file_sizer, 1, wx.EXPAND | wx.ALL, 0)
 
     # def on_check_align_ctrl(self, event: wx.Event) -> None:
-    #     if self.align_finger_check_ctrl.GetValue() or self.align_thumb0_check_ctrl.GetValue():
+    #     if self.align_finger_check_ctrl.GetValue() or self.align_finger_tail_check_ctrl.GetValue():
     #         self.align_check_ctrl.SetValue(1)
     #     self.on_change_dest_model_pmx(event)
 
@@ -267,7 +267,7 @@ class SizingBoneSet:
             if (
                 self.panel.align_check_ctrl.GetValue()
                 or self.panel.align_finger_check_ctrl.GetValue()
-                or self.panel.align_thumb0_check_ctrl.GetValue()
+                or self.panel.align_finger_tail_check_ctrl.GetValue()
             ):
                 sizing_types.append("P")
             if self.panel.twist_check_ctrl.GetValue():
@@ -339,4 +339,4 @@ class SizingBoneSet:
         # self.twist_check_ctrl.Enable(enable)
         # self.align_check_ctrl.Enable(enable)
         # self.align_finger_check_ctrl.Enable(enable)
-        # self.align_thumb0_check_ctrl.Enable(enable)
+        # self.align_finger_tail_check_ctrl.Enable(enable)

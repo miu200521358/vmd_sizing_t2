@@ -64,7 +64,7 @@ class BoneWorker(BaseWorker):
                     sizing_set.dest_model_ctrl.data,
                     bone_panel.align_check_ctrl.GetValue(),
                     bone_panel.align_finger_check_ctrl.GetValue(),
-                    bone_panel.align_thumb0_check_ctrl.GetValue(),
+                    bone_panel.align_finger_tail_check_ctrl.GetValue(),
                     bone_panel.twist_check_ctrl.GetValue(),
                 ):
                     for direction in ("右", "左"):
@@ -106,7 +106,7 @@ class BoneWorker(BaseWorker):
                 sizing_set.dest_model_ctrl.data,
                 bone_panel.align_check_ctrl.GetValue(),
                 bone_panel.align_finger_check_ctrl.GetValue(),
-                bone_panel.align_thumb0_check_ctrl.GetValue(),
+                bone_panel.align_finger_tail_check_ctrl.GetValue(),
                 bone_panel.twist_check_ctrl.GetValue(),
             ):
                 usecase.setup_model_ik(
@@ -114,7 +114,7 @@ class BoneWorker(BaseWorker):
                     True,
                     sizing_set.src_model_ctrl.data,
                     bone_panel.align_finger_check_ctrl.GetValue(),
-                    bone_panel.align_thumb0_check_ctrl.GetValue(),
+                    bone_panel.align_finger_tail_check_ctrl.GetValue(),
                     bone_panel.twist_check_ctrl.GetValue(),
                 )
                 usecase.setup_model_ik(
@@ -122,7 +122,7 @@ class BoneWorker(BaseWorker):
                     False,
                     sizing_set.dest_model_ctrl.data,
                     bone_panel.align_finger_check_ctrl.GetValue(),
-                    bone_panel.align_thumb0_check_ctrl.GetValue(),
+                    bone_panel.align_finger_tail_check_ctrl.GetValue(),
                     bone_panel.twist_check_ctrl.GetValue(),
                 )
 
@@ -135,7 +135,7 @@ class BoneWorker(BaseWorker):
                     sizing_set.dest_model_ctrl.data,
                     bone_panel.align_check_ctrl.GetValue(),
                     bone_panel.align_finger_check_ctrl.GetValue(),
-                    bone_panel.align_thumb0_check_ctrl.GetValue(),
+                    bone_panel.align_finger_tail_check_ctrl.GetValue(),
                     bone_panel.twist_check_ctrl.GetValue(),
                 ):
                     for direction in ("右", "左"):
@@ -151,7 +151,7 @@ class BoneWorker(BaseWorker):
                                 initial_matrixes[(sizing_idx, False, direction)],
                                 direction,
                                 bone_panel.align_finger_check_ctrl.GetValue(),
-                                bone_panel.align_thumb0_check_ctrl.GetValue(),
+                                bone_panel.align_finger_tail_check_ctrl.GetValue(),
                                 bone_panel.twist_check_ctrl.GetValue(),
                             )
                         )

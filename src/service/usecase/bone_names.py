@@ -92,11 +92,11 @@ class BoneNames:
 
     @staticmethod
     def thumb_ik_parent(direction: str) -> str:
-        return f"{SIZING_BONE_PREFIX}{direction}親０IK親"
+        return f"{SIZING_BONE_PREFIX}{direction}親IK親"
 
     @staticmethod
     def thumb_ik(direction: str) -> str:
-        return f"{SIZING_BONE_PREFIX}{direction}親０IK"
+        return f"{SIZING_BONE_PREFIX}{direction}親IK"
 
     @staticmethod
     def thumb1(direction: str) -> str:
@@ -175,8 +175,12 @@ class BoneNames:
         return f"{SIZING_BONE_PREFIX}{direction}小先"
 
     @staticmethod
-    def fingers4(direction: str) -> list[str]:
+    def fingers(direction: str) -> list[str]:
         return [
+            BoneNames.thumb0(direction),
+            BoneNames.thumb1(direction),
+            BoneNames.thumb2(direction),
+            BoneNames.thumb_tail(direction),
             BoneNames.index1(direction),
             BoneNames.index2(direction),
             BoneNames.index3(direction),

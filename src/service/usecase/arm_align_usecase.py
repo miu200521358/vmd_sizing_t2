@@ -26,13 +26,13 @@ class ArmAlignUsecase:
         dest_model: Optional[PmxModel],
         is_align: bool,
         is_align_finger: bool,
-        is_align_thumb0: bool,
+        is_align_finger_tail: bool,
         is_twist: bool,
         show_message: bool = False,
     ) -> bool:
         BONE_NAMES = ["右肩", "右腕", "右ひじ", "右手首", "左肩", "左腕", "左ひじ", "左手首"]
 
-        if not (src_model and dest_model) or (not is_align and not is_align_finger and not is_align_thumb0 and not is_twist):
+        if not (src_model and dest_model) or (not is_align and not is_align_finger and not is_align_finger_tail and not is_twist):
             # モデルが揃ってない、チェックが入ってない場合、スルー
             return False
 
@@ -68,7 +68,7 @@ class ArmAlignUsecase:
         dest_initial_matrixes: VmdBoneFrameTrees,
         direction: str,
         is_align_finger: bool,
-        is_align_thumb0: bool,
+        is_align_finger_tail: bool,
         is_twist: bool,
     ) -> tuple[int, VmdMotion]:
         fnos = dest_initial_matrixes.indexes
@@ -99,54 +99,26 @@ class ArmAlignUsecase:
 
         logger.debug(f"wrist_ratio[{wrist_ratio:.3f}]")
 
-        if is_align_thumb0 and BoneNames.thumb0(direction) in src_model.bones and BoneNames.thumb0(direction) in dest_model.bones:
-            thumb0_ratio = dest_model.bones[BoneNames.index1(direction)].position.distance(
-                dest_model.bones[BoneNames.thumb_tail(direction)].position
-            ) / src_model.bones[BoneNames.index1(direction)].position.distance(src_model.bones[BoneNames.thumb_tail(direction)].position)
-        else:
-            thumb0_ratio = 1.0
-
-        logger.debug(f"thumb0_ratio[{thumb0_ratio:.3f}]")
-
-        if BoneNames.thumb2(direction) in src_model.bones and BoneNames.thumb2(direction) in dest_model.bones:
+        if BoneNames.thumb_tail(direction) in src_model.bones and BoneNames.thumb_tail(direction) in dest_model.bones:
             thumb_ratio = (
-                dest_model.bones[BoneNames.wrist_tail(direction)].position.distance(dest_model.bones[BoneNames.thumb2(direction)].position)
-                + dest_model.bones[BoneNames.thumb2(direction)].tail_relative_position.length()
-            ) / (
-                src_model.bones[BoneNames.wrist_tail(direction)].position.distance(src_model.bones[BoneNames.thumb2(direction)].position)
-                + src_model.bones[BoneNames.thumb2(direction)].tail_relative_position.length()
-            )
-            thumb_src_ratio = (
-                src_model.bones[BoneNames.middle1(direction)].position.distance(src_model.bones[BoneNames.middle2(direction)].position)
-                + src_model.bones[BoneNames.middle2(direction)].position.distance(src_model.bones[BoneNames.middle3(direction)].position)
-                + src_model.bones[BoneNames.middle3(direction)].tail_relative_position.length()
-            ) / (
-                src_model.bones[BoneNames.thumb1(direction)].position.distance(src_model.bones[BoneNames.thumb2(direction)].position)
-                + src_model.bones[BoneNames.thumb2(direction)].tail_relative_position.length()
-            )
+                dest_model.bones[BoneNames.wrist(direction)].position - dest_model.bones[BoneNames.thumb_tail(direction)].position
+            ) / (src_model.bones[BoneNames.wrist(direction)].position - src_model.bones[BoneNames.thumb_tail(direction)].position)
         else:
             thumb_ratio = 1.0
-            thumb_src_ratio = 1.0
 
-        logger.debug(f"thumb_ratio[{thumb_ratio:.3f}], thumb_src_ratio[{thumb_src_ratio:.3f}]")
+        logger.debug(f"thumb_ratio[{thumb_ratio:.3f}]")
 
         if BoneNames.index3(direction) in src_model.bones and BoneNames.index3(direction) in dest_model.bones:
             index_ratio = (
                 dest_model.bones[BoneNames.wrist_tail(direction)].position.distance(dest_model.bones[BoneNames.index3(direction)].position)
-                + dest_model.bones[BoneNames.index3(direction)].tail_relative_position.length()
-            ) / (
-                src_model.bones[BoneNames.wrist_tail(direction)].position.distance(src_model.bones[BoneNames.index3(direction)].position)
-                + src_model.bones[BoneNames.index3(direction)].tail_relative_position.length()
-            )
+            ) / (src_model.bones[BoneNames.wrist_tail(direction)].position.distance(src_model.bones[BoneNames.index3(direction)].position))
 
             index_src_ratio = (
                 src_model.bones[BoneNames.middle1(direction)].position.distance(src_model.bones[BoneNames.middle2(direction)].position)
                 + src_model.bones[BoneNames.middle2(direction)].position.distance(src_model.bones[BoneNames.middle3(direction)].position)
-                + src_model.bones[BoneNames.middle3(direction)].tail_relative_position.length()
             ) / (
                 src_model.bones[BoneNames.index1(direction)].position.distance(src_model.bones[BoneNames.index2(direction)].position)
                 + src_model.bones[BoneNames.index2(direction)].position.distance(src_model.bones[BoneNames.index3(direction)].position)
-                + src_model.bones[BoneNames.index3(direction)].tail_relative_position.length()
             )
         else:
             index_ratio = 1.0
@@ -157,11 +129,7 @@ class ArmAlignUsecase:
         if BoneNames.middle3(direction) in src_model.bones and BoneNames.middle3(direction) in dest_model.bones:
             middle_ratio = (
                 dest_model.bones[BoneNames.wrist_tail(direction)].position.distance(dest_model.bones[BoneNames.middle3(direction)].position)
-                + dest_model.bones[BoneNames.middle3(direction)].tail_relative_position.length()
-            ) / (
-                src_model.bones[BoneNames.wrist_tail(direction)].position.distance(src_model.bones[BoneNames.middle3(direction)].position)
-                + src_model.bones[BoneNames.middle3(direction)].tail_relative_position.length()
-            )
+            ) / (src_model.bones[BoneNames.wrist_tail(direction)].position.distance(src_model.bones[BoneNames.middle3(direction)].position))
             middle_src_ratio = 1.0
         else:
             middle_ratio = 1.0
@@ -172,20 +140,14 @@ class ArmAlignUsecase:
         if BoneNames.ring3(direction) in src_model.bones and BoneNames.ring3(direction) in dest_model.bones:
             ring_ratio = (
                 dest_model.bones[BoneNames.wrist_tail(direction)].position.distance(dest_model.bones[BoneNames.ring3(direction)].position)
-                + dest_model.bones[BoneNames.ring3(direction)].tail_relative_position.length()
-            ) / (
-                src_model.bones[BoneNames.wrist_tail(direction)].position.distance(src_model.bones[BoneNames.ring3(direction)].position)
-                + src_model.bones[BoneNames.ring3(direction)].tail_relative_position.length()
-            )
+            ) / (src_model.bones[BoneNames.wrist_tail(direction)].position.distance(src_model.bones[BoneNames.ring3(direction)].position))
 
             ring_src_ratio = (
                 src_model.bones[BoneNames.middle1(direction)].position.distance(src_model.bones[BoneNames.middle2(direction)].position)
                 + src_model.bones[BoneNames.middle2(direction)].position.distance(src_model.bones[BoneNames.middle3(direction)].position)
-                + src_model.bones[BoneNames.middle3(direction)].tail_relative_position.length()
             ) / (
                 src_model.bones[BoneNames.ring1(direction)].position.distance(src_model.bones[BoneNames.ring2(direction)].position)
                 + src_model.bones[BoneNames.ring2(direction)].position.distance(src_model.bones[BoneNames.ring3(direction)].position)
-                + src_model.bones[BoneNames.ring3(direction)].tail_relative_position.length()
             )
         else:
             ring_ratio = 1.0
@@ -254,8 +216,8 @@ class ArmAlignUsecase:
             wrist_ik_bf.register = True
             dest_motion.append_bone_frame(wrist_ik_bf)
 
-            if BoneNames.thumb0(direction) in dest_model.bones:
-                # 親指０IK --------------------
+            if BoneNames.thumb_tail(direction) in dest_model.bones:
+                # 親指IK --------------------
                 thumb0_ik_bf = VmdBoneFrame(fno, BoneNames.thumb_ik(direction))
                 thumb0_ik_bf.position = dest_initial_matrixes[fno, BoneNames.thumb_tail(direction)].position
                 thumb0_ik_bf.register = True
@@ -373,15 +335,19 @@ class ArmAlignUsecase:
                 + f"[initial_wrist_tail_global={dest_initial_matrixes[fno, BoneNames.wrist_tail(direction)].position}]"
             )
 
-            if is_align_thumb0 and BoneNames.thumb0(direction) in src_model.bones and BoneNames.thumb0(direction) in dest_model.bones:
-                # 親指０IK親 --------------------
+            if (
+                is_align_finger_tail
+                and BoneNames.thumb_tail(direction) in src_model.bones
+                and BoneNames.thumb_tail(direction) in dest_model.bones
+            ):
+                # 親指IK親 --------------------
 
                 src_thumb_tail_local_position = (
                     src_initial_matrixes[fno, BoneNames.thumb_tail(direction)].position
-                    - src_initial_matrixes[fno, BoneNames.index1(direction)].position
+                    - src_initial_matrixes[fno, BoneNames.wrist(direction)].position
                 )
-                dest_thumb_tail_global_position = dest_initial_matrixes[fno, BoneNames.index1(direction)].position + (
-                    src_thumb_tail_local_position * thumb0_ratio
+                dest_thumb_tail_global_position = dest_initial_matrixes[fno, BoneNames.wrist(direction)].position + (
+                    src_thumb_tail_local_position * thumb_ratio
                 )
 
                 thumb0_ik_parent_bf = VmdBoneFrame(fno, BoneNames.thumb_ik_parent(direction))
@@ -650,7 +616,7 @@ class ArmAlignUsecase:
         ):
             if (
                 bone_name not in dest_motion.bones
-                or (BoneNames.thumb0(direction) == bone_name and not is_align_thumb0)
+                or (BoneNames.thumb0(direction) == bone_name and not is_align_finger_tail)
                 or (bone_name in (BoneNames.hand_twist(direction), BoneNames.arm_twist(direction)) and not is_twist)
             ):
                 continue
@@ -822,7 +788,7 @@ class ArmAlignUsecase:
         is_src: bool,
         model: PmxModel,
         is_align_finger: bool,
-        is_align_thumb0: bool,
+        is_align_finger_tail: bool,
         is_twist: bool,
     ) -> None:
         logger.info(
@@ -1007,8 +973,8 @@ class ArmAlignUsecase:
                 model.insert_bone(wrist_ik_bone)
                 sizing_display_slot.references.append(DisplaySlotReference(display_index=wrist_ik_bone.index))
 
-            if is_align_thumb0 and BoneNames.thumb0(direction) in model.bones:
-                # 親指０IK親 追加 ---------------
+            if is_align_finger_tail and BoneNames.thumb0(direction) in model.bones:
+                # 親指IK親 追加 ---------------
                 thumb0_ik_parent_bone = Bone(
                     index=model.bones[BoneNames.thumb_tail(direction)].index, name=BoneNames.thumb_ik_parent(direction)
                 )
@@ -1020,7 +986,7 @@ class ArmAlignUsecase:
                 model.insert_bone(thumb0_ik_parent_bone)
                 sizing_display_slot.references.append(DisplaySlotReference(display_index=thumb0_ik_parent_bone.index))
 
-                # 親指０IK追加 ---------------
+                # 親指IK追加 ---------------
                 thumb0_ik_bone = Bone(index=model.bones[BoneNames.thumb_tail(direction)].index, name=BoneNames.thumb_ik(direction))
                 thumb0_ik_bone.parent_index = thumb0_ik_parent_bone.index
                 thumb0_ik_bone.position = MVector3D()
@@ -1036,12 +1002,12 @@ class ArmAlignUsecase:
 
                 thumb0_ik_link_thumb2 = IkLink()
                 thumb0_ik_link_thumb2.bone_index = model.bones[BoneNames.thumb2(direction)].index
-                thumb0_ik_link_thumb2.angle_limit = True
+                # thumb0_ik_link_thumb2.angle_limit = True
                 thumb0_ik.links.append(thumb0_ik_link_thumb2)
 
                 thumb0_ik_link_thumb1 = IkLink()
                 thumb0_ik_link_thumb1.bone_index = model.bones[BoneNames.thumb1(direction)].index
-                thumb0_ik_link_thumb1.angle_limit = True
+                # thumb0_ik_link_thumb1.angle_limit = True
                 thumb0_ik.links.append(thumb0_ik_link_thumb1)
 
                 thumb0_ik_link_thumb0 = IkLink()

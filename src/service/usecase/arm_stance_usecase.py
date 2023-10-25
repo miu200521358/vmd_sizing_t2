@@ -49,10 +49,10 @@ class ArmStanceUsecase:
             return sizing_idx, motion
 
         left_finger_bone_names = [
-            bone_name for bone_name in BoneNames.fingers4("左") if bone_name in src_model.bones and bone_name in dest_model.bones
+            bone_name for bone_name in BoneNames.fingers("左") if bone_name in src_model.bones and bone_name in dest_model.bones
         ]
         right_finger_bone_names = [
-            bone_name for bone_name in BoneNames.fingers4("右") if bone_name in src_model.bones and bone_name in dest_model.bones
+            bone_name for bone_name in BoneNames.fingers("右") if bone_name in src_model.bones and bone_name in dest_model.bones
         ]
 
         offset_from_slope_matrixes, offset_to_slope_matrixes = self.get_slope_qq(
@@ -111,6 +111,8 @@ class ArmStanceUsecase:
                 ("腕", "ひじ", "手首"),
                 ("ひじ", "手首", "中指１"),
                 ("手首", "親指１", "親指２"),
+                ("手首", "親指０", "親指１"),
+                ("親指０", "親指１", "親指２"),
                 ("親指１", "親指２", "親先"),
                 ("手首", "人指１", "人指２"),
                 ("人指１", "人指２", "人指３"),
@@ -145,7 +147,8 @@ class ArmStanceUsecase:
 
                 if to_bone_name not in src_model.bones or to_bone_name not in dest_model.bones:
                     # 指とかがなければ空欄
-                    offset_to_slope_matrixes[target_bone_name] = np.eye(4)
+                    if target_bone_name not in offset_to_slope_matrixes:
+                        offset_to_slope_matrixes[target_bone_name] = np.eye(4)
                     continue
 
                 src_from_bone_position = src_matrixes[0, target_bone_name].position

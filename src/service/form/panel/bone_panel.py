@@ -100,20 +100,20 @@ class BonePanel(NotebookPanel):
 
         self.align_finger_check_ctrl = wx.CheckBox(self, wx.ID_ANY, __("指位置合わせ"), wx.DefaultPosition, wx.DefaultSize, 0)
         self.align_finger_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_align_sub_ctrl)
-        self.align_finger_check_ctrl.SetToolTip(__("指の位置を元モーションと大体同じ位置になるよう合わせます"))
+        self.align_finger_check_ctrl.SetToolTip(__("鎖骨あたりに対する指の位置を元モーションと大体同じ位置になるよう合わせます"))
 
         self.align_finger_sizer.Add(self.align_finger_check_ctrl, 0, wx.ALL, 0)
         self.align_group_sizer.Add(self.align_finger_sizer, 0, wx.ALL, 3)
 
-        self.align_thumb0_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.align_thumb0_blank = wx.StaticText(self, wx.ID_ANY, "     ")
-        self.align_thumb0_sizer.Add(self.align_thumb0_blank)
+        self.align_finger_tail_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.align_finger_tail_blank = wx.StaticText(self, wx.ID_ANY, "     ")
+        self.align_finger_tail_sizer.Add(self.align_finger_tail_blank)
 
-        self.align_thumb0_check_ctrl = wx.CheckBox(self, wx.ID_ANY, __("親指０位置合わせ"), wx.DefaultPosition, wx.DefaultSize, 0)
-        self.align_thumb0_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_align_sub_ctrl)
-        self.align_thumb0_check_ctrl.SetToolTip(__("親指の位置を元モーションと大体同じ位置になるよう合わせます"))
-        self.align_thumb0_sizer.Add(self.align_thumb0_check_ctrl, 0, wx.ALL, 0)
-        self.align_group_sizer.Add(self.align_thumb0_sizer, 0, wx.ALL, 3)
+        self.align_finger_tail_check_ctrl = wx.CheckBox(self, wx.ID_ANY, __("指先位置合わせ"), wx.DefaultPosition, wx.DefaultSize, 0)
+        self.align_finger_tail_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_align_sub_ctrl)
+        self.align_finger_tail_check_ctrl.SetToolTip(__("手のひらに対する指先の位置を元モーションと大体同じ位置になるよう合わせます"))
+        self.align_finger_tail_sizer.Add(self.align_finger_tail_check_ctrl, 0, wx.ALL, 0)
+        self.align_group_sizer.Add(self.align_finger_tail_sizer, 0, wx.ALL, 3)
 
         self.config_sizer.Add(self.align_group_sizer, 0, wx.ALL, 1)
 
@@ -246,18 +246,18 @@ class BonePanel(NotebookPanel):
         self.twist_check_ctrl.SetValue(self.is_full_config)
         self.align_check_ctrl.SetValue(self.is_full_config)
         self.align_finger_check_ctrl.SetValue(self.is_full_config)
-        self.align_thumb0_check_ctrl.SetValue(self.is_full_config)
+        self.align_finger_tail_check_ctrl.SetValue(self.is_full_config)
 
         self.on_change_dest_model_pmx(event)
 
     def on_check_align_ctrl(self, event: wx.Event) -> None:
         if not self.align_check_ctrl.GetValue():
             self.align_finger_check_ctrl.SetValue(0)
-            self.align_thumb0_check_ctrl.SetValue(0)
+            self.align_finger_tail_check_ctrl.SetValue(0)
         self.on_change_dest_model_pmx(event)
 
     def on_check_align_sub_ctrl(self, event: wx.Event) -> None:
-        if self.align_finger_check_ctrl.GetValue() or self.align_thumb0_check_ctrl.GetValue():
+        if self.align_finger_check_ctrl.GetValue() or self.align_finger_tail_check_ctrl.GetValue():
             self.align_check_ctrl.SetValue(1)
         self.on_change_dest_model_pmx(event)
 
@@ -325,7 +325,7 @@ class BonePanel(NotebookPanel):
         self.twist_help_ctrl.Enable(enable)
         self.align_check_ctrl.Enable(enable)
         self.align_finger_check_ctrl.Enable(enable)
-        self.align_thumb0_check_ctrl.Enable(enable)
+        self.align_finger_tail_check_ctrl.Enable(enable)
         self.align_help_ctrl.Enable(enable)
 
         self.EnableExec(enable)
