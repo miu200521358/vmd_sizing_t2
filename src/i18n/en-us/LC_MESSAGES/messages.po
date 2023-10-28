@@ -521,3 +521,21 @@ msgstr "Fingertip alignment"
 
 msgid "手のひらに対する指先の位置を元モーションと大体同じ位置になるよう合わせます"
 msgstr "Align the fingertips in relation to the palm of the hand so that they are in roughly the same position as the original motion"
+
+msgid "捩り分散用初期位置取得"
+msgstr "Obtain initial position for torsional dispersion"
+
+msgid "[{v}]予期せぬエラーが発生しました"
+msgstr "[{v}]An unexpected error has occurred"
+
+msgid "[{v}]処理が継続できないため、中断しました\n----------------\n{m}"
+msgstr "[{v}]Aborted because processing cannot continue\n----------------\n{m}"
+
+msgid "-- 剛体データ読み取り [{i} ({p:.2f}%)]"
+msgstr "-- Rigid data reading [{i} ({p:.2f}%)]"
+
+msgid "-- ジョイントデータ読み取り [{i} ({p:.2f}%)]"
+msgstr "-- Joint data read [{i} ({p:.2f}%)]"
+
+msgid "-- モデルセットアップ：ボーンツリー [{i} ({p:.2f}%)]"
+msgstr "-- Model setup: bone tree [{i} ({p:.2f}%)]"

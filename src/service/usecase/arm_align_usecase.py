@@ -1,4 +1,4 @@
-from math import degrees
+from math import acos, degrees
 import os
 from typing import Optional
 
@@ -101,8 +101,8 @@ class ArmAlignUsecase:
 
         if BoneNames.thumb_tail(direction) in src_model.bones and BoneNames.thumb_tail(direction) in dest_model.bones:
             thumb_ratio = (
-                dest_model.bones[BoneNames.wrist(direction)].position - dest_model.bones[BoneNames.thumb_tail(direction)].position
-            ) / (src_model.bones[BoneNames.wrist(direction)].position - src_model.bones[BoneNames.thumb_tail(direction)].position)
+                dest_model.bones[BoneNames.wrist(direction)].position.distance(dest_model.bones[BoneNames.thumb_tail(direction)].position)
+            ) / (src_model.bones[BoneNames.wrist(direction)].position.distance(src_model.bones[BoneNames.thumb_tail(direction)].position))
         else:
             thumb_ratio = 1.0
 
@@ -385,10 +385,10 @@ class ArmAlignUsecase:
                 # )
 
         # src_thumb2_local_position = (
-        #     src_initial_matrixes[fno, BoneNames.thumb0(direction)].global_matrix_no_scale.inverse()
+        #     src_initial_matrixes[fno, BoneNames.thumb0(direction)].global_matrix.inverse()
         #     * src_initial_matrixes[fno, BoneNames.thumb2(direction)].position
         # )
-        # dest_thumb2_global_position = dest_initial_matrixes[fno, BoneNames.thumb0(direction)].global_matrix_no_scale * MVector3D(
+        # dest_thumb2_global_position = dest_initial_matrixes[fno, BoneNames.thumb0(direction)].global_matrix * MVector3D(
         #     src_thumb2_local_position.x * thumb0_ratio, src_thumb2_local_position.y, src_thumb2_local_position.z
         # )
 
@@ -422,41 +422,41 @@ class ArmAlignUsecase:
         # ):
         #     # 指がある場合、指位置合わせ --------------------
         #     src_thumb_tail_position = (
-        #         src_initial_matrixes[fno, BoneNames.thumb_2(direction)].global_matrix_no_scale
+        #         src_initial_matrixes[fno, BoneNames.thumb_2(direction)].global_matrix
         #         * src_model.bones[BoneNames.thumb_2(direction)].tail_relative_position
         #     )
         #     src_index_tail_position = (
-        #         src_initial_matrixes[fno, BoneNames.index_3(direction)].global_matrix_no_scale
+        #         src_initial_matrixes[fno, BoneNames.index_3(direction)].global_matrix
         #         * src_model.bones[BoneNames.index_3(direction)].tail_relative_position
         #     )
         #     src_middle_tail_position = (
-        #         src_initial_matrixes[fno, BoneNames.middle_3(direction)].global_matrix_no_scale
+        #         src_initial_matrixes[fno, BoneNames.middle_3(direction)].global_matrix
         #         * src_model.bones[BoneNames.middle_3(direction)].tail_relative_position
         #     )
         #     src_ring_tail_position = (
-        #         src_initial_matrixes[fno, BoneNames.ring_3(direction)].global_matrix_no_scale
+        #         src_initial_matrixes[fno, BoneNames.ring_3(direction)].global_matrix
         #         * src_model.bones[BoneNames.ring_3(direction)].tail_relative_position
         #     )
         #     src_pinky_tail_position = (
-        #         src_initial_matrixes[fno, BoneNames.pinky_3(direction)].global_matrix_no_scale
+        #         src_initial_matrixes[fno, BoneNames.pinky_3(direction)].global_matrix
         #         * src_model.bones[BoneNames.pinky_3(direction)].tail_relative_position
         #     )
 
         #     # 各指の手首先から見た指先ローカル位置
         #     src_thumb_tail_local_position = (
-        #         src_initial_matrixes[fno, BoneNames.wrist_tail(direction)].global_matrix_no_scale.inverse() * src_thumb_tail_position
+        #         src_initial_matrixes[fno, BoneNames.wrist_tail(direction)].global_matrix.inverse() * src_thumb_tail_position
         #     )
         #     src_index_tail_local_position = (
-        #         src_initial_matrixes[fno, BoneNames.wrist_tail(direction)].global_matrix_no_scale.inverse() * src_index_tail_position
+        #         src_initial_matrixes[fno, BoneNames.wrist_tail(direction)].global_matrix.inverse() * src_index_tail_position
         #     )
         #     src_middle_tail_local_position = (
-        #         src_initial_matrixes[fno, BoneNames.wrist_tail(direction)].global_matrix_no_scale.inverse() * src_middle_tail_position
+        #         src_initial_matrixes[fno, BoneNames.wrist_tail(direction)].global_matrix.inverse() * src_middle_tail_position
         #     )
         #     src_ring_tail_local_position = (
-        #         src_initial_matrixes[fno, BoneNames.wrist_tail(direction)].global_matrix_no_scale.inverse() * src_ring_tail_position
+        #         src_initial_matrixes[fno, BoneNames.wrist_tail(direction)].global_matrix.inverse() * src_ring_tail_position
         #     )
         #     src_pinky_tail_local_position = (
-        #         src_initial_matrixes[fno, BoneNames.wrist_tail(direction)].global_matrix_no_scale.inverse() * src_pinky_tail_position
+        #         src_initial_matrixes[fno, BoneNames.wrist_tail(direction)].global_matrix.inverse() * src_pinky_tail_position
         #     )
 
         #     dest_thumb_tail_local_position = src_thumb_tail_local_position * thumb_ratio
@@ -497,32 +497,32 @@ class ArmAlignUsecase:
         #         )
 
         #         index_src_tail_position = (
-        #             src_initial_matrixes[fno, BoneNames.index_3(direction)].global_matrix_no_scale * -src_model.bones[BoneNames.index_3(direction)].tail_relative_position
+        #             src_initial_matrixes[fno, BoneNames.index_3(direction)].global_matrix * -src_model.bones[BoneNames.index_3(direction)].tail_relative_position
         #         )
         #         middle_src_tail_position = (
-        #             src_initial_matrixes[fno, BoneNames.middle_3(direction)].global_matrix_no_scale * -src_model.bones[BoneNames.middle_3(direction)].tail_relative_position
+        #             src_initial_matrixes[fno, BoneNames.middle_3(direction)].global_matrix * -src_model.bones[BoneNames.middle_3(direction)].tail_relative_position
         #         )
         #         ring_src_tail_position = (
-        #             src_initial_matrixes[fno, BoneNames.ring_3(direction)].global_matrix_no_scale * -src_model.bones[BoneNames.ring_3(direction)].tail_relative_position
+        #             src_initial_matrixes[fno, BoneNames.ring_3(direction)].global_matrix * -src_model.bones[BoneNames.ring_3(direction)].tail_relative_position
         #         )
         #         pinky_src_tail_position = (
-        #             src_initial_matrixes[fno, BoneNames.pinky_3(direction)].global_matrix_no_scale * -src_model.bones[BoneNames.pinky_3(direction)].tail_relative_position
+        #             src_initial_matrixes[fno, BoneNames.pinky_3(direction)].global_matrix * -src_model.bones[BoneNames.pinky_3(direction)].tail_relative_position
         #         )
 
         #         index_dest_tail_position = (
-        #             dest_finger_matrixes[fno, BoneNames.index_3(direction)].global_matrix_no_scale
+        #             dest_finger_matrixes[fno, BoneNames.index_3(direction)].global_matrix
         #             * -dest_model.bones[BoneNames.index_3(direction)].tail_relative_position
         #         )
         #         middle_dest_tail_position = (
-        #             dest_finger_matrixes[fno, BoneNames.middle_3(direction)].global_matrix_no_scale
+        #             dest_finger_matrixes[fno, BoneNames.middle_3(direction)].global_matrix
         #             * -dest_model.bones[BoneNames.middle_3(direction)].tail_relative_position
         #         )
         #         ring_dest_tail_position = (
-        #             dest_finger_matrixes[fno, BoneNames.ring_3(direction)].global_matrix_no_scale
+        #             dest_finger_matrixes[fno, BoneNames.ring_3(direction)].global_matrix
         #             * -dest_model.bones[BoneNames.ring_3(direction)].tail_relative_position
         #         )
         #         pinky_dest_tail_position = (
-        #             dest_finger_matrixes[fno, BoneNames.pinky_3(direction)].global_matrix_no_scale
+        #             dest_finger_matrixes[fno, BoneNames.pinky_3(direction)].global_matrix
         #             * -dest_model.bones[BoneNames.pinky_3(direction)].tail_relative_position
         #         )
 
@@ -540,8 +540,8 @@ class ArmAlignUsecase:
         #         ][src_far_finger_index]
         #         src_far_finger_ratio = [index_ratio, middle_ratio, ring_ratio, pinky_ratio][src_far_finger_index]
 
-        #         src_finger_local_position = src_initial_matrixes[fno, BoneNames.wrist(direction)].global_matrix_no_scale.inverse() * src_far_finger_position
-        #         dest_finger_global_position = dest_finger_matrixes[fno, BoneNames.wrist(direction)].global_matrix_no_scale * (
+        #         src_finger_local_position = src_initial_matrixes[fno, BoneNames.wrist(direction)].global_matrix.inverse() * src_far_finger_position
+        #         dest_finger_global_position = dest_finger_matrixes[fno, BoneNames.wrist(direction)].global_matrix * (
         #             src_finger_local_position * src_far_finger_ratio
         #         )
 
@@ -562,16 +562,22 @@ class ArmAlignUsecase:
                 sizing_idx,
                 dest_model,
                 dest_motion,
+                dest_initial_matrixes,
+                BoneNames.shoulder(direction),
                 BoneNames.arm(direction),
                 BoneNames.arm_twist(direction),
+                BoneNames.elbow(direction),
             )
             # 手捩
             self.prepare_twist(
                 sizing_idx,
                 dest_model,
                 dest_motion,
+                dest_initial_matrixes,
+                BoneNames.arm(direction),
                 BoneNames.elbow(direction),
                 BoneNames.hand_twist(direction),
+                BoneNames.wrist(direction),
             )
 
         if 10 >= logger.total_level:
@@ -690,8 +696,11 @@ class ArmAlignUsecase:
         sizing_idx: int,
         dest_model: PmxModel,
         dest_motion: VmdMotion,
+        dest_initial_matrixes: VmdBoneFrameTrees,
+        begin_bone_name: str,
         above_bone_name: str,
         twist_bone_name: str,
+        below_bone_name: str,
     ) -> None:
         if not (twist_bone_name in dest_model.bones and above_bone_name in dest_model.bones):
             return
@@ -716,7 +725,7 @@ class ArmAlignUsecase:
             above_bf = dest_motion.bones[above_bone_name][fno]
             twist_bf = dest_motion.bones[twist_bone_name][fno]
 
-            above_x_qq, _, _, above_yz_qq = above_bf.rotation.separate_by_axis(above_local_x_axis)
+            _, _, _, above_yz_qq = above_bf.rotation.separate_by_axis(above_local_x_axis)
 
             if "ひじ" in above_bone_name:
                 above_bf.rotation = above_yz_qq.to_other_axis_rotation(above_local_y_axis)
@@ -725,13 +734,38 @@ class ArmAlignUsecase:
             above_bf.register = True
             dest_motion.insert_bone_frame(above_bf)
 
-            twist_qq: MQuaternion = above_x_qq * twist_bf.rotation
-            twist_bf.rotation = twist_qq.to_other_axis_rotation(twist_fixed_axis)
+            # IK計算と同じように「どのくらい回転すれば元の位置に近付くか」を求める
+
+            mat = dest_initial_matrixes[fno, begin_bone_name].global_matrix.copy()
+            mat.rotate(above_bf.rotation)
+            mat.translate(dest_model.bones[below_bone_name].position - dest_model.bones[above_bone_name].position)
+
+            # 捩りを除去した場合の腕もしくはひじの末端位置
+            twist_off_above_tail_position = mat.to_position()
+
+            # モーションをそのまま読み込んだ場合の腕もしくはひじの末端位置
+            initial_above_tail_position = dest_initial_matrixes[fno, below_bone_name].position
+
+            # 捩り除去時のローカル座標
+            inv_mat = mat.inverse()
+            local_twist_off_above_tail_position = inv_mat * twist_off_above_tail_position
+            local_initial_above_tail_position = inv_mat * initial_above_tail_position
+
+            # 回転角度
+            rotation_dot = local_twist_off_above_tail_position.normalized().dot(local_initial_above_tail_position.normalized())
+            rotation_degree = degrees(acos(max(-1, min(1, rotation_dot))))
+
+            twist_bf.rotation = MQuaternion.from_euler_degrees(rotation_degree, 0, 0).to_other_axis_rotation(twist_fixed_axis)
             twist_bf.register = True
             dest_motion.insert_bone_frame(twist_bf)
 
     def get_initial_matrixes(
-        self, sizing_idx: int, is_src: bool, model: PmxModel, motion: VmdMotion, direction: str
+        self,
+        sizing_idx: int,
+        is_src: bool,
+        model: PmxModel,
+        motion: VmdMotion,
+        direction: str,
     ) -> tuple[int, bool, str, VmdBoneFrameTrees]:
         model_type = __("作成元モデル" if is_src else "サイジング先モデル")
 
@@ -755,31 +789,32 @@ class ArmAlignUsecase:
             | set(motion.bones[BoneNames.thumb0(direction)].indexes)
         )
 
+        initial_matrixes = motion.animate_bone(
+            fnos,
+            model,
+            [
+                BoneNames.shoulder_root(direction),
+                BoneNames.shoulder(direction),
+                BoneNames.shoulder_center(direction),
+                BoneNames.arm(direction),
+                BoneNames.elbow(direction),
+                BoneNames.wrist(direction),
+                BoneNames.wrist_tail(direction),
+                BoneNames.thumb_tail(direction),
+                BoneNames.index_tail(direction),
+                BoneNames.middle_tail(direction),
+                BoneNames.ring_tail(direction),
+                BoneNames.pinky_tail(direction),
+            ],
+            clear_ik=True,
+            out_fno_log=True,
+            description=f"{sizing_idx + 1}|{__(direction)}|{__('初期位置取得')}|{model_type}",
+        )
         return (
             sizing_idx,
             is_src,
             direction,
-            motion.animate_bone(
-                fnos,
-                model,
-                [
-                    BoneNames.shoulder_root(direction),
-                    BoneNames.shoulder(direction),
-                    BoneNames.shoulder_center(direction),
-                    BoneNames.arm(direction),
-                    BoneNames.elbow(direction),
-                    BoneNames.wrist(direction),
-                    BoneNames.wrist_tail(direction),
-                    BoneNames.thumb_tail(direction),
-                    BoneNames.index_tail(direction),
-                    BoneNames.middle_tail(direction),
-                    BoneNames.ring_tail(direction),
-                    BoneNames.pinky_tail(direction),
-                ],
-                clear_ik=True,
-                out_fno_log=True,
-                description=f"{sizing_idx + 1}|{__(direction)}|{__('初期位置取得')}|{model_type}",
-            ),
+            initial_matrixes,
         )
 
     def setup_model_ik(

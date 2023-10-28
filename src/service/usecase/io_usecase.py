@@ -83,7 +83,9 @@ class IoUsecase:
                     bone.local_x_vector = original_bone.local_x_vector.copy()
                     bone.local_z_vector = original_bone.local_z_vector.copy()
                     bone.bone_flg |= BoneFlg.HAS_LOCAL_COORDINATE
-                if original_bone.is_external_rotation or original_bone.is_external_translation:
+                if (original_bone.is_external_rotation or original_bone.is_external_translation) and original_model.bones[
+                    original_bone.effect_index
+                ].name in model.bones:
                     # 付与親
                     bone.bone_flg |= BoneFlg.IS_EXTERNAL_ROTATION if original_bone.is_external_rotation else BoneFlg.IS_EXTERNAL_TRANSLATION
                     bone.effect_index = model.bones[original_model.bones[original_bone.effect_index].name].index

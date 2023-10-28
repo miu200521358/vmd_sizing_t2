@@ -72,7 +72,7 @@ class ArmStanceUsecase:
         to_offsets: list[np.ndarray] = []
         rotations: list[np.ndarray] = []
         for bone_name in ARM_BONE_NAMES + left_finger_bone_names + right_finger_bone_names:
-            if bone_name not in motion.bones:
+            if not (bone_name in motion.bones and bone_name in offset_from_slope_matrixes and bone_name in offset_to_slope_matrixes):
                 continue
             for bf in motion.bones[bone_name]:
                 rotations.append(bf.rotation.to_matrix4x4().vector)
@@ -87,7 +87,7 @@ class ArmStanceUsecase:
             rot_sizing_matrixes = from_offset_matrixes @ rot_matrixes @ to_offset_matrixes
             n = 0
             for bone_name in ARM_BONE_NAMES + left_finger_bone_names + right_finger_bone_names:
-                if bone_name not in motion.bones:
+                if not (bone_name in motion.bones and bone_name in offset_from_slope_matrixes and bone_name in offset_to_slope_matrixes):
                     continue
                 for bf in motion.bones[bone_name]:
                     bf.rotation = MMatrix4x4(rot_sizing_matrixes[n]).to_quaternion()
@@ -110,22 +110,25 @@ class ArmStanceUsecase:
                 ("", "腕", "ひじ"),
                 ("腕", "ひじ", "手首"),
                 ("ひじ", "手首", "中指１"),
-                ("手首", "親指１", "親指２"),
-                ("手首", "親指０", "親指１"),
-                ("親指０", "親指１", "親指２"),
-                ("親指１", "親指２", "親先"),
-                ("手首", "人指１", "人指２"),
-                ("人指１", "人指２", "人指３"),
-                ("人指２", "人指３", "人先"),
-                ("手首", "中指１", "中指２"),
-                ("中指１", "中指２", "中指３"),
-                ("中指２", "中指３", "中先"),
-                ("手首", "薬指１", "薬指２"),
-                ("薬指１", "薬指２", "薬指３"),
-                ("薬指２", "薬指３", "薬先"),
-                ("手首", "小指１", "小指２"),
-                ("小指１", "小指２", "小指３"),
-                ("小指２", "小指３", "小先"),
+                ("手首", "親指１", "親先"),
+                ("手首", "人指１", "人先"),
+                ("手首", "中指１", "中先"),
+                ("手首", "薬指１", "薬先"),
+                ("手首", "小指１", "小先"),
+                # ("親指０", "親指１", "親指２"),
+                # ("親指１", "親指２", "親先"),
+                # ("手首", "人指１", "人指２"),
+                # ("人指１", "人指２", "人指３"),
+                # ("人指２", "人指３", "人先"),
+                # ("手首", "中指１", "中指２"),
+                # ("中指１", "中指２", "中指３"),
+                # ("中指２", "中指３", "中先"),
+                # ("手首", "薬指１", "薬指２"),
+                # ("薬指１", "薬指２", "薬指３"),
+                # ("薬指２", "薬指３", "薬先"),
+                # ("手首", "小指１", "小指２"),
+                # ("小指１", "小指２", "小指３"),
+                # ("小指２", "小指３", "小先"),
             ):
                 from_bone_name = f"{direction}{from_bone_suffix}"
                 target_bone_name = f"{direction}{target_bone_suffix}"
