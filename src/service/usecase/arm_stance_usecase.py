@@ -56,7 +56,7 @@ class ArmStanceUsecase:
         ]
 
         offset_from_slope_matrixes, offset_to_slope_matrixes = self.get_slope_qq(
-            src_model, dest_model, left_finger_bone_names, right_finger_bone_names
+            src_model, dest_model, motion, left_finger_bone_names, right_finger_bone_names
         )
 
         logger.info(
@@ -96,7 +96,12 @@ class ArmStanceUsecase:
         return sizing_idx, motion
 
     def get_slope_qq(
-        self, src_model: PmxModel, dest_model: PmxModel, left_finger_bone_names: list[str], right_finger_bone_names: list[str]
+        self,
+        src_model: PmxModel,
+        dest_model: PmxModel,
+        motion: VmdMotion,
+        left_finger_bone_names: list[str],
+        right_finger_bone_names: list[str],
     ) -> tuple[dict[str, np.ndarray], dict[str, np.ndarray]]:
         """スタンス補正用比率算出"""
         src_matrixes = VmdMotion().animate_bone([0], src_model, ARM_BONE_NAMES + left_finger_bone_names + right_finger_bone_names)
@@ -110,25 +115,11 @@ class ArmStanceUsecase:
                 ("", "腕", "ひじ"),
                 ("腕", "ひじ", "手首"),
                 ("ひじ", "手首", "中指１"),
-                ("手首", "親指１", "親先"),
-                ("手首", "人指１", "人先"),
-                ("手首", "中指１", "中先"),
-                ("手首", "薬指１", "薬先"),
-                ("手首", "小指１", "小先"),
-                # ("親指０", "親指１", "親指２"),
-                # ("親指１", "親指２", "親先"),
-                # ("手首", "人指１", "人指２"),
-                # ("人指１", "人指２", "人指３"),
-                # ("人指２", "人指３", "人先"),
-                # ("手首", "中指１", "中指２"),
-                # ("中指１", "中指２", "中指３"),
-                # ("中指２", "中指３", "中先"),
-                # ("手首", "薬指１", "薬指２"),
-                # ("薬指１", "薬指２", "薬指３"),
-                # ("薬指２", "薬指３", "薬先"),
-                # ("手首", "小指１", "小指２"),
-                # ("小指１", "小指２", "小指３"),
-                # ("小指２", "小指３", "小先"),
+                ("", "親指１", "親先"),
+                ("", "人指１", "人先"),
+                ("", "中指１", "中先"),
+                ("", "薬指１", "薬先"),
+                ("", "小指１", "小先"),
             ):
                 from_bone_name = f"{direction}{from_bone_suffix}"
                 target_bone_name = f"{direction}{target_bone_suffix}"
@@ -142,8 +133,9 @@ class ArmStanceUsecase:
                     and from_bone_name in dest_model.bones
                     and target_bone_name in src_model.bones
                     and target_bone_name in dest_model.bones
+                    and from_bone_name in motion.bones
                 ):
-                    # 逆回転をかける
+                    # モデルとモーションにボーンがある場合、逆回転をかける
                     offset_from_slope_matrixes[target_bone_name] = inv(offset_to_slope_matrixes[from_bone_name])
                 else:
                     offset_from_slope_matrixes[target_bone_name] = np.eye(4)
@@ -167,8 +159,11 @@ class ArmStanceUsecase:
                 offset_qq = src_slope_qq * dest_slope_qq.inverse()
 
                 # X軸（捩り）成分を除去した値のみ保持
-                _, _, _, offset_yz_qq = offset_qq.separate_by_axis(dest_bone_vector)
+                _, offset_y_qq, _, offset_yz_qq = offset_qq.separate_by_axis(dest_bone_vector)
 
-                offset_to_slope_matrixes[target_bone_name] = offset_yz_qq.to_matrix4x4().vector
+                if "指" in target_bone_suffix:
+                    offset_to_slope_matrixes[target_bone_name] = offset_y_qq.to_matrix4x4().vector
+                else:
+                    offset_to_slope_matrixes[target_bone_name] = offset_yz_qq.to_matrix4x4().vector
 
         return offset_from_slope_matrixes, offset_to_slope_matrixes
