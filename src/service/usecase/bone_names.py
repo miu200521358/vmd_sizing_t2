@@ -67,7 +67,11 @@ class BoneNames:
         return f"{SIZING_BONE_PREFIX}{direction}ひじ中点"
 
     @staticmethod
-    def hand_twist(direction: str, index: int = 0):
+    def elbow_rotate(direction: str) -> str:
+        return f"{SIZING_BONE_PREFIX}{direction}ひじ回転"
+
+    @staticmethod
+    def wrist_twist(direction: str, index: int = 0):
         return f"{direction}手捩" if index == 0 else f"{direction}手捩{index}"
 
     @staticmethod
@@ -77,6 +81,10 @@ class BoneNames:
     @staticmethod
     def wrist_tail(direction: str) -> str:
         return f"{SIZING_BONE_PREFIX}{direction}手首先"
+
+    @staticmethod
+    def wrist_rotate(direction: str) -> str:
+        return f"{SIZING_BONE_PREFIX}{direction}手首回転"
 
     @staticmethod
     def wrist_ik_parent(direction: str) -> str:

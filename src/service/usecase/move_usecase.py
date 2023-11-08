@@ -11,9 +11,30 @@ logger = MLogger(os.path.basename(__file__), level=1)
 __ = logger.get_text
 
 
-MOVE_ALL_BONE_NAMES = {"全ての親", "センター", "グルーブ", "右足IK親", "左足IK親", "右足ＩＫ", "左足ＩＫ", "右つま先ＩＫ", "左つま先ＩＫ"}
+MOVE_ALL_BONE_NAMES = {
+    "全ての親",
+    "センター",
+    "グルーブ",
+    "右足IK親",
+    "左足IK親",
+    "右足ＩＫ",
+    "左足ＩＫ",
+    "右つま先ＩＫ",
+    "左つま先ＩＫ",
+}
 
-MOVE_CHECK_BONE_NAMES = {"右足", "右ひざ", "右足首", "右足ＩＫ", "右つま先ＩＫ", "左足", "左ひざ", "左足首", "左足ＩＫ", "左つま先ＩＫ"}
+MOVE_CHECK_BONE_NAMES = {
+    "右足",
+    "右ひざ",
+    "右足首",
+    "右足ＩＫ",
+    "右つま先ＩＫ",
+    "左足",
+    "左ひざ",
+    "左足首",
+    "左足ＩＫ",
+    "左つま先ＩＫ",
+}
 
 
 class MoveUsecase:
@@ -67,7 +88,9 @@ class MoveUsecase:
                     offset_positions.append(np.zeros(3))
 
         if 0 < len(move_sizing_positions):
-            move_sizing_matrixes = np.full((len(move_sizing_positions), 4, 4), np.eye(4))
+            move_sizing_matrixes = np.full(
+                (len(move_sizing_positions), 4, 4), np.eye(4)
+            )
             move_sizing_matrixes[..., :3, 3] = np.array(move_sizing_positions)
 
             offset_matrixes = np.full((len(offset_positions), 4, 4), np.eye(4))
@@ -93,17 +116,25 @@ class MoveUsecase:
 
         return float(np.min([np.mean(xz_leg_ratios), 1.2]))
 
-    def get_move_ratio(self, src_model: PmxModel, dest_model: PmxModel) -> tuple[float, float, MVector3D]:
+    def get_move_ratio(
+        self, src_model: PmxModel, dest_model: PmxModel
+    ) -> tuple[float, float, MVector3D]:
         """移動補正用比率算出"""
-        if (MOVE_CHECK_BONE_NAMES - set(src_model.bones.names)) or (MOVE_CHECK_BONE_NAMES - set(dest_model.bones.names)):
+        if (MOVE_CHECK_BONE_NAMES - set(src_model.bones.names)) or (
+            MOVE_CHECK_BONE_NAMES - set(dest_model.bones.names)
+        ):
             return 1.0, 1.0, MVector3D()
 
         # 足からひざまでの長さ
         src_upper_length = float(
             np.mean(
                 [
-                    src_model.bones["左ひざ"].position.distance(src_model.bones["左足"].position),
-                    src_model.bones["右ひざ"].position.distance(src_model.bones["右足"].position),
+                    src_model.bones["左ひざ"].position.distance(
+                        src_model.bones["左足"].position
+                    ),
+                    src_model.bones["右ひざ"].position.distance(
+                        src_model.bones["右足"].position
+                    ),
                 ]
             )
         )
@@ -112,8 +143,12 @@ class MoveUsecase:
         src_lower_length = float(
             np.mean(
                 [
-                    src_model.bones["左足首"].position.distance(src_model.bones["左ひざ"].position),
-                    src_model.bones["右足首"].position.distance(src_model.bones["右ひざ"].position),
+                    src_model.bones["左足首"].position.distance(
+                        src_model.bones["左ひざ"].position
+                    ),
+                    src_model.bones["右足首"].position.distance(
+                        src_model.bones["右ひざ"].position
+                    ),
                 ]
             )
         )
@@ -125,8 +160,12 @@ class MoveUsecase:
         dest_upper_length = float(
             np.mean(
                 [
-                    dest_model.bones["左ひざ"].position.distance(dest_model.bones["左足"].position),
-                    dest_model.bones["右ひざ"].position.distance(dest_model.bones["右足"].position),
+                    dest_model.bones["左ひざ"].position.distance(
+                        dest_model.bones["左足"].position
+                    ),
+                    dest_model.bones["右ひざ"].position.distance(
+                        dest_model.bones["右足"].position
+                    ),
                 ]
             )
         )
@@ -135,8 +174,12 @@ class MoveUsecase:
         dest_lower_length = float(
             np.mean(
                 [
-                    dest_model.bones["左足首"].position.distance(dest_model.bones["左ひざ"].position),
-                    dest_model.bones["右足首"].position.distance(dest_model.bones["右ひざ"].position),
+                    dest_model.bones["左足首"].position.distance(
+                        dest_model.bones["左ひざ"].position
+                    ),
+                    dest_model.bones["右足首"].position.distance(
+                        dest_model.bones["右ひざ"].position
+                    ),
                 ]
             )
         )
@@ -145,20 +188,30 @@ class MoveUsecase:
         dest_xz_leg_length = dest_upper_length + dest_lower_length
 
         # XZ比率(足の長さ) ------------------
-        xz_leg_ratio = dest_xz_leg_length / src_xz_leg_length if src_xz_leg_length and dest_xz_leg_length else 1
+        xz_leg_ratio = (
+            dest_xz_leg_length / src_xz_leg_length
+            if src_xz_leg_length and dest_xz_leg_length
+            else 1
+        )
 
         src_y_leg_length = (
-            ((src_model.bones["左足"].position - src_model.bones["左足首"].position)).y
-            + ((src_model.bones["右足"].position - src_model.bones["右足首"].position)).y
+            (src_model.bones["左足"].position - src_model.bones["左足首"].position).y
+            + (src_model.bones["右足"].position - src_model.bones["右足首"].position).y
         ) / 2
 
         dest_y_leg_length = (
-            ((dest_model.bones["左足"].position - dest_model.bones["左足首"].position)).y
-            + ((dest_model.bones["右足"].position - dest_model.bones["右足首"].position)).y
+            (dest_model.bones["左足"].position - dest_model.bones["左足首"].position).y
+            + (
+                dest_model.bones["右足"].position - dest_model.bones["右足首"].position
+            ).y
         ) / 2
 
         # Y比率(股下のY差) ------------------
-        y_leg_ratio = dest_y_leg_length / src_y_leg_length if src_y_leg_length and dest_y_leg_length else 1
+        y_leg_ratio = (
+            dest_y_leg_length / src_y_leg_length
+            if src_y_leg_length and dest_y_leg_length
+            else 1
+        )
 
         # センターYオフセット -------------------------
 
@@ -173,13 +226,28 @@ class MoveUsecase:
 
         # センターZオフセット -------------------------
 
-        src_leg_z = (src_model.bones["左足"].position.z + src_model.bones["右足"].position.z) / 2
-        src_ankle_z = (src_model.bones["左足首"].position.z + src_model.bones["右足首"].position.z) / 2
-        src_toe_z = (src_model.bones["左つま先ＩＫ"].position.z + src_model.bones["右つま先ＩＫ"].position.z) / 2
+        src_leg_z = (
+            src_model.bones["左足"].position.z + src_model.bones["右足"].position.z
+        ) / 2
+        src_ankle_z = (
+            src_model.bones["左足首"].position.z + src_model.bones["右足首"].position.z
+        ) / 2
+        src_toe_z = (
+            src_model.bones["左つま先ＩＫ"].position.z
+            + src_model.bones["右つま先ＩＫ"].position.z
+        ) / 2
 
-        dest_leg_z = (dest_model.bones["左足"].position.z + dest_model.bones["右足"].position.z) / 2
-        dest_ankle_z = (dest_model.bones["左足首"].position.z + dest_model.bones["右足首"].position.z) / 2
-        dest_toe_z = (dest_model.bones["左つま先ＩＫ"].position.z + dest_model.bones["右つま先ＩＫ"].position.z) / 2
+        dest_leg_z = (
+            dest_model.bones["左足"].position.z + dest_model.bones["右足"].position.z
+        ) / 2
+        dest_ankle_z = (
+            dest_model.bones["左足首"].position.z
+            + dest_model.bones["右足首"].position.z
+        ) / 2
+        dest_toe_z = (
+            dest_model.bones["左つま先ＩＫ"].position.z
+            + dest_model.bones["右つま先ＩＫ"].position.z
+        ) / 2
 
         # 元モデルの足の長さ
         src_foot_length = src_toe_z - src_ankle_z
@@ -192,6 +260,8 @@ class MoveUsecase:
         dest_center_gravity = (dest_ankle_z - dest_leg_z) / (dest_ankle_z - dest_toe_z)
 
         # センターZオフセット
-        center_z_offset = (dest_center_gravity - src_center_gravity) * (dest_foot_length / src_foot_length)
+        center_z_offset = (dest_center_gravity - src_center_gravity) * (
+            dest_foot_length / src_foot_length
+        )
 
         return xz_leg_ratio, y_leg_ratio, MVector3D(0, center_y_offset, center_z_offset)

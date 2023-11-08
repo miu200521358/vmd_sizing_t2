@@ -18,10 +18,19 @@ __ = logger.get_text
 
 
 class MainFrame(NotebookFrame):
-    def __init__(self, app: wx.App, title: str, size: wx.Size, is_saving: bool, *args, **kw) -> None:
+    def __init__(
+        self, app: wx.App, title: str, size: wx.Size, is_saving: bool, *args, **kw
+    ) -> None:
         super().__init__(
             app,
-            history_keys=["vmd", "org_pmx", "rep_pmx", "camera_vmd", "camera_pmx", "ik_pmx"],
+            history_keys=[
+                "vmd",
+                "org_pmx",
+                "rep_pmx",
+                "camera_vmd",
+                "camera_pmx",
+                "ik_pmx",
+            ],
             title=title,
             size=size,
             is_saving=is_saving,
@@ -55,16 +64,25 @@ class MainFrame(NotebookFrame):
                 model: Optional[PmxModel] = panel.model_ctrl.data
                 if model:
                     self.morph_sub_window.panel.canvas.clear_model_set()
-                    self.morph_sub_window.panel.canvas.append_model_set(model, VmdMotion(), bone_alpha=0.0, is_sub=True)
+                    self.morph_sub_window.panel.canvas.append_model_set(
+                        model, VmdMotion(), bone_alpha=0.0, is_sub=True
+                    )
                     self.morph_sub_window.panel.canvas.vertical_degrees = 5
-                    self.morph_sub_window.panel.canvas.look_at_center = model.bones["頭"].position.copy()
+                    self.morph_sub_window.panel.canvas.look_at_center = model.bones[
+                        "頭"
+                    ].position.copy()
                     self.morph_sub_window.panel.canvas.Refresh()
                     self.morph_sub_window.panel.canvas.camera_offset_position.y = (
                         model.bones["頭"].position.y - MShader.INITIAL_CAMERA_POSITION_Y
                     )
 
                 frame_x, frame_y = self.GetPosition()
-                self.morph_sub_window.SetPosition(wx.Point(max(0, frame_x + self.GetSize().GetWidth() + 10), max(0, frame_y + 30)))
+                self.morph_sub_window.SetPosition(
+                    wx.Point(
+                        max(0, frame_x + self.GetSize().GetWidth() + 10),
+                        max(0, frame_y + 30),
+                    )
+                )
 
                 self.morph_sub_window.Show()
             elif self.morph_sub_window.IsShown():
@@ -75,7 +93,12 @@ class MainFrame(NotebookFrame):
         model: Optional[PmxModel] = panel.model_ctrl.data
         if not self.morph_sub_window and model:
             self.morph_sub_window = MorphSubCanvasWindow(
-                self, __("モーフプレビュー"), self.morph_sub_window_size, [model.name], [model.bones.names], model.morphs.names
+                self,
+                __("モーフプレビュー"),
+                self.morph_sub_window_size,
+                [model.name],
+                [model.bones.names],
+                model.morphs.names,
             )
 
     def on_change_tab(self, event: wx.Event) -> None:

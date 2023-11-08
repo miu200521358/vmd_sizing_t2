@@ -28,6 +28,7 @@ class BakePanel(NotebookPanel):
 
     def _initialize_ui(self) -> None:
         # ヘッダー -----------------------------
+        self.header_sizer = wx.BoxSizer(wx.VERTICAL)
 
         self.model_ctrl = MPmxFilePickerCtrl(
             self,
@@ -41,7 +42,7 @@ class BakePanel(NotebookPanel):
             tooltip="モーションを適用させたいモデルを指定してください\nこのモデルに合わせてモーションのIK部分をIK焼き込みします",
             file_change_event=self.on_change_model_pmx,
         )
-        self.model_ctrl.set_parent_sizer(self.root_sizer)
+        self.model_ctrl.set_parent_sizer(self.header_sizer)
 
         self.motion_ctrl = MVmdFilePickerCtrl(
             self,
@@ -55,7 +56,7 @@ class BakePanel(NotebookPanel):
             tooltip="IK焼き込みの対象となるVMDモーションデータを指定してください",
             file_change_event=self.on_change_motion,
         )
-        self.motion_ctrl.set_parent_sizer(self.root_sizer)
+        self.motion_ctrl.set_parent_sizer(self.header_sizer)
 
         self.output_motion_ctrl = MVmdFilePickerCtrl(
             self,
@@ -66,7 +67,7 @@ class BakePanel(NotebookPanel):
             is_save=True,
             tooltip="IK焼き込みモーションの出力ファイルパスです\n任意の値に変更可能です",
         )
-        self.output_motion_ctrl.set_parent_sizer(self.root_sizer)
+        self.output_motion_ctrl.set_parent_sizer(self.header_sizer)
 
         # ボタン -------------------------
         self.btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -78,15 +79,18 @@ class BakePanel(NotebookPanel):
             __("IK焼き込み実行停止"),
             self.exec,
             250,
-            __("IK焼き込みを実行します\nモデルとモーションを設定後、クリックできるようになります"),
+            __(
+                "IK焼き込みを実行します\nモデルとモーションを設定後、クリックできるようになります"
+            ),
         )
         self.exec_btn_ctrl.exec_worker = self.bake_worker
         self.btn_sizer.Add(self.exec_btn_ctrl, 0, wx.ALL, 3)
 
+        self.root_sizer.Add(self.header_sizer, 1, wx.EXPAND | wx.ALL, 3)
         self.root_sizer.Add(self.btn_sizer, 0, wx.ALIGN_CENTER | wx.SHAPED, 3)
 
         # コンソール -----------------
-        self.console_ctrl = ConsoleCtrl(self, self.frame, self, rows=580)
+        self.console_ctrl = ConsoleCtrl(self, self.frame, self, rows=500)
         self.console_ctrl.set_parent_sizer(self.root_sizer)
 
     def on_change_model_pmx(self, event: wx.Event) -> None:
@@ -105,8 +109,16 @@ class BakePanel(NotebookPanel):
 
     def create_output_path(self) -> None:
         if self.motion_ctrl.valid() and self.model_ctrl.valid():
-            motion_dir_path, motion_file_name, motion_file_ext = self.motion_ctrl.separated_path
-            model_dir_path, model_file_name, model_file_ext = self.model_ctrl.separated_path
+            (
+                motion_dir_path,
+                motion_file_name,
+                motion_file_ext,
+            ) = self.motion_ctrl.separated_path
+            (
+                model_dir_path,
+                model_file_name,
+                model_file_ext,
+            ) = self.model_ctrl.separated_path
 
             self.output_motion_ctrl.path = os.path.join(
                 motion_dir_path,

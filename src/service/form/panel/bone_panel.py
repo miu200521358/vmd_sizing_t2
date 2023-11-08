@@ -34,12 +34,24 @@ class BonePanel(NotebookPanel):
         # ヘッダー -----------------------------
         self.header_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.add_set_btn_ctrl = wx.Button(self, wx.ID_ANY, __("サイジングセット追加"), wx.DefaultPosition, wx.Size(120, -1))
+        self.add_set_btn_ctrl = wx.Button(
+            self,
+            wx.ID_ANY,
+            __("サイジングセット追加"),
+            wx.DefaultPosition,
+            wx.Size(120, -1),
+        )
         self.add_set_btn_ctrl.SetToolTip(__("サイジングセットを追加できます"))
         self.add_set_btn_ctrl.Bind(wx.EVT_BUTTON, self.on_add_set)
         self.header_sizer.Add(self.add_set_btn_ctrl, 0, wx.ALL, 3)
 
-        self.clear_set_btn_ctrl = wx.Button(self, wx.ID_ANY, __("サイジングセット全削除"), wx.DefaultPosition, wx.Size(120, -1))
+        self.clear_set_btn_ctrl = wx.Button(
+            self,
+            wx.ID_ANY,
+            __("サイジングセット全削除"),
+            wx.DefaultPosition,
+            wx.Size(120, -1),
+        )
         self.clear_set_btn_ctrl.SetToolTip(__("全てのサイジングセットを削除できます"))
         self.clear_set_btn_ctrl.Bind(wx.EVT_BUTTON, self.on_clear_set)
         self.header_sizer.Add(self.clear_set_btn_ctrl, 0, wx.ALL, 3)
@@ -54,15 +66,21 @@ class BonePanel(NotebookPanel):
         self.config_sizer = wx.StaticBoxSizer(self.config_box, orient=wx.VERTICAL)
 
         self.is_full_config = False
-        self.full_config_btn_ctrl = wx.Button(self, wx.ID_ANY, __("全追加補正ON"), wx.DefaultPosition, wx.Size(120, -1))
+        self.full_config_btn_ctrl = wx.Button(
+            self, wx.ID_ANY, __("全追加補正ON"), wx.DefaultPosition, wx.Size(120, -1)
+        )
         self.full_config_btn_ctrl.SetToolTip(__("全ての追加補正を有効にします"))
         self.full_config_btn_ctrl.Bind(wx.EVT_BUTTON, self.on_full_config)
         self.config_sizer.Add(self.full_config_btn_ctrl, 0, wx.ALL | wx.ALIGN_RIGHT, 3)
 
         # 全親統合 ------------------------
         self.root_integrate_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.root_integrate_check_ctrl = wx.CheckBox(self, wx.ID_ANY, __("全親統合"), wx.DefaultPosition, wx.DefaultSize, 0)
-        self.root_integrate_check_ctrl.SetToolTip(__("全ての親の移動や回転をセンター・上半身・下半身に振り分けます"))
+        self.root_integrate_check_ctrl = wx.CheckBox(
+            self, wx.ID_ANY, __("全親統合"), wx.DefaultPosition, wx.DefaultSize, 0
+        )
+        self.root_integrate_check_ctrl.SetToolTip(
+            __("全ての親の移動や回転をセンター・上半身・下半身に振り分けます")
+        )
         self.root_integrate_sizer.Add(self.root_integrate_check_ctrl, 0, wx.ALL, 3)
         self.root_integrate_help_ctrl = ImageButton(
             self,
@@ -79,8 +97,12 @@ class BonePanel(NotebookPanel):
 
         self.align_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.align_check_ctrl = wx.CheckBox(self, wx.ID_ANY, __("手首位置合わせ"), wx.DefaultPosition, wx.DefaultSize, 0)
-        self.align_check_ctrl.SetToolTip(__("手首の位置を元モーションと大体同じ位置になるよう合わせます"))
+        self.align_check_ctrl = wx.CheckBox(
+            self, wx.ID_ANY, __("手首位置合わせ"), wx.DefaultPosition, wx.DefaultSize, 0
+        )
+        self.align_check_ctrl.SetToolTip(
+            __("手首の位置を元モーションと大体同じ位置になるよう合わせます")
+        )
         self.align_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_align_ctrl)
         self.align_sizer.Add(self.align_check_ctrl, 0, wx.ALL, 3)
 
@@ -98,9 +120,15 @@ class BonePanel(NotebookPanel):
         self.align_finger_blank = wx.StaticText(self, wx.ID_ANY, "     ")
         self.align_finger_sizer.Add(self.align_finger_blank)
 
-        self.align_finger_check_ctrl = wx.CheckBox(self, wx.ID_ANY, __("指位置合わせ"), wx.DefaultPosition, wx.DefaultSize, 0)
+        self.align_finger_check_ctrl = wx.CheckBox(
+            self, wx.ID_ANY, __("指位置合わせ"), wx.DefaultPosition, wx.DefaultSize, 0
+        )
         self.align_finger_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_align_sub_ctrl)
-        self.align_finger_check_ctrl.SetToolTip(__("鎖骨あたりに対する指の位置を元モーションと大体同じ位置になるよう合わせます"))
+        self.align_finger_check_ctrl.SetToolTip(
+            __(
+                "鎖骨あたりに対する指の位置を元モーションと大体同じ位置になるよう合わせます"
+            )
+        )
 
         self.align_finger_sizer.Add(self.align_finger_check_ctrl, 0, wx.ALL, 0)
         self.align_group_sizer.Add(self.align_finger_sizer, 0, wx.ALL, 3)
@@ -109,18 +137,32 @@ class BonePanel(NotebookPanel):
         self.align_finger_tail_blank = wx.StaticText(self, wx.ID_ANY, "     ")
         self.align_finger_tail_sizer.Add(self.align_finger_tail_blank)
 
-        self.align_finger_tail_check_ctrl = wx.CheckBox(self, wx.ID_ANY, __("指先位置合わせ"), wx.DefaultPosition, wx.DefaultSize, 0)
-        self.align_finger_tail_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_align_sub_ctrl)
-        self.align_finger_tail_check_ctrl.SetToolTip(__("手のひらに対する指先の位置を元モーションと大体同じ位置になるよう合わせます"))
-        self.align_finger_tail_sizer.Add(self.align_finger_tail_check_ctrl, 0, wx.ALL, 0)
+        self.align_finger_tail_check_ctrl = wx.CheckBox(
+            self, wx.ID_ANY, __("指先位置合わせ"), wx.DefaultPosition, wx.DefaultSize, 0
+        )
+        self.align_finger_tail_check_ctrl.Bind(
+            wx.EVT_CHECKBOX, self.on_check_align_sub_ctrl
+        )
+        self.align_finger_tail_check_ctrl.SetToolTip(
+            __(
+                "手のひらに対する指先の位置を元モーションと大体同じ位置になるよう合わせます"
+            )
+        )
+        self.align_finger_tail_sizer.Add(
+            self.align_finger_tail_check_ctrl, 0, wx.ALL, 0
+        )
         self.align_group_sizer.Add(self.align_finger_tail_sizer, 0, wx.ALL, 3)
 
         self.config_sizer.Add(self.align_group_sizer, 0, wx.ALL, 1)
 
         # 捩り分散 ------------------------
         self.twist_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.twist_check_ctrl = wx.CheckBox(self, wx.ID_ANY, __("捩り分散"), wx.DefaultPosition, wx.DefaultSize, 0)
-        self.twist_check_ctrl.SetToolTip(__("腕を腕捩りなど、捩りボーンに捩り回転を分散させます"))
+        self.twist_check_ctrl = wx.CheckBox(
+            self, wx.ID_ANY, __("捩り分散"), wx.DefaultPosition, wx.DefaultSize, 0
+        )
+        self.twist_check_ctrl.SetToolTip(
+            __("腕を腕捩りなど、捩りボーンに捩り回転を分散させます")
+        )
         self.twist_sizer.Add(self.twist_check_ctrl, 0, wx.ALL, 3)
         self.twist_help_ctrl = ImageButton(
             self,
@@ -219,7 +261,9 @@ class BonePanel(NotebookPanel):
             __("サイジング実行停止"),
             self.exec,
             250,
-            __("サイジングを実行します\nサイジングセットを1件以上設定後、クリックできるようになります"),
+            __(
+                "サイジングを実行します\nサイジングセットを1件以上設定後、クリックできるようになります"
+            ),
         )
         self.exec_btn_ctrl.exec_worker = self.bone_worker
         self.btn_sizer.Add(self.exec_btn_ctrl, 0, wx.ALL, 3)
@@ -236,10 +280,18 @@ class BonePanel(NotebookPanel):
     def on_full_config(self, event: wx.Event) -> None:
         self.is_full_config = not self.is_full_config
 
-        self.full_config_btn_ctrl.SetLabelText(__("全追加補正OFF") if self.is_full_config else __("全追加補正ON"))
-        self.full_config_btn_ctrl.SetToolTip(__("全ての追加補正を無効にします") if self.is_full_config else __("全ての追加補正を有効にします"))
+        self.full_config_btn_ctrl.SetLabelText(
+            __("全追加補正OFF") if self.is_full_config else __("全追加補正ON")
+        )
+        self.full_config_btn_ctrl.SetToolTip(
+            __("全ての追加補正を無効にします")
+            if self.is_full_config
+            else __("全ての追加補正を有効にします")
+        )
         self.full_config_btn_ctrl.SetBackgroundColour(
-            self.active_background_color if self.is_full_config else wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNFACE)
+            self.active_background_color
+            if self.is_full_config
+            else wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNFACE)
         )
 
         self.root_integrate_check_ctrl.SetValue(self.is_full_config)
@@ -257,7 +309,10 @@ class BonePanel(NotebookPanel):
         self.on_change_dest_model_pmx(event)
 
     def on_check_align_sub_ctrl(self, event: wx.Event) -> None:
-        if self.align_finger_check_ctrl.GetValue() or self.align_finger_tail_check_ctrl.GetValue():
+        if (
+            self.align_finger_check_ctrl.GetValue()
+            or self.align_finger_tail_check_ctrl.GetValue()
+        ):
             self.align_check_ctrl.SetValue(1)
         self.on_change_dest_model_pmx(event)
 

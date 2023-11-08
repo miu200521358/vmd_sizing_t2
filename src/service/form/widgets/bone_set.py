@@ -12,23 +12,49 @@ logger = MLogger(os.path.basename(__file__))
 __ = logger.get_text
 
 STANCE_DETAIL_CHOICES = [
-    __("全ての親補正: 【注目点: 全ての親の位置】【補正対象: 全ての親をセンター・体幹に合併】【有効例: 全ての親】"),
-    __("センターXZ補正: 【注目点: 腰あたりの位置】【補正対象: センターXZ】【有効例: ターン】"),
-    __("センターY補正:【注目点: 手首の接地】【補正対象: センターYの位置】【有効例: 倒立】"),
-    __("上半身補正:【注目点: 頭の位置】【補正対象: 上半身・上半身2の傾き】【有効例: 上体反らし】"),
-    __("下半身補正:【注目点: 足ボーンの傾き】【補正対象: 下半身の傾き】【有効例: 四つ足モデル】"),
-    __("足IK補正:【注目点: 足首の位置】【補正対象: 足IKの位置】【有効例: 低頭身モデル】"),
-    __("足FK補正:【注目点: 足FK系の回転】【補正対象: 足FKの焼き込み】【有効例: 足IK使用モーション】"),
-    __("足D補正:【注目点: 足D系の回転】【補正対象: 足D系を足に合併】【有効例: 足D使用モーション】"),
-    __("つま先補正:【注目点: つま先の接地】【補正対象: 足IKの位置】【有効例: つま先立ち】"),
-    __("つま先IK補正:【注目点: 足首の向き】【補正対象: つま先IKを足IKに合併】【有効例: つま先IK使用モーション】"),
+    __(
+        "全ての親補正: 【注目点: 全ての親の位置】【補正対象: 全ての親をセンター・体幹に合併】【有効例: 全ての親】"
+    ),
+    __(
+        "センターXZ補正: 【注目点: 腰あたりの位置】【補正対象: センターXZ】【有効例: ターン】"
+    ),
+    __(
+        "センターY補正:【注目点: 手首の接地】【補正対象: センターYの位置】【有効例: 倒立】"
+    ),
+    __(
+        "上半身補正:【注目点: 頭の位置】【補正対象: 上半身・上半身2の傾き】【有効例: 上体反らし】"
+    ),
+    __(
+        "下半身補正:【注目点: 足ボーンの傾き】【補正対象: 下半身の傾き】【有効例: 四つ足モデル】"
+    ),
+    __(
+        "足IK補正:【注目点: 足首の位置】【補正対象: 足IKの位置】【有効例: 低頭身モデル】"
+    ),
+    __(
+        "足FK補正:【注目点: 足FK系の回転】【補正対象: 足FKの焼き込み】【有効例: 足IK使用モーション】"
+    ),
+    __(
+        "足D補正:【注目点: 足D系の回転】【補正対象: 足D系を足に合併】【有効例: 足D使用モーション】"
+    ),
+    __(
+        "つま先補正:【注目点: つま先の接地】【補正対象: 足IKの位置】【有効例: つま先立ち】"
+    ),
+    __(
+        "つま先IK補正:【注目点: 足首の向き】【補正対象: つま先IKを足IKに合併】【有効例: つま先IK使用モーション】"
+    ),
 ]
 
 INITIAL_STANCE_DETAIL_CHOICES = [0, 1, 2, 3, 4, 5, 7, 8, 9, 10]
 
 
 class SizingBoneSet:
-    def __init__(self, window: wx.Window, frame: NotebookFrame, panel: NotebookPanel, sizing_idx: int) -> None:
+    def __init__(
+        self,
+        window: wx.Window,
+        frame: NotebookFrame,
+        panel: NotebookPanel,
+        sizing_idx: int,
+    ) -> None:
         self.window = window
         self.frame = frame
         self.panel = panel
@@ -40,7 +66,11 @@ class SizingBoneSet:
     def _initialize_ui(self) -> None:
         self.sizer = wx.BoxSizer(wx.VERTICAL)
 
-        self.background_color = wx.Colour("LIGHT GREY") if 0 == self.sizing_idx % 2 else wx.Colour("LIGHT BLUE")
+        self.background_color = (
+            wx.Colour("LIGHT GREY")
+            if 0 == self.sizing_idx % 2
+            else wx.Colour("LIGHT BLUE")
+        )
         self.box = wx.StaticBox(self.window, wx.ID_ANY, f"【No.{self.sizing_idx + 1}】")
         self.box.SetBackgroundColour(self.background_color)
 
@@ -258,10 +288,22 @@ class SizingBoneSet:
         self.panel.EnableExec(True)
 
     def create_output_path(self) -> None:
-        if self.motion_ctrl.valid() and self.src_model_ctrl.valid() and self.dest_model_ctrl.valid():
-            motion_dir_path, motion_file_name, motion_file_ext = self.motion_ctrl.separated_path
+        if (
+            self.motion_ctrl.valid()
+            and self.src_model_ctrl.valid()
+            and self.dest_model_ctrl.valid()
+        ):
+            (
+                motion_dir_path,
+                motion_file_name,
+                motion_file_ext,
+            ) = self.motion_ctrl.separated_path
             # src_model_dir_path, src_model_file_name, src_model_file_ext = self.src_model_ctrl.separated_path
-            dest_model_dir_path, dest_model_file_name, dest_model_file_ext = self.dest_model_ctrl.separated_path
+            (
+                dest_model_dir_path,
+                dest_model_file_name,
+                dest_model_file_ext,
+            ) = self.dest_model_ctrl.separated_path
 
             sizing_types: list[str] = []
             if (
@@ -283,14 +325,22 @@ class SizingBoneSet:
             )
 
     def get_loadable_path(self) -> tuple[bool, list[str], list[str], list[str]]:
-        logger.info("【No.{i}】読み込み開始", i=self.sizing_idx + 1, decoration=MLogger.Decoration.LINE)
+        logger.info(
+            "【No.{i}】読み込み開始",
+            i=self.sizing_idx + 1,
+            decoration=MLogger.Decoration.LINE,
+        )
         loadable_motion_paths: list[str] = []
         loadable_src_model_paths: list[str] = []
         loadable_dest_model_paths: list[str] = []
         can_load: bool = True
         is_check: bool = False
 
-        if self.motion_ctrl.path or self.src_model_ctrl.path or self.dest_model_ctrl.path:
+        if (
+            self.motion_ctrl.path
+            or self.src_model_ctrl.path
+            or self.dest_model_ctrl.path
+        ):
             is_check = True
 
         if is_check:
@@ -315,8 +365,13 @@ class SizingBoneSet:
                 logger.error("有効なサイジング先モデルが指定されていません。")
                 can_load = False
 
-        if can_load and (not self.output_motion_ctrl.path or (self.output_motion_ctrl.path and not self.output_motion_ctrl.valid())):
-            logger.warning("出力ファイルパスが有効なパスではないため、デフォルトの出力ファイルパスを再設定します。")
+        if can_load and (
+            not self.output_motion_ctrl.path
+            or (self.output_motion_ctrl.path and not self.output_motion_ctrl.valid())
+        ):
+            logger.warning(
+                "出力ファイルパスが有効なパスではないため、デフォルトの出力ファイルパスを再設定します。"
+            )
             self.create_output_path()
 
         if can_load:
@@ -327,7 +382,12 @@ class SizingBoneSet:
             if self.dest_model_ctrl.path:
                 loadable_dest_model_paths.append(self.dest_model_ctrl.path)
 
-        return can_load, loadable_motion_paths, loadable_src_model_paths, loadable_dest_model_paths
+        return (
+            can_load,
+            loadable_motion_paths,
+            loadable_src_model_paths,
+            loadable_dest_model_paths,
+        )
 
     def Enable(self, enable: bool) -> None:
         self.motion_ctrl.Enable(enable)

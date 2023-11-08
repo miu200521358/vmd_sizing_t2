@@ -17,7 +17,7 @@ if __name__ == "__main__":
     try:
         # Windowsマルチプロセス対策
         freeze_support()
-    except:
+    except Exception:
         pass
 
     # 引数の取得
@@ -40,13 +40,16 @@ if __name__ == "__main__":
         is_out_log=args.out_log,
     )
 
-    from mlib.utils.file_utils import get_path
     from service.form.main_frame import MainFrame
+
+    from mlib.utils.file_utils import get_path
 
     # アプリの起動
     app = wx.App(False)
     icon = wx.Icon(get_path("resources/logo.ico"), wx.BITMAP_TYPE_ICO)
-    frame = MainFrame(app, f"{APP_NAME} {VERSION_NAME}", wx.Size(900, 800), args.is_saving)
+    frame = MainFrame(
+        app, f"{APP_NAME} {VERSION_NAME}", wx.Size(900, 800), args.is_saving
+    )
     frame.SetIcon(icon)
     frame.Show(True)
     app.MainLoop()
