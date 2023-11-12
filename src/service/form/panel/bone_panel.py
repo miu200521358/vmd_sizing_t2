@@ -2,6 +2,8 @@ import os
 import webbrowser
 
 import wx
+from service.form.widgets.bone_set import SizingBoneSet
+from service.worker.bone_worker import BoneWorker
 
 from mlib.core.logger import ConsoleHandler, MLogger
 from mlib.service.form.notebook_frame import NotebookFrame
@@ -10,8 +12,6 @@ from mlib.service.form.widgets.console_ctrl import ConsoleCtrl
 from mlib.service.form.widgets.exec_btn_ctrl import ExecButton
 from mlib.service.form.widgets.image_btn_ctrl import ImageButton
 from mlib.utils.file_utils import save_histories
-from service.form.widgets.bone_set import SizingBoneSet
-from service.worker.bone_worker import BoneWorker
 
 logger = MLogger(os.path.basename(__file__))
 __ = logger.get_text
@@ -78,9 +78,7 @@ class BonePanel(NotebookPanel):
         self.root_integrate_check_ctrl = wx.CheckBox(
             self, wx.ID_ANY, __("全親統合"), wx.DefaultPosition, wx.DefaultSize, 0
         )
-        self.root_integrate_check_ctrl.SetToolTip(
-            __("全ての親の移動や回転をセンター・上半身・下半身に振り分けます")
-        )
+        self.root_integrate_check_ctrl.SetToolTip(__("全ての親の移動や回転をセンター・上半身・下半身に振り分けます"))
         self.root_integrate_sizer.Add(self.root_integrate_check_ctrl, 0, wx.ALL, 3)
         self.root_integrate_help_ctrl = ImageButton(
             self,
@@ -100,9 +98,7 @@ class BonePanel(NotebookPanel):
         self.align_check_ctrl = wx.CheckBox(
             self, wx.ID_ANY, __("手首位置合わせ"), wx.DefaultPosition, wx.DefaultSize, 0
         )
-        self.align_check_ctrl.SetToolTip(
-            __("手首の位置を元モーションと大体同じ位置になるよう合わせます")
-        )
+        self.align_check_ctrl.SetToolTip(__("手首の位置を元モーションと大体同じ位置になるよう合わせます"))
         self.align_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_align_ctrl)
         self.align_sizer.Add(self.align_check_ctrl, 0, wx.ALL, 3)
 
@@ -125,9 +121,7 @@ class BonePanel(NotebookPanel):
         )
         self.align_finger_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_align_sub_ctrl)
         self.align_finger_check_ctrl.SetToolTip(
-            __(
-                "鎖骨あたりに対する指の位置を元モーションと大体同じ位置になるよう合わせます"
-            )
+            __("鎖骨あたりに対する指の位置を元モーションと大体同じ位置になるよう合わせます")
         )
 
         self.align_finger_sizer.Add(self.align_finger_check_ctrl, 0, wx.ALL, 0)
@@ -144,9 +138,7 @@ class BonePanel(NotebookPanel):
             wx.EVT_CHECKBOX, self.on_check_align_sub_ctrl
         )
         self.align_finger_tail_check_ctrl.SetToolTip(
-            __(
-                "手のひらに対する指先の位置を元モーションと大体同じ位置になるよう合わせます"
-            )
+            __("手のひらに対する指先の位置を元モーションと大体同じ位置になるよう合わせます")
         )
         self.align_finger_tail_sizer.Add(
             self.align_finger_tail_check_ctrl, 0, wx.ALL, 0
@@ -160,9 +152,7 @@ class BonePanel(NotebookPanel):
         self.twist_check_ctrl = wx.CheckBox(
             self, wx.ID_ANY, __("捩り分散"), wx.DefaultPosition, wx.DefaultSize, 0
         )
-        self.twist_check_ctrl.SetToolTip(
-            __("腕を腕捩りなど、捩りボーンに捩り回転を分散させます")
-        )
+        self.twist_check_ctrl.SetToolTip(__("腕を腕捩りなど、捩りボーンに捩り回転を分散させます"))
         self.twist_sizer.Add(self.twist_check_ctrl, 0, wx.ALL, 3)
         self.twist_help_ctrl = ImageButton(
             self,
@@ -261,9 +251,7 @@ class BonePanel(NotebookPanel):
             __("サイジング実行停止"),
             self.exec,
             250,
-            __(
-                "サイジングを実行します\nサイジングセットを1件以上設定後、クリックできるようになります"
-            ),
+            __("サイジングを実行します\nサイジングセットを1件以上設定後、クリックできるようになります"),
         )
         self.exec_btn_ctrl.exec_worker = self.bone_worker
         self.btn_sizer.Add(self.exec_btn_ctrl, 0, wx.ALL, 3)
@@ -284,9 +272,7 @@ class BonePanel(NotebookPanel):
             __("全追加補正OFF") if self.is_full_config else __("全追加補正ON")
         )
         self.full_config_btn_ctrl.SetToolTip(
-            __("全ての追加補正を無効にします")
-            if self.is_full_config
-            else __("全ての追加補正を有効にします")
+            __("全ての追加補正を無効にします") if self.is_full_config else __("全ての追加補正を有効にします")
         )
         self.full_config_btn_ctrl.SetBackgroundColour(
             self.active_background_color

@@ -539,3 +539,15 @@ msgstr "-- Joint data read [{i} ({p:.2f}%)]"
 
 msgid "-- モデルセットアップ：ボーンツリー [{i} ({p:.2f}%)]"
 msgstr "-- Model setup: bone tree [{i} ({p:.2f}%)]"
+
+msgid "腕：初期位置取得"
+msgstr "Arm: Initial position acquired"
+
+msgid "【No.{x}】{d}腕：初期位置取得({m})"
+msgstr "[No.{x}]{d} arm: initial position acquisition ({m})"
+
+msgid "IK事前計算[{d}]"
+msgstr "IK pre-calculation [{d}]"
+
+msgid "-- IK事前計算[{d}] [{i} ({p:.2f}%)]"
+msgstr "-- IK pre-calculation [{d}] [{i} ({p:.2f}%)]"

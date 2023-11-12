@@ -1,7 +1,8 @@
-from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 import os
+from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 
 from mlib.core.logger import MLogger
+from mlib.core.math import MQuaternion
 from mlib.pmx.pmx_collection import PmxModel
 from mlib.pmx.pmx_part import Bone
 from mlib.vmd.vmd_collection import VmdMotion
@@ -73,76 +74,28 @@ class BakeUsecase:
 
             bone_name = model.bones[link.bone_index].name
 
+            for bf in motion.bones[bone_name]:
+                if not bf.register:
+                    continue
+                # 先に一旦焼き込み用のモーションを生成しておく
+                bake_motion.append_bone_frame(bf.copy())
+
             logger.info("IK計算結果設定: {b}", b=bone_name)
+            prev_qq = MQuaternion()
             for fidx, fno in enumerate(fnos):
                 logger.count("IK計算結果設定", fidx, len(fnos), display_block=1000)
 
-                qq = matrixes[fno, bone_name].frame_rotation
+                qq = matrixes[fno, bone_name].frame_ik_rotation
                 logger.debug(f"[{bone_name}][{fno}][now: {qq.to_degrees():.3f}]")
 
                 bf = motion.bones[bone_name][fno]
-                bf.rotation = qq
+                if fidx == 0 or bf.register or qq.dot(prev_qq) < 0.95:
+                    # 最初のキーフレ・登録キーフレ・前回からある程度変形したキーフレの場合、登録
+                    bf.rotation = qq
+                    bf.register = True
+                    bake_motion.insert_bone_frame(bf)
 
-                for effect_bone_index in model.bones[
-                    bone_name
-                ].effective_target_indexes:
-                    bf.rotation *= motion.bones[model.bones[effect_bone_index].name][
-                        fno
-                    ].rotation.inverse()
-                bf.register = True
-                bake_motion.append_bone_frame(bf)
-
-                # is_register = False
-                # is_prev_register = False
-
-                # if fidx == 0:
-                #     # 初回はそのまま登録
-                #     bf.rotation = qq
-                #     is_register = True
-                # else:
-                #     # 2回目以降は前回との内積差が一定以上ある場合のみ登録
-                #     if abs(prev_qq.dot(qq)) < 0.95 and not bf.read:
-                #         # 前との差が大きい場合、ひとつ前も登録する
-                #         prev_fno = fnos[fidx - 1]
-                #         prev_bf = motion.bones[bone_name][prev_fno]
-                #         prev_qq = matrixes[prev_fno, bone_name].frame_rotation
-                #         for effect_bone_index in model.bones[bone_name].effective_target_indexes:
-                #             prev_bf.rotation *= motion.bones[model.bones[effect_bone_index].name][prev_fno].rotation.inverse()
-                #         prev_bf.register = True
-                #         motion.insert_bone_frame(prev_bf)
-                #         is_prev_register = True
-
-                #     if abs(prev_qq.dot(qq)) < 0.9 and bf.read:
-                #         # 読み込んだキーフレかつ差が前より大きい、場合、読み込んだキーフレを除去する
-                #         pass
-                #     elif 0.99 - ((fno - prev_fno) ** 1.5 * 0.01) < abs(prev_qq.dot(qq)) < 0.99 + ((fno - prev_fno) ** 1.5 * 0.001) and (
-                #         not is_prev_register or (is_prev_register and fno - prev_fno > 1)
-                #     ):
-                #         bf.rotation = qq
-                #         is_register = True
-
-                #     logger.debug(
-                #         f"[{bone_name}][{prev_fno}][{fno}][prev: {prev_qq.to_degrees():.3f}][now: {qq.to_degrees():.3f}]"
-                #         + f"[dot: {abs(prev_qq.dot(qq)):.3f}][prev: {is_prev_register}][now: {is_register}]"
-                #     )
-
-                # # x_qq, _, _, yz_qq = qq.separate_by_axis(model.bones[link.bone_index].local_axis)
-                # # if x_qq.to_degrees() > 90:
-                # #     # くるんと回転してしまった場合を避けるため、YZのみを採用する
-                # #     bf.rotation = yz_qq
-                # # else:
-                # #     bf.rotation = qq
-                # if is_register:
-                #     for effect_bone_index in model.bones[bone_name].effective_target_indexes:
-                #         bf.rotation *= motion.bones[model.bones[effect_bone_index].name][fno].rotation.inverse()
-                #     bf.register = True
-                #     motion.insert_bone_frame(bf)
-
-                #     prev_fno = fno
-                #     prev_qq = bf.rotation
-                # else:
-                #     # 登録しない場合、削除しておく
-                #     del motion.bones[bone_name][fno]
+                    prev_qq = qq
 
         if model.bones[model.bones[ik_bone_index].parent_index].is_ik:
             # 親ボーンがIKである場合、親も辿る
@@ -161,9 +114,7 @@ class BakeUsecase:
         motion: VmdMotion,
         ik_bone: Bone,
     ) -> tuple[Bone, list[int], VmdBoneFrameTrees]:
-        logger.info(
-            "IK焼き込み: {b}", b=ik_bone.name, decoration=MLogger.Decoration.LINE
-        )
+        logger.info("IK焼き込み: {b}", b=ik_bone.name, decoration=MLogger.Decoration.LINE)
 
         bone_names: list[str] = [model.bones[ik_bone.ik.bone_index].name]
 

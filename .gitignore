@@ -139,3 +139,4 @@ revision.txt
 
 *.vmd
 *.pmx
+.ruff_cache

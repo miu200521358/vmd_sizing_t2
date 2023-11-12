@@ -721,3 +721,11 @@ msgstr ""
 msgid "【No.{x}】{d}腕：初期位置取得({m})"
 msgstr ""
 
+
+msgid "IK事前計算[{d}]"
+msgstr ""
+
+
+msgid "-- IK事前計算[{d}] [{i} ({p:.2f}%)]"
+msgstr ""
+
