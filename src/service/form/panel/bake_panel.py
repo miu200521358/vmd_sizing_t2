@@ -30,20 +30,6 @@ class BakePanel(NotebookPanel):
         # ヘッダー -----------------------------
         self.header_sizer = wx.BoxSizer(wx.VERTICAL)
 
-        self.model_ctrl = MPmxFilePickerCtrl(
-            self,
-            self.frame,
-            self,
-            key="ik_pmx",
-            title="焼き込み元モデル",
-            is_show_name=True,
-            name_spacer=4,
-            is_save=False,
-            tooltip="モーションを適用させたいモデルを指定してください\nこのモデルに合わせてモーションのIK部分をIK焼き込みします",
-            file_change_event=self.on_change_model_pmx,
-        )
-        self.model_ctrl.set_parent_sizer(self.header_sizer)
-
         self.motion_ctrl = MVmdFilePickerCtrl(
             self,
             self.frame,
@@ -57,6 +43,20 @@ class BakePanel(NotebookPanel):
             file_change_event=self.on_change_motion,
         )
         self.motion_ctrl.set_parent_sizer(self.header_sizer)
+
+        self.model_ctrl = MPmxFilePickerCtrl(
+            self,
+            self.frame,
+            self,
+            key="ik_pmx",
+            title="焼き込み元モデル",
+            is_show_name=True,
+            name_spacer=4,
+            is_save=False,
+            tooltip="モーションを適用させたいモデルを指定してください\nこのモデルに合わせてモーションのIK部分をIK焼き込みします",
+            file_change_event=self.on_change_model_pmx,
+        )
+        self.model_ctrl.set_parent_sizer(self.header_sizer)
 
         self.output_motion_ctrl = MVmdFilePickerCtrl(
             self,
