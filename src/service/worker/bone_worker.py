@@ -8,33 +8,28 @@ from concurrent.futures import (
 )
 
 import wx
+from service.form.widgets.bone_set import SizingBoneSet
+from service.usecase.arm_align_usecase import ArmAlignUsecase
+from service.usecase.arm_stance_usecase import ArmStanceUsecase
+from service.usecase.arm_twist_usecase import ArmTwistUsecase
+from service.usecase.io_usecase import IoUsecase
+from service.usecase.move_usecase import MoveUsecase
 
 from mlib.core.exception import MApplicationException
 from mlib.core.logger import MLogger
 from mlib.core.math import MVector3D
 from mlib.service.base_worker import BaseWorker
-from mlib.service.form.base_frame import BaseFrame
+from mlib.service.form.base_panel import BasePanel
 from mlib.utils.file_utils import get_root_dir
 from mlib.vmd.vmd_tree import VmdBoneFrameTrees
-from service.form.widgets.bone_set import SizingBoneSet
-from service.usecase.arm_twist_usecase import ArmTwistUsecase
-from service.usecase.io_usecase import IoUsecase
-from service.usecase.move_usecase import MoveUsecase
-from service.usecase.arm_stance_usecase import ArmStanceUsecase
-from service.usecase.arm_align_usecase import ArmAlignUsecase
 
 logger = MLogger(os.path.basename(__file__), level=1)
 __ = logger.get_text
 
 
 class BoneWorker(BaseWorker):
-    def __init__(self, frame: BaseFrame, result_event: wx.Event) -> None:
-        super().__init__(frame, result_event)
-        self.max_worker = (
-            1
-            if frame.is_saving
-            else max(1, int(min(32, (os.cpu_count() or 0) + 4) / 2))
-        )
+    def __init__(self, panel: BasePanel, result_event: wx.Event) -> None:
+        super().__init__(panel, result_event)
 
     def thread_execute(self):
         bone_panel = self.frame.bone_panel

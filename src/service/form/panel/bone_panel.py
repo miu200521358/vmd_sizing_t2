@@ -22,7 +22,7 @@ class BonePanel(NotebookPanel):
         super().__init__(frame, tab_idx, *args, **kw)
         self.sizing_sets: list[SizingBoneSet] = []
 
-        self.bone_worker = BoneWorker(frame, self.on_exec_result)
+        self.bone_worker = BoneWorker(self, self.on_exec_result)
 
         self._initialize_ui()
 

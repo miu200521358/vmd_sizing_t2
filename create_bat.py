@@ -1,7 +1,7 @@
 import sys
 
 sys.path.append("src")
-from executor import APP_NAME, VERSION_NAME
+from executor import APP_NAME, VERSION_NAME  # noqa: E402
 
 EXE_NAME = f"{APP_NAME}_{VERSION_NAME}"
 

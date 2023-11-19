@@ -1,7 +1,8 @@
-from datetime import datetime
 import os
+from datetime import datetime
 
 import wx
+from service.worker.bake_worker import BakeWorker
 
 from mlib.core.logger import ConsoleHandler, MLogger
 from mlib.service.form.notebook_frame import NotebookFrame
@@ -10,7 +11,6 @@ from mlib.service.form.widgets.console_ctrl import ConsoleCtrl
 from mlib.service.form.widgets.exec_btn_ctrl import ExecButton
 from mlib.service.form.widgets.file_ctrl import MPmxFilePickerCtrl, MVmdFilePickerCtrl
 from mlib.utils.file_utils import save_histories
-from service.worker.bake_worker import BakeWorker
 
 logger = MLogger(os.path.basename(__file__))
 __ = logger.get_text
@@ -20,7 +20,7 @@ class BakePanel(NotebookPanel):
     def __init__(self, frame: NotebookFrame, tab_idx: int, *args, **kw) -> None:
         super().__init__(frame, tab_idx, *args, **kw)
 
-        self.bake_worker = BakeWorker(frame, self.on_exec_result)
+        self.bake_worker = BakeWorker(self, self.on_exec_result)
 
         self._initialize_ui()
 
@@ -79,9 +79,7 @@ class BakePanel(NotebookPanel):
             __("IK焼き込み実行停止"),
             self.exec,
             250,
-            __(
-                "IK焼き込みを実行します\nモデルとモーションを設定後、クリックできるようになります"
-            ),
+            __("IK焼き込みを実行します\nモデルとモーションを設定後、クリックできるようになります"),
         )
         self.exec_btn_ctrl.exec_worker = self.bake_worker
         self.btn_sizer.Add(self.exec_btn_ctrl, 0, wx.ALL, 3)

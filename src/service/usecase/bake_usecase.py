@@ -89,7 +89,7 @@ class BakeUsecase:
                 logger.debug(f"[{bone_name}][{fno}][now: {qq.to_degrees():.3f}]")
 
                 bf = motion.bones[bone_name][fno]
-                if fidx == 0 or bf.register or qq.dot(prev_qq) < 0.95:
+                if fidx == 0 or bf.register or qq.dot(prev_qq) < 0.99:
                     # 最初のキーフレ・登録キーフレ・前回からある程度変形したキーフレの場合、登録
                     bf.rotation = qq
                     bf.register = True

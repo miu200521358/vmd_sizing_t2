@@ -2,26 +2,21 @@ import os
 from concurrent.futures import ThreadPoolExecutor
 
 import wx
+from service.usecase.bake_usecase import BakeUsecase
+from service.usecase.io_usecase import IoUsecase
 
 from mlib.core.logger import MLogger
 from mlib.service.base_worker import BaseWorker
-from mlib.service.form.base_frame import BaseFrame
+from mlib.service.form.base_panel import BasePanel
 from mlib.utils.file_utils import get_root_dir
-from service.usecase.bake_usecase import BakeUsecase
-from service.usecase.io_usecase import IoUsecase
 
 logger = MLogger(os.path.basename(__file__), level=1)
 __ = logger.get_text
 
 
 class BakeWorker(BaseWorker):
-    def __init__(self, frame: BaseFrame, result_event: wx.Event) -> None:
-        super().__init__(frame, result_event)
-        self.max_worker = (
-            1
-            if frame.is_saving
-            else max(1, int(min(32, (os.cpu_count() or 0) + 4) / 2))
-        )
+    def __init__(self, panel: BasePanel, result_event: wx.Event) -> None:
+        super().__init__(panel, result_event)
 
     def thread_execute(self):
         # まずは読み込み
