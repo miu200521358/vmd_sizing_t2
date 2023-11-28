@@ -21,8 +21,9 @@ class TreeDialog(wx.Dialog):
         self.description_ctrl = wx.StaticText(
             self.panel,
             wx.ID_ANY,
-            __("焼き込みたいIK管理下のボーンを選択してください\n")
-            + __("Shiftキーを押しながら選択すると、複数ボーンを一気に選択できます\n")
+            __("焼き込みたいIK管理下のボーン(足・ひざ・足首等)を選択してください\n")
+            + __("Shiftキーを押しながら選択すると、複数ボーンをまとめて選択できます\n")
+            + __("Ctrlキーを押しながら選択すると、複数ボーンをそれぞれ選択できます\n")
             + __("（IKボーンも一緒に選択しても問題ありません）"),
         )
         self.sizer.Add(self.description_ctrl, 0, wx.ALL, 2)
@@ -60,5 +61,6 @@ class TreeDialog(wx.Dialog):
         return [
             self.tree_ctrl.GetItemText(idx)
             for idx in self.tree_ctrl.GetSelections()
-            if not self.model.bones[self.tree_ctrl.GetItemText(idx)].ik
+            if self.tree_ctrl.GetItemText(idx) in self.model.bones
+            and not self.model.bones[self.tree_ctrl.GetItemText(idx)].ik
         ]

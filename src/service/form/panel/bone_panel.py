@@ -34,6 +34,13 @@ class BonePanel(NotebookPanel):
         # ヘッダー -----------------------------
         self.header_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
+        self.description_ctrl = wx.StaticText(
+            self,
+            wx.ID_ANY,
+            __("モーション作成元モデルにモーションを読み込んだ時の動きを、任意のモデルで再現できるようモーションを調整します\n"),
+        )
+        self.header_sizer.Add(self.description_ctrl, 0, wx.ALL, 2)
+
         self.add_set_btn_ctrl = wx.Button(
             self,
             wx.ID_ANY,

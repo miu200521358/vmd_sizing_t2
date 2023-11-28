@@ -614,3 +614,15 @@ msgstr "[{b}]For the following keyfre, the IK bone ({i}) is positioned further a
 
 msgid "焼き込み設定"
 msgstr "Burn-In Settings"
+
+msgid "モーション作成元モデルにモーションを読み込んだ時の動きを、任意のモデルで再現できるようモーションを調整します\n"
+msgstr "Adjust the motion so that any model can reproduce the movement of the motion when the motion is loaded into the model from which the motion was created.
+
+msgid "焼き込みたいIK管理下のボーン(足・ひざ・足首等)を選択してください\n"
+msgstr "Please select the bone (foot, knee, ankle, etc.) under IK management that you want to burn in)》
+
+msgid "Shiftキーを押しながら選択すると、複数ボーンをまとめて選択できます\n"
+msgstr "You can select multiple bones at once by holding down the Shift key while selecting them!\n"
+
+msgid "Ctrlキーを押しながら選択すると、複数ボーンをそれぞれ選択できます\n"
+msgstr "Hold down the Ctrl key while selecting to select each of the multiple bones.

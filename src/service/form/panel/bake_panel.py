@@ -183,19 +183,21 @@ class BakePanel(NotebookPanel):
 
             self.selected_bone_names = dialog.get_selected_names()
 
+            self.EnableExec(True)
+
             # 選択されている場合、ボタンの色を変える
             if 0 < len(self.selected_bone_names):
                 self.target_bone_btn_ctrl.SetBackgroundColour(
                     self.active_background_color
                 )
                 self.target_bone_txt_ctrl.SetValue(", ".join(self.selected_bone_names))
+                self.exec_btn_ctrl.SetBackgroundColour(self.selectable_background_color)
             else:
                 self.target_bone_btn_ctrl.SetBackgroundColour(
-                    wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNFACE)
+                    self.default_background_color
                 )
                 self.target_bone_txt_ctrl.SetValue("")
-
-            self.EnableExec(True)
+                self.exec_btn_ctrl.SetBackgroundColour(self.default_background_color)
 
     def on_change_model_pmx(self, event: wx.Event) -> None:
         self.model_ctrl.unwrap()
@@ -313,11 +315,21 @@ class BakePanel(NotebookPanel):
         self.output_motion_ctrl.Enable(enable)
         self.model_ctrl.Enable(enable)
         self.prepare_btn_ctrl.Enable(enable)
+        if not enable:
+            self.target_bone_btn_ctrl.SetBackgroundColour(self.default_background_color)
 
     def EnableConfig(self, enable: bool) -> None:
         self.target_bone_txt_ctrl.Enable(enable)
         self.target_bone_btn_ctrl.Enable(enable)
         self.bake_grain_slider.Enable(enable)
+        if enable:
+            self.target_bone_btn_ctrl.SetBackgroundColour(
+                self.selectable_background_color
+            )
+        else:
+            self.target_bone_btn_ctrl.SetBackgroundColour(self.default_background_color)
 
     def EnableExec(self, enable: bool) -> None:
         self.exec_btn_ctrl.Enable(enable)
+        self.target_bone_btn_ctrl.SetBackgroundColour(self.default_background_color)
+        self.exec_btn_ctrl.SetBackgroundColour(self.default_background_color)
