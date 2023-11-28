@@ -1,7 +1,8 @@
-from math import acos, degrees
 import os
+from math import acos, degrees
 from typing import Optional
 
+from service.usecase.bone_names import BoneNames
 
 from mlib.core.logger import MLogger
 from mlib.core.math import MQuaternion, MVector3D
@@ -11,7 +12,6 @@ from mlib.pmx.pmx_part import Bone, DisplaySlotReference, Ik, IkLink
 from mlib.vmd.vmd_collection import VmdMotion
 from mlib.vmd.vmd_part import VmdBoneFrame
 from mlib.vmd.vmd_tree import VmdBoneFrameTrees
-from service.usecase.bone_names import BoneNames
 
 logger = MLogger(os.path.basename(__file__), level=1)
 __ = logger.get_text
@@ -30,14 +30,14 @@ class ArmAlignUsecase:
         show_message: bool = False,
     ) -> bool:
         BONE_NAMES = [
-            "右肩",
-            "右腕",
-            "右ひじ",
-            "右手首",
-            "左肩",
-            "左腕",
-            "左ひじ",
-            "左手首",
+            BoneNames.shoulder("右"),
+            BoneNames.arm("右"),
+            BoneNames.elbow("右"),
+            BoneNames.wrist("右"),
+            BoneNames.shoulder("左"),
+            BoneNames.arm("左"),
+            BoneNames.elbow("左"),
+            BoneNames.wrist("左"),
         ]
 
         if not (src_model and dest_model) or (

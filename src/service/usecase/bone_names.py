@@ -206,3 +206,39 @@ class BoneNames:
             BoneNames.pinky3(direction),
             BoneNames.pinky_tail(direction),
         ]
+
+    @staticmethod
+    def root_parent() -> str:
+        return "全ての親"
+
+    @staticmethod
+    def center() -> str:
+        return "センター"
+
+    @staticmethod
+    def groove() -> str:
+        return "グルーブ"
+
+    @staticmethod
+    def leg(direction: str) -> str:
+        return f"{direction}足"
+
+    @staticmethod
+    def knee(direction: str) -> str:
+        return f"{direction}ひざ"
+
+    @staticmethod
+    def ankle(direction: str) -> str:
+        return f"{direction}足首"
+
+    @staticmethod
+    def leg_ik_parent(direction: str) -> str:
+        return f"{direction}足IK親"
+
+    @staticmethod
+    def leg_ik(direction: str) -> str:
+        return f"{direction}足ＩＫ"
+
+    @staticmethod
+    def toe_ik(direction: str) -> str:
+        return f"{direction}つま先ＩＫ"

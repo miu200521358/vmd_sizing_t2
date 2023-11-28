@@ -29,6 +29,7 @@ class MainFrame(NotebookFrame):
                 "rep_pmx",
                 "camera_vmd",
                 "camera_pmx",
+                "ik_vmd",
                 "ik_pmx",
             ],
             title=title,

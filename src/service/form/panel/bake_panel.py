@@ -51,7 +51,7 @@ class BakePanel(NotebookPanel):
             self,
             self.frame,
             self,
-            key="vmd",
+            key="ik_vmd",
             title="焼き込み対象モーション",
             is_show_name=True,
             name_spacer=1,
