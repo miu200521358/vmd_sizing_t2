@@ -551,3 +551,66 @@ msgstr "IK pre-calculation [{d}]"
 
 msgid "-- IK事前計算[{d}] [{i} ({p:.2f}%)]"
 msgstr "-- IK pre-calculation [{d}] [{i} ({p:.2f}%)]"
+
+msgid "焼き込み対象のボーン一覧"
+msgstr "List of bones to be burned"
+
+msgid "焼き込み対象ボーン選択"
+msgstr "Select Bone to Burn"
+
+msgid "焼き込み対象のボーンを選択できます"
+msgstr "You can select the bones to be burned"
+
+msgid "データ読み込み"
+msgstr "Data loading"
+
+msgid "データ読み込み停止"
+msgstr "Stop reading data"
+
+msgid "指定されたモデルとモーションを読み込みます。"
+msgstr "Loads the specified model and motion"
+
+msgid "読み込み完了"
+msgstr "Loading complete"
+
+msgid "読み込み完了\n「焼き込み対象ボーン選択」ボタンから焼き込み対象のIK管理下ボーンを選択してください"
+msgstr "Select the IK managed bone to burn from the "Select Bone to Burn" button"
+
+msgid "任意のIKボーンの計算を行い、IK管理下のボーンの角度を算出したモーションデータを生成します。\n"
+msgstr "Calculate any IK bone and generate motion data with calculated angles of the bone under IK management. \n"
+
+msgid "極力MMDに近づけて計算していますが、差異が出てくる場合があります。"
+msgstr "The calculations are made as close to MMD as possible, but there may be differences"
+
+msgid "モーションが読み込まれていない為、処理を中断します"
+msgstr "Processing is aborted because motion has not been loaded"
+
+msgid "モデルが読み込まれていない為、処理を中断します"
+msgstr "Processing is aborted because the model has not been loaded"
+
+msgid "読み込み完了\n「焼き込み対象ボーン選択」ボタンから焼き込みたいIK管理下ボーンを選択してください"
+msgstr "Please select the IK managed bone you want to burn from the "Select Bone to Burn" button"
+
+msgid "焼き込みの細かさを設定できます\n値が大きいほど細かい変動に反応するようになります"
+msgstr "You can set the fineness of burn-in.
+
+msgid "\nEnterキーを押下したタイミングで値が反映されます。"
+msgstr "The value is reflected at the time the \nEnter key is pressed"
+
+msgid "焼き込みたいIK管理下のボーンを選択してください\n"
+msgstr "Please select the bone under IK management that you want to burn in.
+
+msgid "Shiftキーを押しながら選択すると、複数ボーンを一気に選択できます（IKボーンも一緒に選択しても問題ありません）"
+msgstr "You can select multiple bones at once by holding down the Shift key while selecting them (you can also select IK bones together)"
+
+msgid "Shiftキーを押しながら選択すると、複数ボーンを一気に選択できます\n"
+msgstr "You can select multiple bones at once by holding down the Shift key while selecting them.
+
+msgid "[{b}][{f}F]IKボーンの位置がIKターゲットより遠くに配置されている為、焼き込み結果が安定してない可能性があります"
+msgstr "[{b}][{f}F]IK bone position is placed further away from the IK target, so the baking result may not be stable"
+
+msgid "[{b}]下記キーフレは、IKボーン({i})の位置がIKターゲットボーン({e})より遠くに配置されている為、焼き込み結果が安定してない可能性があります\n    {f}"
+msgstr "[{b}]For the following keyfre, the IK bone ({i}) is positioned further away from the IK target bone ({e}), so the baking result may not be stable.
+
+msgid "焼き込み設定"
+msgstr "Burn-In Settings"

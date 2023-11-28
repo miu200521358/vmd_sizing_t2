@@ -1,5 +1,4 @@
 import os
-from concurrent.futures import ThreadPoolExecutor
 
 import wx
 from service.usecase.bake_usecase import BakeUsecase
@@ -19,9 +18,6 @@ class BakeWorker(BaseWorker):
         super().__init__(panel, result_event)
 
     def thread_execute(self):
-        # まずは読み込み
-        self.load()
-
         # IK焼き込み
         self.bake_ik()
 
@@ -41,6 +37,8 @@ class BakeWorker(BaseWorker):
         bake_panel.output_motion_ctrl.data = usecase.bake_ik(
             bake_panel.model_ctrl.data,
             bake_panel.output_motion_ctrl.data,
+            bake_panel.selected_bone_names,
+            bake_panel.bake_grain_slider.GetValue(),
             self.max_worker,
         )
 
@@ -55,34 +53,6 @@ class BakeWorker(BaseWorker):
             bake_panel.output_motion_ctrl.data,
             bake_panel.output_motion_ctrl.path,
         )
-
-    def load(self):
-        """データ読み込み"""
-        usecase = IoUsecase()
-        bake_panel = self.frame.bake_panel
-
-        with ThreadPoolExecutor(
-            thread_name_prefix="load", max_workers=self.max_worker
-        ) as executor:
-            motion_future = executor.submit(
-                usecase.load_motion,
-                0,
-                bake_panel.motion_ctrl.path,
-                self.frame.cache_motions,
-            )
-            model_future = executor.submit(
-                usecase.load_model_no_copy,
-                0,
-                bake_panel.model_ctrl.path,
-                self.frame.cache_models,
-            )
-
-        sizing_idx, digest, original_motion, motion = motion_future.result()
-        bake_panel.motion_ctrl.data = original_motion
-        bake_panel.output_motion_ctrl.data = motion
-
-        sizing_idx, digest, model = model_future.result()
-        bake_panel.model_ctrl.data = model
 
     def output_log(self):
         bake_panel = self.frame.bake_panel

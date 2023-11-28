@@ -2,6 +2,9 @@ import os
 from typing import Optional
 
 import wx
+from service.form.panel.bake_panel import BakePanel
+from service.form.panel.bone_panel import BonePanel
+from service.form.widgets.morph_sub_window import MorphSubCanvasWindow
 
 from mlib.core.logger import MLogger
 from mlib.pmx.pmx_collection import PmxModel
@@ -9,9 +12,6 @@ from mlib.pmx.shader import MShader
 from mlib.service.form.base_panel import BasePanel
 from mlib.service.form.notebook_frame import NotebookFrame
 from mlib.vmd.vmd_collection import VmdMotion
-from service.form.panel.bake_panel import BakePanel
-from service.form.panel.bone_panel import BonePanel
-from service.form.widgets.morph_sub_window import MorphSubCanvasWindow
 
 logger = MLogger(os.path.basename(__file__), level=1)
 __ = logger.get_text
@@ -41,7 +41,7 @@ class MainFrame(NotebookFrame):
 
         # ボーンモーションサイジング
         self.bone_panel = BonePanel(self, 0)
-        self.notebook.AddPage(self.bone_panel, __("ボーン"), True)
+        self.notebook.AddPage(self.bone_panel, __("サイジング"), True)
 
         # IK焼き込み
         self.bake_panel = BakePanel(self, 1)
