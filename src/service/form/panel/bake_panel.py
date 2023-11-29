@@ -31,6 +31,8 @@ class BakePanel(NotebookPanel):
         self.Enable(False)
         self.EnableLoad(True)
 
+        self.prepare_btn_ctrl.SetBackgroundColour(self.selectable_background_color)
+
     def _initialize_ui(self) -> None:
         # ヘッダー -----------------------------
         self.header_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -206,6 +208,7 @@ class BakePanel(NotebookPanel):
             self.create_output_path()
         self.Enable(False)
         self.EnableLoad(True)
+        self.prepare_btn_ctrl.SetBackgroundColour(self.selectable_background_color)
 
     def on_change_motion(self, event: wx.Event) -> None:
         self.motion_ctrl.unwrap()
@@ -214,6 +217,7 @@ class BakePanel(NotebookPanel):
             self.create_output_path()
         self.Enable(False)
         self.EnableLoad(True)
+        self.prepare_btn_ctrl.SetBackgroundColour(self.selectable_background_color)
 
     def create_output_path(self) -> None:
         if self.motion_ctrl.valid() and self.model_ctrl.valid():
@@ -315,7 +319,9 @@ class BakePanel(NotebookPanel):
         self.output_motion_ctrl.Enable(enable)
         self.model_ctrl.Enable(enable)
         self.prepare_btn_ctrl.Enable(enable)
-        if not enable:
+        if enable:
+            self.prepare_btn_ctrl.SetBackgroundColour(self.default_background_color)
+        else:
             self.target_bone_btn_ctrl.SetBackgroundColour(self.default_background_color)
 
     def EnableConfig(self, enable: bool) -> None:
@@ -332,4 +338,5 @@ class BakePanel(NotebookPanel):
     def EnableExec(self, enable: bool) -> None:
         self.exec_btn_ctrl.Enable(enable)
         self.target_bone_btn_ctrl.SetBackgroundColour(self.default_background_color)
+        self.prepare_btn_ctrl.SetBackgroundColour(self.default_background_color)
         self.exec_btn_ctrl.SetBackgroundColour(self.default_background_color)
