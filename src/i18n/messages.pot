@@ -829,3 +829,27 @@ msgstr ""
 msgid "Ctrlキーを押しながら選択すると、複数ボーンをそれぞれ選択できます\n"
 msgstr ""
 
+
+msgid "間隔"
+msgstr ""
+
+
+msgid "焼き込みの間隔を設定できます\n固定間隔の場合でも付与親などの関係で必要な箇所にはキーフレを挿入します"
+msgstr ""
+
+
+msgid "影響キーフレ箇所のみ"
+msgstr ""
+
+
+msgid "5Fごと固定"
+msgstr ""
+
+
+msgid "3Fごと固定"
+msgstr ""
+
+
+msgid "全打ち"
+msgstr ""
+

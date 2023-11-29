@@ -122,6 +122,25 @@ class BakePanel(NotebookPanel):
         self.target_bone_btn_ctrl.SetToolTip(__("焼き込み対象のボーンを選択できます"))
         self.config_sizer.Add(self.target_bone_btn_ctrl, 0, wx.ALL, 2)
 
+        self.bake_frame_title_ctrl = wx.StaticText(self, wx.ID_ANY, __("間隔"))
+        self.config_sizer.Add(self.bake_frame_title_ctrl)
+
+        self.bake_interval_choice_ctrl = wx.Choice(
+            self,
+            wx.ID_ANY,
+            wx.DefaultPosition,
+            wx.Size(150, -1),
+            choices=[__("影響キーフレ箇所のみ"), __("5Fごと固定"), __("3Fごと固定"), __("全打ち")],
+        )
+        self.bake_interval_choice_ctrl.SetToolTip(
+            __("焼き込みの間隔を設定できます\n固定間隔の場合でも付与親などの関係で必要な箇所にはキーフレを挿入します")
+        )
+        self.bake_interval_choice_ctrl.Bind(
+            wx.EVT_CHOICE, self.on_change_bake_attribute
+        )
+        self.bake_interval_choice_ctrl.SetSelection(0)
+        self.config_sizer.Add(self.bake_interval_choice_ctrl, 0, wx.ALL | wx.BOTTOM, 2)
+
         self.bake_grain_title_ctrl = wx.StaticText(self, wx.ID_ANY, __("細かさ"))
         self.config_sizer.Add(self.bake_grain_title_ctrl)
 
@@ -134,6 +153,7 @@ class BakePanel(NotebookPanel):
             spin_increment=0.1,
             border=3,
             size=wx.Size(120, -1),
+            change_event=self.on_change_bake_attribute,
             tooltip=__("焼き込みの細かさを設定できます\n値が大きいほど細かい変動に反応するようになります"),
         )
         self.config_sizer.Add(self.bake_grain_slider.sizer, 0, wx.ALL | wx.BOTTOM, 2)
@@ -186,6 +206,7 @@ class BakePanel(NotebookPanel):
             self.selected_bone_names = dialog.get_selected_names()
 
             self.EnableExec(True)
+            self.on_change_bake_attribute(event)
 
             # 選択されている場合、ボタンの色を変える
             if 0 < len(self.selected_bone_names):
@@ -200,6 +221,9 @@ class BakePanel(NotebookPanel):
                 )
                 self.target_bone_txt_ctrl.SetValue("")
                 self.exec_btn_ctrl.SetBackgroundColour(self.default_background_color)
+
+    def on_change_bake_attribute(self, event: wx.Event) -> None:
+        self.create_output_path()
 
     def on_change_model_pmx(self, event: wx.Event) -> None:
         self.model_ctrl.unwrap()
@@ -236,7 +260,7 @@ class BakePanel(NotebookPanel):
                 motion_dir_path,
                 "".join(
                     [
-                        f"{motion_file_name}_{model_file_name}_{datetime.now():%Y%m%d_%H%M%S}{motion_file_ext}",
+                        f"{motion_file_name}_{model_file_name}_bake_{datetime.now():%Y%m%d_%H%M%S}{motion_file_ext}",
                     ]
                 ),
             )
@@ -327,6 +351,7 @@ class BakePanel(NotebookPanel):
     def EnableConfig(self, enable: bool) -> None:
         self.target_bone_txt_ctrl.Enable(enable)
         self.target_bone_btn_ctrl.Enable(enable)
+        self.bake_interval_choice_ctrl.Enable(enable)
         self.bake_grain_slider.Enable(enable)
         if enable:
             self.target_bone_btn_ctrl.SetBackgroundColour(

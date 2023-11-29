@@ -18,6 +18,7 @@ class BakeUsecase:
         model: PmxModel,
         motion: VmdMotion,
         selected_bone_names: list[str],
+        bake_interval: int,
         bake_grain: float,
         max_worker: int,
     ) -> VmdMotion:
@@ -47,7 +48,9 @@ class BakeUsecase:
                 ):
                     # 自身がIKであること、IKのターゲットが存在している事、IKリンクに処理対象ボーンがいること、子ボーンにIKがいないこと（つま先ＩＫ対策）
                     futures.append(
-                        executor.submit(self.bake_ik_bone, model, motion, bone)
+                        executor.submit(
+                            self.bake_ik_bone, model, motion, bone, bake_interval
+                        )
                     )
 
             wait(futures)
@@ -67,6 +70,7 @@ class BakeUsecase:
                     ik_bone_index,
                     fnos,
                     selected_bone_names,
+                    bake_interval,
                     bake_grain,
                     matrixes,
                 )
@@ -81,6 +85,7 @@ class BakeUsecase:
         ik_bone_index: int,
         fnos: list[int],
         selected_bone_names: list[str],
+        bake_interval: int,
         bake_grain: float,
         matrixes: VmdBoneFrameTrees,
     ):
@@ -153,12 +158,24 @@ class BakeUsecase:
                     # IKボーンの位置がIK関連ボーンの長さより長い場合、警告する
                     ik_over_fnos |= {fno}
 
+                # 固定間隔キーフレが選択されているか否か
+                is_register_interval = (
+                    True
+                    if (
+                        (bake_interval == 1 and fno % 5 == 0)
+                        or (bake_interval == 2 and fno % 3 == 0)
+                        or bake_interval == 3
+                    )
+                    else False
+                )
+
                 if (
                     0 == fidx
                     or bf.register
                     or effective_bone_registers
                     or fno in link_fnos
-                    or qq.dot(prev_qq) < 0.99 + (bake_grain * 0.01)
+                    or qq.dot(prev_qq) < 0.97 + (bake_grain * 0.03)
+                    or is_register_interval
                 ):
                     logger.debug(f"[{bone.name}][{fno}][now: {qq.to_degree():.3f}]")
 
@@ -222,6 +239,7 @@ class BakeUsecase:
                 model.bones[ik_bone_index].parent_index,
                 fnos,
                 selected_bone_names,
+                bake_interval,
                 bake_grain,
                 matrixes,
             )
@@ -231,6 +249,7 @@ class BakeUsecase:
         model: PmxModel,
         motion: VmdMotion,
         ik_bone: Bone,
+        bake_interval: int,
     ) -> tuple[Bone, list[int], VmdBoneFrameTrees]:
         logger.info("IK焼き込み: {b}", b=ik_bone.name, decoration=MLogger.Decoration.LINE)
 
@@ -265,6 +284,16 @@ class BakeUsecase:
             for tree_bone in model.bone_trees[bone_name]:
                 fnos |= set(motion.bones[tree_bone.name].register_indexes)
                 bone_names.append(tree_bone.name)
+
+        if bake_interval == 1:
+            # 5Fごと
+            fnos |= set(range(0, motion.max_fno + 1, 5))
+        elif bake_interval == 2:
+            # 3Fごと
+            fnos |= set(range(0, motion.max_fno + 1, 3))
+        elif bake_interval == 3:
+            # 全打ち
+            fnos |= set(range(motion.max_fno + 1))
 
         sorted_fnos = sorted(fnos)
 

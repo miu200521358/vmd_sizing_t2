@@ -38,6 +38,7 @@ class BakeWorker(BaseWorker):
             bake_panel.model_ctrl.data,
             bake_panel.output_motion_ctrl.data,
             bake_panel.selected_bone_names,
+            bake_panel.bake_interval_choice_ctrl.GetSelection(),
             bake_panel.bake_grain_slider.GetValue(),
             self.max_worker,
         )

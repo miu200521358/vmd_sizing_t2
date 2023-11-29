@@ -626,3 +626,21 @@ msgstr "You can select multiple bones at once by holding down the Shift key whil
 
 msgid "Ctrlキーを押しながら選択すると、複数ボーンをそれぞれ選択できます\n"
 msgstr "Hold down the Ctrl key while selecting to select each of the multiple bones.
+
+msgid "間隔"
+msgstr "Spacing"
+
+msgid "焼き込みの間隔を設定できます\n固定間隔の場合でも付与親などの関係で必要な箇所にはキーフレを挿入します"
+msgstr "You can set the interval of burn-in,Јn even in the case of fixed intervals, keyfre will be inserted where necessary due to the granting parent and so on"
+
+msgid "影響キーフレ箇所のみ"
+msgstr "Only impacted keffre points"
+
+msgid "5Fごと固定"
+msgstr "Fixed every 5F"
+
+msgid "3Fごと固定"
+msgstr "Fixed every third floor"
+
+msgid "全打ち"
+msgstr "All strikes"
