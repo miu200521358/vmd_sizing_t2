@@ -1,6 +1,8 @@
 
-msgid "モデルセットアップ：システム用ボーン"
+msgid "-- キーフレーム確認[{d}] [{i} ({p:.2f}%)]"
 msgstr ""
+
+"
 
 
 msgid "モデルセットアップ：ボーン"
@@ -851,5 +853,49 @@ msgstr ""
 
 
 msgid "全打ち"
+msgstr ""
+
+
+msgid "-- テクスチャデータ読み取り [{i} ({p:.2f}%)]"
+msgstr ""
+
+
+msgid "-- モーフデータ読み取り [{i} ({p:.2f}%)]"
+msgstr ""
+
+
+msgid "-- 表示枠データ読み取り [{i} ({p:.2f}%)]"
+msgstr ""
+
+
+msgid "キーフレーム確認[{d}]"
+msgstr ""
+
+
+msgid "-- キーフレーム確認[{d}] [{i} ({p:.2f}%)]"
+msgstr ""
+
+
+msgid "ボーン変形行列積[{d}]"
+msgstr ""
+
+
+msgid "-- ボーン変形行列積[{d}] [{i} ({p:.2f}%)]"
+msgstr ""
+
+
+msgid "-- IK計算結果設定 [{i} ({p:.2f}%)]"
+msgstr ""
+
+
+msgid "モデルセットアップ：システム用ボーン"
+msgstr ""
+
+
+msgid "ボーンモーション出力"
+msgstr ""
+
+
+msgid "-- ボーンモーション出力 [{i} ({p:.2f}%)]"
 msgstr ""
 

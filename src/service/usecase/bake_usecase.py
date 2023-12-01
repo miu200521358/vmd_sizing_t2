@@ -134,14 +134,14 @@ class BakeUsecase:
             for fidx, fno in enumerate(fnos):
                 logger.count("IK計算結果設定", fidx, len(fnos), display_block=1000)
 
-                qq = matrixes[fno, bone.name].frame_ik_rotation
+                qq = matrixes[bone.name, fno].frame_fk_rotation
                 effective_bone_registers = []
                 for effective_bone_index in bone.effective_target_indexes:
                     # 自身が付与親となっているボーンがある場合、そのボーンの回転量を除去しておく
                     effective_bone = model.bones[effective_bone_index]
                     effective_bf = motion.bones[effective_bone.name][fno]
                     qq = (
-                        matrixes[fno, effective_bone.name].frame_ik_rotation.inverse()
+                        matrixes[effective_bone.name, fno].frame_fk_rotation.inverse()
                         * qq
                     )
                     if effective_bf.register:
@@ -151,8 +151,8 @@ class BakeUsecase:
                 bf = motion.bones[bone.name][fno]
 
                 ik_local_position = (
-                    matrixes[fno, ik_bone.name].position
-                    - matrixes[fno, ik_link_root_bone.name].position
+                    matrixes[ik_bone.name, fno].position
+                    - matrixes[ik_link_root_bone.name, fno].position
                 )
                 if sum(bone_distances) * 1.05 < ik_local_position.length():
                     # IKボーンの位置がIK関連ボーンの長さより長い場合、警告する
@@ -190,14 +190,14 @@ class BakeUsecase:
                         prev_fno = fnos[fidx - 1]
                         prev_bf = motion.bones[bone.name][prev_fno]
 
-                        prev_qq = matrixes[prev_fno, bone.name].frame_ik_rotation
+                        prev_qq = matrixes[bone.name, prev_fno].frame_fk_rotation
                         for effective_bone_index in bone.effective_target_indexes:
                             # 自身が付与親となっているボーンがある場合、そのボーンの回転量を除去しておく
                             effective_bone = model.bones[effective_bone_index]
                             prev_qq = (
                                 matrixes[
-                                    prev_fno, effective_bone.name
-                                ].frame_ik_rotation.inverse()
+                                    effective_bone.name, prev_fno
+                                ].frame_fk_rotation.inverse()
                                 * prev_qq
                             )
 

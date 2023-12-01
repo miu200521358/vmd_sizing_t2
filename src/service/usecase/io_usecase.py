@@ -1,6 +1,7 @@
 import os
 
 import numpy as np
+from service.usecase.bone_names import BoneNames
 
 from mlib.core.logger import MLogger
 from mlib.core.math import MVector3D
@@ -12,7 +13,6 @@ from mlib.utils.file_utils import get_path
 from mlib.vmd.vmd_collection import VmdMotion
 from mlib.vmd.vmd_reader import VmdReader
 from mlib.vmd.vmd_writer import VmdWriter
-from service.usecase.bone_names import BoneNames
 
 logger = MLogger(os.path.basename(__file__), level=1)
 __ = logger.get_text
@@ -81,9 +81,9 @@ class IoUsecase:
                     # 表示先
                     bone.bone_flg &= ~BoneFlg.TAIL_IS_BONE
                     bone.tail_position = (
-                        original_matrixes[0, original_bone.name].global_matrix
+                        original_matrixes[original_bone.name, 0].global_matrix
                         * tail_relative_position
-                        - original_matrixes[0, original_bone.name].position
+                        - original_matrixes[original_bone.name, 0].position
                     )
                 else:
                     bone.tail_position = MVector3D()

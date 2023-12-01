@@ -135,9 +135,7 @@ class BakePanel(NotebookPanel):
         self.bake_interval_choice_ctrl.SetToolTip(
             __("焼き込みの間隔を設定できます\n固定間隔の場合でも付与親などの関係で必要な箇所にはキーフレを挿入します")
         )
-        self.bake_interval_choice_ctrl.Bind(
-            wx.EVT_CHOICE, self.on_change_bake_attribute
-        )
+        self.bake_interval_choice_ctrl.Bind(wx.EVT_CHOICE, self.on_change_bake_interval)
         self.bake_interval_choice_ctrl.SetSelection(0)
         self.config_sizer.Add(self.bake_interval_choice_ctrl, 0, wx.ALL | wx.BOTTOM, 2)
 
@@ -221,6 +219,13 @@ class BakePanel(NotebookPanel):
                 )
                 self.target_bone_txt_ctrl.SetValue("")
                 self.exec_btn_ctrl.SetBackgroundColour(self.default_background_color)
+
+    def on_change_bake_interval(self, event: wx.Event) -> None:
+        # 細かさを選べるのは影響キーフレの時のみ
+        self.bake_grain_slider.Enable(
+            self.bake_interval_choice_ctrl.GetSelection() == 0
+        )
+        self.create_output_path()
 
     def on_change_bake_attribute(self, event: wx.Event) -> None:
         self.create_output_path()

@@ -2,12 +2,12 @@ import os
 
 import numpy as np
 from numpy.linalg import inv
+from service.usecase.bone_names import SIZING_BONE_PREFIX, BoneNames
 
 from mlib.core.logger import MLogger
 from mlib.core.math import MMatrix4x4
 from mlib.pmx.pmx_collection import PmxModel
 from mlib.vmd.vmd_collection import VmdMotion
-from service.usecase.bone_names import SIZING_BONE_PREFIX, BoneNames
 
 logger = MLogger(os.path.basename(__file__), level=1)
 __ = logger.get_text
@@ -189,15 +189,15 @@ class ArmStanceUsecase:
                         offset_to_slope_matrixes[target_bone_name] = np.eye(4)
                     continue
 
-                src_from_bone_position = src_matrixes[0, target_bone_name].position
-                src_to_bone_position = src_matrixes[0, to_bone_name].position
+                src_from_bone_position = src_matrixes[target_bone_name, 0].position
+                src_to_bone_position = src_matrixes[to_bone_name, 0].position
                 src_bone_vector = (
                     src_to_bone_position - src_from_bone_position
                 ).normalized()
                 src_slope_qq = src_bone_vector.to_local_matrix4x4().to_quaternion()
 
-                dest_from_bone_position = dest_matrixes[0, target_bone_name].position
-                dest_to_bone_position = dest_matrixes[0, to_bone_name].position
+                dest_from_bone_position = dest_matrixes[target_bone_name, 0].position
+                dest_to_bone_position = dest_matrixes[to_bone_name, 0].position
                 dest_bone_vector = (
                     dest_to_bone_position - dest_from_bone_position
                 ).normalized()

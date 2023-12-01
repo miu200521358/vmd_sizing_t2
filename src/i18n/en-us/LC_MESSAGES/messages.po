@@ -1,6 +1,8 @@
 
-msgid "モデルセットアップ：システム用ボーン"
+msgid "-- キーフレーム確認[{d}] [{i} ({p:.2f}%)]"
 msgstr ""
+
+"
 
 
 msgid "モデルセットアップ：ボーン"
@@ -16,8 +18,7 @@ msgstr ""
 
 
 msgid "モデルセットアップ完了"
-msgstr ""
-
+msgstr "Model setup complete"
 
 msgid "モデルセットアップ：サイジング用"
 msgstr "Model setup: for sizing"
@@ -644,3 +645,36 @@ msgstr "Fixed every third floor"
 
 msgid "全打ち"
 msgstr "All strikes"
+
+msgid "-- テクスチャデータ読み取り [{i} ({p:.2f}%)]"
+msgstr "-- Texture data read [{i} ({p:.2f}%)]"
+
+msgid "-- モーフデータ読み取り [{i} ({p:.2f}%)]"
+msgstr "-- Morph data read [{i} ({p:.2f}%)]"
+
+msgid "-- 表示枠データ読み取り [{i} ({p:.2f}%)]"
+msgstr "-- Display frame data read [{i} ({p:.2f}%)]"
+
+msgid "キーフレーム確認[{d}]"
+msgstr "Keyframe confirmation [{d}]"
+
+msgid "-- キーフレーム確認[{d}] [{i} ({p:.2f}%)]"
+msgstr "-- Keyframe confirmation [{d}] [{i} ({p:.2f}%)]"
+
+msgid "ボーン変形行列積[{d}]"
+msgstr "Bourne deformation matrix product [{d}]"
+
+msgid "-- ボーン変形行列積[{d}] [{i} ({p:.2f}%)]"
+msgstr "-- Bourne deformation matrix product [{d}] [{i} ({p:.2f}%)]"
+
+msgid "-- IK計算結果設定 [{i} ({p:.2f}%)]"
+msgstr "-- IK calculation result setting [{i} ({p:.2f}%)]"
+
+msgid "モデルセットアップ：システム用ボーン"
+msgstr "Model Setup: bones for systems"
+
+msgid "ボーンモーション出力"
+msgstr "Bone Motion Output"
+
+msgid "-- ボーンモーション出力 [{i} ({p:.2f}%)]"
+msgstr "-- Bone motion output [{i} ({p:.2f}%)]"

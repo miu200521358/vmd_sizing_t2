@@ -1,6 +1,8 @@
 import os
 from typing import Optional
 
+from service.usecase.bone_names import BoneNames
+
 from mlib.core.logger import MLogger
 from mlib.core.math import MQuaternion, MVector3D
 from mlib.pmx.pmx_collection import PmxModel
@@ -8,7 +10,6 @@ from mlib.pmx.pmx_part import Bone
 from mlib.vmd.vmd_collection import VmdMotion
 from mlib.vmd.vmd_part import VmdBoneFrame
 from mlib.vmd.vmd_tree import VmdBoneFrameTrees
-from service.usecase.bone_names import BoneNames
 
 logger = MLogger(os.path.basename(__file__), level=1)
 __ = logger.get_text
@@ -179,8 +180,8 @@ class ArmTwistUsecase:
         # 1度捩った時の腕捩りの相対位置
         local_twist_default_position = rotate_bone.position - twist_bone.position
         local_twist_initial_twist_position = (
-            initial_twist_matrixes[0, rotate_bone.name].position
-            - initial_twist_matrixes[0, twist_bone.name].position
+            initial_twist_matrixes[rotate_bone.name, 0].position
+            - initial_twist_matrixes[twist_bone.name, 0].position
         )
 
         # 1度捩った時の腕捩りの回転角度
