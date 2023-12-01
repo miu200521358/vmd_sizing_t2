@@ -678,3 +678,21 @@ msgstr "Bone Motion Output"
 
 msgid "-- ボーンモーション出力 [{i} ({p:.2f}%)]"
 msgstr "-- Bone motion output [{i} ({p:.2f}%)]"
+
+msgid "モーフモーション出力"
+msgstr "Morph motion output"
+
+msgid "-- モーフモーション出力 [{i} ({p:.2f}%)]"
+msgstr "-- Morph motion output [{i} ({p:.2f}%)]"
+
+msgid "全ての親の移動や回転を子ボーンに振り分けて、全ての親のキーフレームを削除します"
+msgstr "Assign all parent translations and rotations to child bones and remove all parent keyframes"
+
+msgid "【No.{i}】全親統合"
+msgstr "[No.{i}] All parent integration"
+
+msgid "【No.{x}】全親統合"
+msgstr "[No.{x}] All parent integration"
+
+msgid "-- 【No.{x}】全親統合 [{i} ({p:.2f}%)]"
+msgstr "-- [No.{x}] All parent integration [{i} ({p:.2f}%)]"

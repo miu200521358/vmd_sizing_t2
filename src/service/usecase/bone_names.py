@@ -208,7 +208,7 @@ class BoneNames:
         ]
 
     @staticmethod
-    def root_parent() -> str:
+    def parent() -> str:
         return "全ての親"
 
     @staticmethod

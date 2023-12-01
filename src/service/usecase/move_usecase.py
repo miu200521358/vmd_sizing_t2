@@ -13,7 +13,7 @@ __ = logger.get_text
 
 
 MOVE_ALL_BONE_NAMES = {
-    BoneNames.root_parent(),
+    BoneNames.parent(),
     BoneNames.center(),
     BoneNames.groove(),
     BoneNames.leg_ik_parent("右"),

@@ -13,6 +13,7 @@ from service.usecase.arm_stance_usecase import ArmStanceUsecase
 from service.usecase.arm_twist_usecase import ArmTwistUsecase
 from service.usecase.io_usecase import IoUsecase
 from service.usecase.move_usecase import MoveUsecase
+from service.usecase.parent_usecase import ParentUsecase
 
 from mlib.core.exception import MApplicationException
 from mlib.core.logger import MLogger
@@ -37,6 +38,10 @@ class SizingWorker(BaseWorker):
 
         # まずは読み込み
         self.load()
+
+        # 全親統合
+        if sizing_panel.integrate_parent_check_ctrl.GetValue():
+            self.integrate_parent()
 
         # 移動補正
         self.sizing_move()
@@ -305,6 +310,37 @@ class SizingWorker(BaseWorker):
             for future in as_completed(futures):
                 if future.exception():
                     raise future.exception()
+                sizing_idx, sizing_motion = future.result()
+                sizing_panel.sizing_sets[
+                    sizing_idx
+                ].output_motion_ctrl.data = sizing_motion
+
+    def integrate_parent(self):
+        """全親統合"""
+
+        logger.info("全親統合", decoration=MLogger.Decoration.BOX)
+
+        usecase = ParentUsecase()
+        sizing_panel: SizingPanel = self.frame.sizing_panel
+
+        with ThreadPoolExecutor(
+            thread_name_prefix="parent", max_workers=self.max_worker
+        ) as executor:
+            futures: list[Future] = []
+            for sizing_set in sizing_panel.sizing_sets:
+                futures.append(
+                    executor.submit(
+                        usecase.integrate_parent,
+                        sizing_set.sizing_idx,
+                        sizing_set.src_model_ctrl.data,
+                        sizing_set.output_motion_ctrl.data,
+                    )
+                )
+
+            for future in as_completed(futures):
+                if future.exception():
+                    raise future.exception()
+
                 sizing_idx, sizing_motion = future.result()
                 sizing_panel.sizing_sets[
                     sizing_idx

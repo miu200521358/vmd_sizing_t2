@@ -907,3 +907,19 @@ msgstr ""
 msgid "-- モーフモーション出力 [{i} ({p:.2f}%)]"
 msgstr ""
 
+
+msgid "全ての親の移動や回転を子ボーンに振り分けて、全ての親のキーフレームを削除します"
+msgstr ""
+
+
+msgid "【No.{i}】全親統合"
+msgstr ""
+
+
+msgid "【No.{x}】全親統合"
+msgstr ""
+
+
+msgid "-- 【No.{x}】全親統合 [{i} ({p:.2f}%)]"
+msgstr ""
+
