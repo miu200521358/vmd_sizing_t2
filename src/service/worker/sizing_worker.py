@@ -1,14 +1,13 @@
 import os
 from concurrent.futures import (
-    FIRST_EXCEPTION,
     Future,
     ThreadPoolExecutor,
     as_completed,
-    wait,
 )
 
 import wx
-from service.form.widgets.bone_set import SizingBoneSet
+from service.form.panel.sizing_panel import SizingPanel
+from service.form.widgets.sizing_bone_set import SizingBoneSet
 from service.usecase.arm_align_usecase import ArmAlignUsecase
 from service.usecase.arm_stance_usecase import ArmStanceUsecase
 from service.usecase.arm_twist_usecase import ArmTwistUsecase
@@ -27,12 +26,14 @@ logger = MLogger(os.path.basename(__file__), level=1)
 __ = logger.get_text
 
 
-class BoneWorker(BaseWorker):
+class SizingWorker(BaseWorker):
     def __init__(self, panel: BasePanel, result_event: wx.Event) -> None:
         super().__init__(panel, result_event)
+        # ワーカー固定(中で細分化していくため)
+        self.max_worker = 1 if self.frame.is_saving else 2
 
     def thread_execute(self):
-        bone_panel = self.frame.bone_panel
+        sizing_panel: SizingPanel = self.frame.sizing_panel
 
         # まずは読み込み
         self.load()
@@ -45,17 +46,17 @@ class BoneWorker(BaseWorker):
 
         # 捩り分散・腕位置合わせがある場合、腕の回転の初期位置を取得
         if (
-            bone_panel.align_check_ctrl.GetValue()
-            or bone_panel.twist_check_ctrl.GetValue()
+            sizing_panel.align_check_ctrl.GetValue()
+            or sizing_panel.twist_check_ctrl.GetValue()
         ):
             initial_matrixes = self.get_initial_arm_matrixes()
 
             # 捩り分散
-            if bone_panel.twist_check_ctrl.GetValue():
+            if sizing_panel.twist_check_ctrl.GetValue():
                 self.sizing_arm_twist(initial_matrixes)
 
             # # 腕位置合わせ
-            # if bone_panel.align_check_ctrl.GetValue():
+            # if sizing_panel.align_check_ctrl.GetValue():
             #     self.sizing_arm_align(initial_matrixes)
 
         # 保存
@@ -68,7 +69,7 @@ class BoneWorker(BaseWorker):
         logger.info("腕：初期位置取得", decoration=MLogger.Decoration.BOX)
 
         usecase = ArmTwistUsecase()
-        bone_panel = self.frame.bone_panel
+        sizing_panel: SizingPanel = self.frame.sizing_panel
         initial_matrixes: dict[tuple[int, bool, str], VmdBoneFrameTrees] = {}
 
         # 先にIKが無い状態でモーション行列を取得する
@@ -76,7 +77,7 @@ class BoneWorker(BaseWorker):
             thread_name_prefix="arm_initial", max_workers=self.max_worker
         ) as executor:
             futures: list[Future] = []
-            for sizing_set in bone_panel.sizing_sets:
+            for sizing_set in sizing_panel.sizing_sets:
                 for direction in ("右", "左"):
                     futures.append(
                         executor.submit(
@@ -100,8 +101,6 @@ class BoneWorker(BaseWorker):
                         )
                     )
 
-            wait(futures, return_when=FIRST_EXCEPTION)
-
             for future in as_completed(futures):
                 if future.exception():
                     raise future.exception()
@@ -115,7 +114,7 @@ class BoneWorker(BaseWorker):
         logger.info("腕位置合わせ", decoration=MLogger.Decoration.BOX)
 
         usecase = ArmAlignUsecase()
-        bone_panel = self.frame.bone_panel
+        sizing_panel: SizingPanel = self.frame.sizing_panel
         initial_matrixes: dict[tuple[int, bool, str], VmdBoneFrameTrees] = {}
 
         # 先にIKが無い状態でモーション行列を取得する
@@ -123,15 +122,15 @@ class BoneWorker(BaseWorker):
             thread_name_prefix="arm_align_initial", max_workers=self.max_worker
         ) as executor:
             futures: list[Future] = []
-            for sizing_set in bone_panel.sizing_sets:
+            for sizing_set in sizing_panel.sizing_sets:
                 if usecase.validate(
                     sizing_set.sizing_idx,
                     sizing_set.src_model_ctrl.data,
                     sizing_set.dest_model_ctrl.data,
-                    bone_panel.align_check_ctrl.GetValue(),
-                    bone_panel.align_finger_check_ctrl.GetValue(),
-                    bone_panel.align_finger_tail_check_ctrl.GetValue(),
-                    bone_panel.twist_check_ctrl.GetValue(),
+                    sizing_panel.align_check_ctrl.GetValue(),
+                    sizing_panel.align_finger_check_ctrl.GetValue(),
+                    sizing_panel.align_finger_tail_check_ctrl.GetValue(),
+                    sizing_panel.twist_check_ctrl.GetValue(),
                 ):
                     for direction in ("右", "左"):
                         futures.append(
@@ -156,8 +155,6 @@ class BoneWorker(BaseWorker):
                             )
                         )
 
-            wait(futures, return_when=FIRST_EXCEPTION)
-
             for future in as_completed(futures):
                 if future.exception():
                     raise future.exception()
@@ -165,46 +162,46 @@ class BoneWorker(BaseWorker):
                 initial_matrixes[(sizing_idx, is_src, direction)] = matrixes
 
         # IKセットアップする
-        for sizing_set in bone_panel.sizing_sets:
+        for sizing_set in sizing_panel.sizing_sets:
             if usecase.validate(
                 sizing_set.sizing_idx,
                 sizing_set.src_model_ctrl.data,
                 sizing_set.dest_model_ctrl.data,
-                bone_panel.align_check_ctrl.GetValue(),
-                bone_panel.align_finger_check_ctrl.GetValue(),
-                bone_panel.align_finger_tail_check_ctrl.GetValue(),
-                bone_panel.twist_check_ctrl.GetValue(),
+                sizing_panel.align_check_ctrl.GetValue(),
+                sizing_panel.align_finger_check_ctrl.GetValue(),
+                sizing_panel.align_finger_tail_check_ctrl.GetValue(),
+                sizing_panel.twist_check_ctrl.GetValue(),
             ):
                 usecase.setup_model_ik(
                     sizing_set.sizing_idx,
                     True,
                     sizing_set.src_model_ctrl.data,
-                    bone_panel.align_finger_check_ctrl.GetValue(),
-                    bone_panel.align_finger_tail_check_ctrl.GetValue(),
-                    bone_panel.twist_check_ctrl.GetValue(),
+                    sizing_panel.align_finger_check_ctrl.GetValue(),
+                    sizing_panel.align_finger_tail_check_ctrl.GetValue(),
+                    sizing_panel.twist_check_ctrl.GetValue(),
                 )
                 usecase.setup_model_ik(
                     sizing_set.sizing_idx,
                     False,
                     sizing_set.dest_model_ctrl.data,
-                    bone_panel.align_finger_check_ctrl.GetValue(),
-                    bone_panel.align_finger_tail_check_ctrl.GetValue(),
-                    bone_panel.twist_check_ctrl.GetValue(),
+                    sizing_panel.align_finger_check_ctrl.GetValue(),
+                    sizing_panel.align_finger_tail_check_ctrl.GetValue(),
+                    sizing_panel.twist_check_ctrl.GetValue(),
                 )
 
         with ThreadPoolExecutor(
             thread_name_prefix="arm_align", max_workers=self.max_worker
         ) as executor:
             futures: list[Future] = []
-            for sizing_set in bone_panel.sizing_sets:
+            for sizing_set in sizing_panel.sizing_sets:
                 if usecase.validate(
                     sizing_set.sizing_idx,
                     sizing_set.src_model_ctrl.data,
                     sizing_set.dest_model_ctrl.data,
-                    bone_panel.align_check_ctrl.GetValue(),
-                    bone_panel.align_finger_check_ctrl.GetValue(),
-                    bone_panel.align_finger_tail_check_ctrl.GetValue(),
-                    bone_panel.twist_check_ctrl.GetValue(),
+                    sizing_panel.align_check_ctrl.GetValue(),
+                    sizing_panel.align_finger_check_ctrl.GetValue(),
+                    sizing_panel.align_finger_tail_check_ctrl.GetValue(),
+                    sizing_panel.twist_check_ctrl.GetValue(),
                 ):
                     for direction in ("右", "左"):
                         futures.append(
@@ -222,19 +219,17 @@ class BoneWorker(BaseWorker):
                                     (sizing_set.sizing_idx, False, direction)
                                 ],
                                 direction,
-                                bone_panel.align_finger_check_ctrl.GetValue(),
-                                bone_panel.align_finger_tail_check_ctrl.GetValue(),
-                                bone_panel.twist_check_ctrl.GetValue(),
+                                sizing_panel.align_finger_check_ctrl.GetValue(),
+                                sizing_panel.align_finger_tail_check_ctrl.GetValue(),
+                                sizing_panel.twist_check_ctrl.GetValue(),
                             )
                         )
-
-            wait(futures, return_when=FIRST_EXCEPTION)
 
             for future in as_completed(futures):
                 if future.exception():
                     raise future.exception()
                 sizing_idx, sizing_motion = future.result()
-                bone_panel.sizing_sets[
+                sizing_panel.sizing_sets[
                     sizing_idx
                 ].output_motion_ctrl.data = sizing_motion
 
@@ -245,18 +240,18 @@ class BoneWorker(BaseWorker):
         logger.info("捩り分散", decoration=MLogger.Decoration.BOX)
 
         usecase = ArmTwistUsecase()
-        bone_panel = self.frame.bone_panel
+        sizing_panel: SizingPanel = self.frame.sizing_panel
 
         with ThreadPoolExecutor(
             thread_name_prefix="arm_twist", max_workers=self.max_worker
         ) as executor:
             futures: list[Future] = []
-            for sizing_set in bone_panel.sizing_sets:
+            for sizing_set in sizing_panel.sizing_sets:
                 if usecase.validate(
                     sizing_set.sizing_idx,
                     sizing_set.src_model_ctrl.data,
                     sizing_set.dest_model_ctrl.data,
-                    bone_panel.twist_check_ctrl.GetValue(),
+                    sizing_panel.twist_check_ctrl.GetValue(),
                 ):
                     for direction in ("右", "左"):
                         futures.append(
@@ -277,13 +272,11 @@ class BoneWorker(BaseWorker):
                             )
                         )
 
-            wait(futures, return_when=FIRST_EXCEPTION)
-
             for future in as_completed(futures):
                 if future.exception():
                     raise future.exception()
                 sizing_idx, sizing_motion = future.result()
-                bone_panel.sizing_sets[
+                sizing_panel.sizing_sets[
                     sizing_idx
                 ].output_motion_ctrl.data = sizing_motion
 
@@ -292,13 +285,13 @@ class BoneWorker(BaseWorker):
         logger.info("腕スタンス補正", decoration=MLogger.Decoration.BOX)
 
         usecase = ArmStanceUsecase()
-        bone_panel = self.frame.bone_panel
+        sizing_panel: SizingPanel = self.frame.sizing_panel
 
         with ThreadPoolExecutor(
             thread_name_prefix="arm_stance", max_workers=self.max_worker
         ) as executor:
             futures: list[Future] = []
-            for sizing_set in bone_panel.sizing_sets:
+            for sizing_set in sizing_panel.sizing_sets:
                 futures.append(
                     executor.submit(
                         usecase.sizing_arm_stance,
@@ -309,13 +302,11 @@ class BoneWorker(BaseWorker):
                     )
                 )
 
-            wait(futures, return_when=FIRST_EXCEPTION)
-
             for future in as_completed(futures):
                 if future.exception():
                     raise future.exception()
                 sizing_idx, sizing_motion = future.result()
-                bone_panel.sizing_sets[
+                sizing_panel.sizing_sets[
                     sizing_idx
                 ].output_motion_ctrl.data = sizing_motion
 
@@ -325,13 +316,13 @@ class BoneWorker(BaseWorker):
         logger.info("移動補正", decoration=MLogger.Decoration.BOX)
 
         usecase = MoveUsecase()
-        bone_panel = self.frame.bone_panel
+        sizing_panel: SizingPanel = self.frame.sizing_panel
 
         xz_leg_ratios: list[float] = []
         y_leg_ratios: list[float] = []
         center_offsets: list[MVector3D] = []
 
-        for sizing_one_set in bone_panel.sizing_sets:
+        for sizing_one_set in sizing_panel.sizing_sets:
             sizing_set: SizingBoneSet = sizing_one_set
 
             # 個別の足XZ比率、足Y比率
@@ -351,7 +342,7 @@ class BoneWorker(BaseWorker):
         ) as executor:
             futures: list[Future] = []
             for sizing_set, xz_leg_ratio, y_leg_ratio, center_offset in zip(
-                bone_panel.sizing_sets, xz_leg_ratios, y_leg_ratios, center_offsets
+                sizing_panel.sizing_sets, xz_leg_ratios, y_leg_ratios, center_offsets
             ):
                 futures.append(
                     executor.submit(
@@ -366,20 +357,18 @@ class BoneWorker(BaseWorker):
                     )
                 )
 
-            wait(futures, return_when=FIRST_EXCEPTION)
-
             for future in as_completed(futures):
                 if future.exception():
                     raise future.exception()
                 sizing_idx, sizing_motion = future.result()
-                bone_panel.sizing_sets[
+                sizing_panel.sizing_sets[
                     sizing_idx
                 ].output_motion_ctrl.data = sizing_motion
 
     def save(self):
         """サイジング結果保存"""
         usecase = IoUsecase()
-        bone_panel = self.frame.bone_panel
+        sizing_panel: SizingPanel = self.frame.sizing_panel
 
         with ThreadPoolExecutor(
             thread_name_prefix="save", max_workers=self.max_worker
@@ -392,10 +381,8 @@ class BoneWorker(BaseWorker):
                     sizing_set.output_motion_ctrl.data,
                     sizing_set.output_motion_ctrl.path,
                 )
-                for sizing_set in bone_panel.sizing_sets
+                for sizing_set in sizing_panel.sizing_sets
             ]
-
-        wait(futures, return_when=FIRST_EXCEPTION)
 
         for future in as_completed(futures):
             if future.exception():
@@ -404,14 +391,14 @@ class BoneWorker(BaseWorker):
     def load(self):
         """データ読み込み"""
         usecase = IoUsecase()
-        bone_panel = self.frame.bone_panel
+        sizing_panel: SizingPanel = self.frame.sizing_panel
 
         loadable_motion_paths: list[str] = []
         loadable_src_model_paths: list[str] = []
         loadable_dest_model_paths: list[str] = []
         can_load: bool = True
 
-        for sizing_one_set in bone_panel.sizing_sets:
+        for sizing_one_set in sizing_panel.sizing_sets:
             sizing_set: SizingBoneSet = sizing_one_set
             (
                 sizing_can_load,
@@ -467,39 +454,33 @@ class BoneWorker(BaseWorker):
                 for sizing_idx, model_path in enumerate(loadable_dest_model_paths)
             ]
 
-        wait(motion_futures, return_when=FIRST_EXCEPTION)
-
         for future in as_completed(motion_futures):
             if future.exception():
                 raise future.exception()
             sizing_idx, digest, original_motion, motion = future.result()
             self.frame.cache_motions[digest] = original_motion
-            bone_panel.sizing_sets[sizing_idx].motion_ctrl.data = original_motion
-            bone_panel.sizing_sets[sizing_idx].output_motion_ctrl.data = motion
-
-        wait(src_model_futures, return_when=FIRST_EXCEPTION)
+            sizing_panel.sizing_sets[sizing_idx].motion_ctrl.data = original_motion
+            sizing_panel.sizing_sets[sizing_idx].output_motion_ctrl.data = motion
 
         for future in as_completed(src_model_futures):
             if future.exception():
                 raise future.exception()
             sizing_idx, digest, original_model, model = future.result()
             self.frame.cache_models[digest] = original_model
-            bone_panel.sizing_sets[sizing_idx].src_model_ctrl.data = model
-
-        wait(dest_model_futures, return_when=FIRST_EXCEPTION)
+            sizing_panel.sizing_sets[sizing_idx].src_model_ctrl.data = model
 
         for future in as_completed(dest_model_futures):
             if future.exception():
                 raise future.exception()
             sizing_idx, digest, original_model, model = future.result()
             self.frame.cache_models[digest] = original_model
-            bone_panel.sizing_sets[sizing_idx].dest_model_ctrl.data = model
+            sizing_panel.sizing_sets[sizing_idx].dest_model_ctrl.data = model
 
     def output_log(self):
-        bone_panel = self.frame.bone_panel
+        sizing_panel: SizingPanel = self.frame.sizing_panel
         output_log_path = os.path.join(
             get_root_dir(),
-            f"{os.path.basename(bone_panel.sizing_sets[0].output_motion_ctrl.path)}.log",
+            f"{os.path.basename(sizing_panel.sizing_sets[0].output_motion_ctrl.path)}.log",
         )
         # 出力されたメッセージを全部出力
-        bone_panel.console_ctrl.text_ctrl.SaveFile(filename=output_log_path)
+        sizing_panel.console_ctrl.text_ctrl.SaveFile(filename=output_log_path)

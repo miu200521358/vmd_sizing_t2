@@ -899,3 +899,11 @@ msgstr ""
 msgid "-- ボーンモーション出力 [{i} ({p:.2f}%)]"
 msgstr ""
 
+
+msgid "モーフモーション出力"
+msgstr ""
+
+
+msgid "-- モーフモーション出力 [{i} ({p:.2f}%)]"
+msgstr ""
+

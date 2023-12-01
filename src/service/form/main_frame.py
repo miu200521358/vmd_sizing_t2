@@ -3,8 +3,9 @@ from typing import Optional
 
 import wx
 from service.form.panel.bake_panel import BakePanel
-from service.form.panel.bone_panel import BonePanel
+from service.form.panel.sizing_panel import SizingPanel
 from service.form.widgets.morph_sub_window import MorphSubCanvasWindow
+from service.worker.sizing_worker import SizingWorker
 
 from mlib.core.logger import MLogger
 from mlib.pmx.pmx_collection import PmxModel
@@ -41,8 +42,11 @@ class MainFrame(NotebookFrame):
         self.running_worker = True
 
         # ボーンモーションサイジング
-        self.bone_panel = BonePanel(self, 0)
-        self.notebook.AddPage(self.bone_panel, __("サイジング"), True)
+        self.sizing_panel = SizingPanel(self, 0)
+        self.sizing_panel.sizing_worker = SizingWorker(
+            self.sizing_panel, self.sizing_panel.on_exec_result
+        )
+        self.notebook.AddPage(self.sizing_panel, __("サイジング"), True)
 
         # IK焼き込み
         self.bake_panel = BakePanel(self, 1)
@@ -113,4 +117,4 @@ class MainFrame(NotebookFrame):
         self.selected_tab_idx = self.notebook.GetSelection()
 
     def Enable(self, enable: bool):
-        self.bone_panel.Enable(enable)
+        self.sizing_panel.Enable(enable)

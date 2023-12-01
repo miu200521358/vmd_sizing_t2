@@ -73,7 +73,7 @@ class IoUsecase:
         for bone in model.bones:
             if bone.name in original_model.bones:
                 original_bone = original_model.bones[bone.name]
-                bone.position = original_matrixes[0, original_bone.name].position
+                bone.position = original_matrixes[original_bone.name, 0].position
                 tail_relative_position = (
                     original_model.bones.get_tail_relative_position(original_bone.index)
                 )

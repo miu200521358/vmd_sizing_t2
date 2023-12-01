@@ -2,8 +2,7 @@ import os
 import webbrowser
 
 import wx
-from service.form.widgets.bone_set import SizingBoneSet
-from service.worker.bone_worker import BoneWorker
+from service.form.widgets.sizing_bone_set import SizingBoneSet
 
 from mlib.core.logger import ConsoleHandler, MLogger
 from mlib.service.form.notebook_frame import NotebookFrame
@@ -17,12 +16,12 @@ logger = MLogger(os.path.basename(__file__))
 __ = logger.get_text
 
 
-class BonePanel(NotebookPanel):
+class SizingPanel(NotebookPanel):
     def __init__(self, frame: NotebookFrame, tab_idx: int, *args, **kw) -> None:
         super().__init__(frame, tab_idx, *args, **kw)
         self.sizing_sets: list[SizingBoneSet] = []
 
-        self.bone_worker = BoneWorker(self, self.on_exec_result)
+        self.sizing_worker = None
 
         self._initialize_ui()
 
@@ -32,15 +31,17 @@ class BonePanel(NotebookPanel):
 
     def _initialize_ui(self) -> None:
         # ヘッダー -----------------------------
-        self.header_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.description_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
         self.description_ctrl = wx.StaticText(
             self,
             wx.ID_ANY,
             __("モーション作成元モデルにモーションを読み込んだ時の動きを、任意のモデルで再現できるようモーションを調整します\n"),
         )
-        self.header_sizer.Add(self.description_ctrl, 0, wx.ALL, 2)
+        self.description_sizer.Add(self.description_ctrl, 0, wx.ALL, 2)
+        self.root_sizer.Add(self.description_sizer, 0, wx.ALL, 3)
 
+        self.header_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.add_set_btn_ctrl = wx.Button(
             self,
             wx.ID_ANY,
@@ -260,7 +261,7 @@ class BonePanel(NotebookPanel):
             250,
             __("サイジングを実行します\nサイジングセットを1件以上設定後、クリックできるようになります"),
         )
-        self.exec_btn_ctrl.exec_worker = self.bone_worker
+        self.exec_btn_ctrl.exec_worker = self.sizing_worker
         self.btn_sizer.Add(self.exec_btn_ctrl, 0, wx.ALL, 3)
 
         self.root_sizer.Add(self.btn_sizer, 0, wx.ALIGN_CENTER | wx.SHAPED, 3)
@@ -348,7 +349,7 @@ class BonePanel(NotebookPanel):
 
         self.Enable(False)
         self.exec_btn_ctrl.Enable(True)
-        self.bone_worker.start()
+        self.sizing_worker.start()
 
     def on_exec_result(self, result: bool, data: list, elapsed_time: str):
         MLogger.console_handler = ConsoleHandler(self.console_ctrl.text_ctrl)
