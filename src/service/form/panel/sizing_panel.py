@@ -100,6 +100,23 @@ class SizingPanel(NotebookPanel):
         self.integrate_parent_sizer.Add(self.integrate_parent_help_ctrl, 0, wx.ALL, 0)
         self.config_sizer.Add(self.integrate_parent_sizer, 0, wx.ALL, 1)
 
+        # 捩り分散 ------------------------
+        self.twist_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.twist_check_ctrl = wx.CheckBox(
+            self, wx.ID_ANY, __("捩り分散"), wx.DefaultPosition, wx.DefaultSize, 0
+        )
+        self.twist_check_ctrl.SetToolTip(__("腕を腕捩りなど、捩りボーンに捩り回転を分散させます"))
+        self.twist_sizer.Add(self.twist_check_ctrl, 0, wx.ALL, 3)
+        self.twist_help_ctrl = ImageButton(
+            self,
+            "resources/icon/help.png",
+            wx.Size(12, 12),
+            lambda event: self.on_help(event, "https://bowlroll.net/file/index"),
+            __("詳しい解説ページをデフォルトブラウザで開きます"),
+        )
+        self.twist_sizer.Add(self.twist_help_ctrl, 0, wx.ALL, 0)
+        self.config_sizer.Add(self.twist_sizer, 0, wx.ALL, 1)
+
         # 位置合わせ ------------------------
         self.align_group_sizer = wx.BoxSizer(wx.VERTICAL)
 
@@ -156,23 +173,6 @@ class SizingPanel(NotebookPanel):
         self.align_group_sizer.Add(self.align_finger_tail_sizer, 0, wx.ALL, 3)
 
         self.config_sizer.Add(self.align_group_sizer, 0, wx.ALL, 1)
-
-        # 捩り分散 ------------------------
-        self.twist_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.twist_check_ctrl = wx.CheckBox(
-            self, wx.ID_ANY, __("捩り分散"), wx.DefaultPosition, wx.DefaultSize, 0
-        )
-        self.twist_check_ctrl.SetToolTip(__("腕を腕捩りなど、捩りボーンに捩り回転を分散させます"))
-        self.twist_sizer.Add(self.twist_check_ctrl, 0, wx.ALL, 3)
-        self.twist_help_ctrl = ImageButton(
-            self,
-            "resources/icon/help.png",
-            wx.Size(12, 12),
-            lambda event: self.on_help(event, "https://bowlroll.net/file/index"),
-            __("詳しい解説ページをデフォルトブラウザで開きます"),
-        )
-        self.twist_sizer.Add(self.twist_help_ctrl, 0, wx.ALL, 0)
-        self.config_sizer.Add(self.twist_sizer, 0, wx.ALL, 1)
 
         # # スタンス追加補正 ----------------------
         # self.stance_sizer = wx.BoxSizer(wx.HORIZONTAL)

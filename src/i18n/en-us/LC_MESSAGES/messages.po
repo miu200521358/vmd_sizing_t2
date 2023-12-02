@@ -696,3 +696,25 @@ msgstr "[No.{x}] All parent integration"
 
 msgid "-- 【No.{x}】全親統合 [{i} ({p:.2f}%)]"
 msgstr "-- [No.{x}] All parent integration [{i} ({p:.2f}%)]"
+
+msgid "全親統合準備"
+msgstr "Preparation for All Parents Integration"
+
+msgid "【No.{x}】【{d}】初期位置取得({m})"
+msgstr "[No.{x}][{d}] Get initial position ({m})"
+
+msgid "【No.{x}】【{d}】捩り分散"
+msgstr "[No.{x}][{d}] torsional dispersion"
+
+msgid "-- 【No.{x}】【{d}】捩り分散 [{i} ({p:.2f}%)]"
+msgstr "-- [No.{x}] [{d}] torsional variance [{i} ({p:.2f}%)]"
+
+msgid "【No.{x}】モーションに全ての親のキーフレームがないため、全親統合をスキップします"
+msgstr "[No.{x}] Skip all parent integration because motion does not have all parent keyframes"
+
+msgid "【No.{x}】捩り分散：追加IKセットアップ({m})"
+msgstr "[No.{x}] Torsional dispersion: additional IK setup ({m})"
+
+msgid "【No.{x}】サイジング先モデルに肩・腕捩・腕・ひじ・手捩・手首の左右ボーンがないため、捩り分散をスキップします"
+msgstr "[No.{x}] Skip torsional dispersion because the sizing destination model does not have left and right bones for shoulder, arm torsion, arm, elbow, hand torsion, and wrist"
+

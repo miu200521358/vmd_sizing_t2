@@ -18,6 +18,7 @@ from service.usecase.parent_usecase import ParentUsecase
 from mlib.core.exception import MApplicationException
 from mlib.core.logger import MLogger
 from mlib.core.math import MVector3D
+from mlib.pmx.pmx_collection import PmxModel
 from mlib.service.base_worker import BaseWorker
 from mlib.service.form.base_panel import BasePanel
 from mlib.utils.file_utils import get_root_dir
@@ -31,7 +32,11 @@ class SizingWorker(BaseWorker):
     def __init__(self, panel: BasePanel, result_event: wx.Event) -> None:
         super().__init__(panel, result_event)
         # ワーカー固定(中で細分化していくため)
-        self.max_worker = 1 if self.frame.is_saving else 2
+        self.max_worker = (
+            1
+            if self.frame.is_saving
+            else min(4, max(1, int(min(32, (os.cpu_count() or 0) + 4) / 4)))
+        )
 
     def thread_execute(self):
         sizing_panel: SizingPanel = self.frame.sizing_panel
@@ -68,6 +73,60 @@ class SizingWorker(BaseWorker):
         self.save()
 
         self.result_data = []
+
+    def setup_model_ik(self) -> dict[tuple[int, bool], PmxModel]:
+        usecase = ArmAlignUsecase()
+        sizing_panel: SizingPanel = self.frame.sizing_panel
+        ik_models: dict[tuple[int, bool], PmxModel] = {}
+
+        # IKセットアップする
+        with ThreadPoolExecutor(
+            thread_name_prefix="ik_setup", max_workers=self.max_worker
+        ) as executor:
+            futures: list[Future] = []
+
+            for sizing_set in sizing_panel.sizing_sets:
+                if usecase.validate(
+                    sizing_set.sizing_idx,
+                    sizing_set.src_model_ctrl.data,
+                    sizing_set.dest_model_ctrl.data,
+                    sizing_panel.align_check_ctrl.GetValue(),
+                    sizing_panel.align_finger_check_ctrl.GetValue(),
+                    sizing_panel.align_finger_tail_check_ctrl.GetValue(),
+                    sizing_panel.twist_check_ctrl.GetValue(),
+                ):
+                    futures.append(
+                        executor.submit(
+                            usecase.setup_model_ik,
+                            sizing_set.sizing_idx,
+                            True,
+                            sizing_set.src_model_ctrl.data,
+                            sizing_panel.align_finger_check_ctrl.GetValue(),
+                            sizing_panel.align_finger_tail_check_ctrl.GetValue(),
+                            sizing_panel.twist_check_ctrl.GetValue(),
+                        )
+                    )
+
+                    futures.append(
+                        executor.submit(
+                            usecase.setup_model_ik,
+                            sizing_set.sizing_idx,
+                            False,
+                            sizing_set.dest_model_ctrl.data,
+                            sizing_panel.align_finger_check_ctrl.GetValue(),
+                            sizing_panel.align_finger_tail_check_ctrl.GetValue(),
+                            sizing_panel.twist_check_ctrl.GetValue(),
+                        )
+                    )
+
+            for future in as_completed(futures):
+                if future.exception():
+                    raise future.exception()
+
+                sizing_idx, is_src, ik_model = future.result()
+                ik_models[(sizing_idx, is_src)] = ik_model
+
+        return ik_models
 
     def get_initial_arm_matrixes(self) -> None:
         """腕初期位置取得"""
@@ -239,13 +298,44 @@ class SizingWorker(BaseWorker):
                 ].output_motion_ctrl.data = sizing_motion
 
     def sizing_arm_twist(
-        self, initial_matrixes: dict[tuple[int, bool, str], VmdBoneFrameTrees]
+        self,
+        initial_matrixes: dict[tuple[int, bool, str], VmdBoneFrameTrees],
     ) -> None:
         """捩り分散"""
         logger.info("捩り分散", decoration=MLogger.Decoration.BOX)
 
         usecase = ArmTwistUsecase()
         sizing_panel: SizingPanel = self.frame.sizing_panel
+
+        ik_models: dict[tuple[int, bool], PmxModel] = {}
+
+        # IKセットアップする
+        with ThreadPoolExecutor(
+            thread_name_prefix="ik_setup", max_workers=self.max_worker
+        ) as executor:
+            futures: list[Future] = []
+
+            for sizing_set in sizing_panel.sizing_sets:
+                if usecase.validate(
+                    sizing_set.sizing_idx,
+                    sizing_set.dest_model_ctrl.data,
+                    sizing_panel.twist_check_ctrl.GetValue(),
+                ):
+                    futures.append(
+                        executor.submit(
+                            usecase.setup_model_ik,
+                            sizing_set.sizing_idx,
+                            False,
+                            sizing_set.dest_model_ctrl.data,
+                        )
+                    )
+
+            for future in as_completed(futures):
+                if future.exception():
+                    raise future.exception()
+
+                sizing_idx, is_src, ik_model = future.result()
+                ik_models[(sizing_idx, is_src)] = ik_model
 
         with ThreadPoolExecutor(
             thread_name_prefix="arm_twist", max_workers=self.max_worker
@@ -254,28 +344,18 @@ class SizingWorker(BaseWorker):
             for sizing_set in sizing_panel.sizing_sets:
                 if usecase.validate(
                     sizing_set.sizing_idx,
-                    sizing_set.src_model_ctrl.data,
-                    sizing_set.dest_model_ctrl.data,
+                    ik_models[(sizing_set.sizing_idx, False)],
                     sizing_panel.twist_check_ctrl.GetValue(),
                 ):
-                    for direction in ("右", "左"):
-                        futures.append(
-                            executor.submit(
-                                usecase.sizing_arm_twist,
-                                sizing_set.sizing_idx,
-                                sizing_set.src_model_ctrl.data,
-                                sizing_set.dest_model_ctrl.data,
-                                sizing_set.motion_ctrl.data,
-                                sizing_set.output_motion_ctrl.data,
-                                initial_matrixes[
-                                    (sizing_set.sizing_idx, True, direction)
-                                ],
-                                initial_matrixes[
-                                    (sizing_set.sizing_idx, False, direction)
-                                ],
-                                direction,
-                            )
+                    futures.append(
+                        executor.submit(
+                            usecase.sizing_arm_twist,
+                            sizing_set.sizing_idx,
+                            ik_models[(sizing_set.sizing_idx, False)],
+                            sizing_set.output_motion_ctrl.data,
+                            initial_matrixes,
                         )
+                    )
 
             for future in as_completed(futures):
                 if future.exception():

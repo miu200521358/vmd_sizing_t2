@@ -32,8 +32,8 @@ class ParentUsecase:
 
         if BoneNames.parent() not in motion.bones:
             logger.warning(
-                "【No.{i}】モーションに全ての親のキーフレームがないため、全親統合をスキップします",
-                i=sizing_idx + 1,
+                "【No.{x}】モーションに全ての親のキーフレームがないため、全親統合をスキップします",
+                x=sizing_idx + 1,
                 decoration=MLogger.Decoration.BOX,
             )
             return sizing_idx, motion
@@ -61,7 +61,7 @@ class ParentUsecase:
             model,
             bone_names,
             out_fno_log=True,
-            description="全親統合準備",
+            description=f"{sizing_idx + 1}|{__('全親統合準備')}",
         )
 
         n = 0

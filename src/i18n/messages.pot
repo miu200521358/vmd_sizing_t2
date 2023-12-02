@@ -923,3 +923,32 @@ msgstr ""
 msgid "-- 【No.{x}】全親統合 [{i} ({p:.2f}%)]"
 msgstr ""
 
+
+msgid "全親統合準備"
+msgstr ""
+
+
+msgid "【No.{x}】【{d}】初期位置取得({m})"
+msgstr ""
+
+
+msgid "【No.{x}】【{d}】捩り分散"
+msgstr ""
+
+
+msgid "-- 【No.{x}】【{d}】捩り分散 [{i} ({p:.2f}%)]"
+msgstr ""
+
+
+msgid "【No.{x}】モーションに全ての親のキーフレームがないため、全親統合をスキップします"
+msgstr ""
+
+
+msgid "【No.{x}】捩り分散：追加IKセットアップ({m})"
+msgstr ""
+
+
+msgid "【No.{x}】サイジング先モデルに肩・腕捩・腕・ひじ・手捩・手首の左右ボーンがないため、捩り分散をスキップします"
+msgstr ""
+
+

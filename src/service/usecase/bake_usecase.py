@@ -89,30 +89,30 @@ class BakeUsecase:
         bake_grain: float,
         matrixes: VmdBoneFrameTrees,
     ):
-        # IKボーン
-        ik_bone = model.bones[ik_bone_index]
-        # Ikリンクルートボーン
-        ik_link_root_bone = model.bones[ik_bone.ik.links[-1].bone_index]
-        # IKターゲットボーン
-        effector_bone = model.bones[ik_bone.ik.bone_index]
+        # # IKボーン
+        # ik_bone = model.bones[ik_bone_index]
+        # # Ikリンクルートボーン
+        # ik_link_root_bone = model.bones[ik_bone.ik.links[-1].bone_index]
+        # # IKターゲットボーン
+        # effector_bone = model.bones[ik_bone.ik.bone_index]
 
-        ik_bone_indexes = list(
-            reversed(
-                [effector_bone.index]
-                + [ik_link.bone_index for ik_link in ik_bone.ik.links]
-            )
-        )
-        # IKボーンの距離
-        bone_distances = [
-            model.bones[parent_bone_index].position.distance(
-                model.bones[child_bone_index].position
-            )
-            for parent_bone_index, child_bone_index in zip(
-                ik_bone_indexes, ik_bone_indexes[1:]
-            )
-        ]
+        # ik_bone_indexes = list(
+        #     reversed(
+        #         [effector_bone.index]
+        #         + [ik_link.bone_index for ik_link in ik_bone.ik.links]
+        #     )
+        # )
+        # # IKボーンの距離
+        # bone_distances = [
+        #     model.bones[parent_bone_index].position.distance(
+        #         model.bones[child_bone_index].position
+        #     )
+        #     for parent_bone_index, child_bone_index in zip(
+        #         ik_bone_indexes, ik_bone_indexes[1:]
+        #     )
+        # ]
 
-        ik_over_fnos: set[int] = set([])
+        # ik_over_fnos: set[int] = set([])
         link_fnos: set[int] = set([])
         for link in reversed(model.bones[ik_bone_index].ik.links):
             if (
@@ -150,13 +150,13 @@ class BakeUsecase:
 
                 bf = motion.bones[bone.name][fno]
 
-                ik_local_position = (
-                    matrixes[ik_bone.name, fno].position
-                    - matrixes[ik_link_root_bone.name, fno].position
-                )
-                if sum(bone_distances) * 1.05 < ik_local_position.length():
-                    # IKボーンの位置がIK関連ボーンの長さより長い場合、警告する
-                    ik_over_fnos |= {fno}
+                # ik_local_position = (
+                #     matrixes[ik_bone.name, fno].position
+                #     - matrixes[ik_link_root_bone.name, fno].position
+                # )
+                # if sum(bone_distances) * 1.05 < ik_local_position.length():
+                #     # IKボーンの位置がIK関連ボーンの長さより長い場合、警告する
+                #     ik_over_fnos |= {fno}
 
                 # 固定間隔キーフレが選択されているか否か
                 is_register_interval = (
@@ -215,20 +215,20 @@ class BakeUsecase:
                     prev_qq = qq
                     link_fnos |= {fno}
 
-        if ik_over_fnos:
-            logger.warning(
-                "[{b}]下記キーフレは、IKボーン({i})の位置がIKターゲットボーン({e})より遠くに配置されている為、焼き込み結果が安定してない可能性があります\n    {f}",
-                b=", ".join(
-                    (
-                        model.bones[link.bone_index].name
-                        for link in reversed(model.bones[ik_bone_index].ik.links)
-                    )
-                ),
-                i=ik_bone.name,
-                e=effector_bone.name,
-                f=", ".join((str(fno) for fno in sorted(ik_over_fnos))),
-                decoration=MLogger.Decoration.BOX,
-            )
+        # if ik_over_fnos:
+        #     logger.warning(
+        #         "[{b}]下記キーフレは、IKボーン({i})の位置がIKターゲットボーン({e})より遠くに配置されている為、焼き込み結果が安定してない可能性があります\n    {f}",
+        #         b=", ".join(
+        #             (
+        #                 model.bones[link.bone_index].name
+        #                 for link in reversed(model.bones[ik_bone_index].ik.links)
+        #             )
+        #         ),
+        #         i=ik_bone.name,
+        #         e=effector_bone.name,
+        #         f=", ".join((str(fno) for fno in sorted(ik_over_fnos))),
+        #         decoration=MLogger.Decoration.BOX,
+        #     )
 
         if model.bones[model.bones[ik_bone_index].parent_index].is_ik:
             # 親ボーンがIKである場合、親も辿る

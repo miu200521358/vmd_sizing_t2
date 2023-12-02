@@ -92,7 +92,9 @@ class ArmAlignUsecase:
             BoneNames.shoulder_root(direction)
         ].position.distance(
             dest_model.bones[BoneNames.arm(direction)].position
-        ) / src_model.bones[BoneNames.shoulder_root(direction)].position.distance(
+        ) / src_model.bones[
+            BoneNames.shoulder_root(direction)
+        ].position.distance(
             src_model.bones[BoneNames.arm(direction)].position
         )
 
@@ -102,7 +104,9 @@ class ArmAlignUsecase:
             BoneNames.shoulder_center(direction)
         ].position.distance(
             dest_model.bones[BoneNames.elbow(direction)].position
-        ) / src_model.bones[BoneNames.shoulder_center(direction)].position.distance(
+        ) / src_model.bones[
+            BoneNames.shoulder_center(direction)
+        ].position.distance(
             src_model.bones[BoneNames.elbow(direction)].position
         )
 
@@ -958,7 +962,7 @@ class ArmAlignUsecase:
         is_align_finger: bool,
         is_align_finger_tail: bool,
         is_twist: bool,
-    ) -> None:
+    ) -> tuple[int, bool, PmxModel]:
         logger.info(
             "【No.{x}】腕位置合わせ：追加IKセットアップ({m})",
             x=sizing_idx + 1,
@@ -966,7 +970,8 @@ class ArmAlignUsecase:
             decoration=MLogger.Decoration.LINE,
         )
 
-        sizing_display_slot = model.display_slots["SIZING"]
+        ik_model = model.copy()
+        sizing_display_slot = ik_model.display_slots["SIZING"]
 
         for direction in ("左", "右"):
             if not (
@@ -976,14 +981,14 @@ class ArmAlignUsecase:
                     BoneNames.arm(direction),
                     BoneNames.wrist(direction),
                 }
-                - set(model.bones.names)
+                - set(ik_model.bones.names)
             ):
                 # 肩IK親追加 ---------------
                 shoulder_ik_parent_bone = Bone(
-                    index=model.bones[BoneNames.arm(direction)].index,
+                    index=ik_model.bones[BoneNames.arm(direction)].index,
                     name=BoneNames.shoulder_ik_parent(direction),
                 )
-                shoulder_ik_parent_bone.parent_index = model.bones[
+                shoulder_ik_parent_bone.parent_index = ik_model.bones[
                     BoneNames.root()
                 ].index
                 shoulder_ik_parent_bone.position = MVector3D()
@@ -995,14 +1000,14 @@ class ArmAlignUsecase:
                     | BoneFlg.IS_VISIBLE
                 )
 
-                model.insert_bone(shoulder_ik_parent_bone)
+                ik_model.insert_bone(shoulder_ik_parent_bone)
                 sizing_display_slot.references.append(
                     DisplaySlotReference(display_index=shoulder_ik_parent_bone.index)
                 )
 
                 # 肩IK追加 ---------------
                 shoulder_ik_bone = Bone(
-                    index=model.bones[BoneNames.arm(direction)].index,
+                    index=ik_model.bones[BoneNames.arm(direction)].index,
                     name=BoneNames.shoulder_ik(direction),
                 )
                 shoulder_ik_bone.parent_index = shoulder_ik_parent_bone.index
@@ -1017,18 +1022,18 @@ class ArmAlignUsecase:
                 )
 
                 shoulder_ik = Ik()
-                shoulder_ik.bone_index = model.bones[BoneNames.arm(direction)].index
-                shoulder_ik.loop_count = 16
+                shoulder_ik.bone_index = ik_model.bones[BoneNames.arm(direction)].index
+                shoulder_ik.loop_count = 32
                 shoulder_ik.unit_rotation.radians = MVector3D(1, 0, 0)
 
                 shoulder_ik_link_shoulder = IkLink()
-                shoulder_ik_link_shoulder.bone_index = model.bones[
+                shoulder_ik_link_shoulder.bone_index = ik_model.bones[
                     BoneNames.shoulder(direction)
                 ].index
                 shoulder_ik.links.append(shoulder_ik_link_shoulder)
 
                 shoulder_ik_bone.ik = shoulder_ik
-                model.insert_bone(shoulder_ik_bone)
+                ik_model.insert_bone(shoulder_ik_bone)
                 sizing_display_slot.references.append(
                     DisplaySlotReference(display_index=shoulder_ik_bone.index)
                 )
@@ -1036,10 +1041,10 @@ class ArmAlignUsecase:
                 # 腕IK親追加 ---------------
 
                 arm_ik_parent_bone = Bone(
-                    index=model.bones[BoneNames.elbow(direction)].index,
+                    index=ik_model.bones[BoneNames.elbow(direction)].index,
                     name=BoneNames.arm_ik_parent(direction),
                 )
-                arm_ik_parent_bone.parent_index = model.bones[BoneNames.root()].index
+                arm_ik_parent_bone.parent_index = ik_model.bones[BoneNames.root()].index
                 arm_ik_parent_bone.position = MVector3D()
                 arm_ik_parent_bone.is_system = True
                 arm_ik_parent_bone.bone_flg |= (
@@ -1049,14 +1054,14 @@ class ArmAlignUsecase:
                     | BoneFlg.IS_VISIBLE
                 )
 
-                model.insert_bone(arm_ik_parent_bone)
+                ik_model.insert_bone(arm_ik_parent_bone)
                 sizing_display_slot.references.append(
                     DisplaySlotReference(display_index=arm_ik_parent_bone.index)
                 )
 
                 # 腕IK追加 ---------------
                 arm_ik_bone = Bone(
-                    index=model.bones[BoneNames.elbow(direction)].index,
+                    index=ik_model.bones[BoneNames.elbow(direction)].index,
                     name=BoneNames.arm_ik(direction),
                 )
                 arm_ik_bone.parent_index = arm_ik_parent_bone.index
@@ -1071,16 +1076,43 @@ class ArmAlignUsecase:
                 )
 
                 arm_ik = Ik()
-                arm_ik.bone_index = model.bones[BoneNames.elbow(direction)].index
-                arm_ik.loop_count = 16
+                arm_ik.bone_index = ik_model.bones[
+                    BoneNames.elbow_rotate(direction)
+                ].index
+                arm_ik.loop_count = 32
                 arm_ik.unit_rotation.radians = MVector3D(1, 0, 0)
 
+                # ひじ自体は動かさない
+                arm_ik_link_elbow = IkLink()
+                arm_ik_link_elbow.bone_index = ik_model.bones[
+                    BoneNames.elbow(direction)
+                ].index
+                arm_ik_link_elbow.angle_limit = True
+                arm_ik.links.append(arm_ik_link_elbow)
+
+                if BoneNames.arm_twist(direction) in ik_model.bones:
+                    # 腕捩がある場合、腕IKに追加
+                    arm_ik_link_arm_twist = IkLink()
+                    arm_ik_link_arm_twist.bone_index = ik_model.bones[
+                        BoneNames.arm_twist(direction)
+                    ].index
+                    arm_ik.links.append(arm_ik_link_arm_twist)
+
+                    for b in ik_model.bones:
+                        if (
+                            BoneNames.arm_twist(direction) in b.name
+                            and BoneNames.arm_twist(direction) != b.name
+                        ):
+                            b.layer += 1
+
                 arm_ik_link_arm = IkLink()
-                arm_ik_link_arm.bone_index = model.bones[BoneNames.arm(direction)].index
+                arm_ik_link_arm.bone_index = ik_model.bones[
+                    BoneNames.arm(direction)
+                ].index
                 arm_ik.links.append(arm_ik_link_arm)
 
                 arm_ik_bone.ik = arm_ik
-                model.insert_bone(arm_ik_bone)
+                ik_model.insert_bone(arm_ik_bone)
                 sizing_display_slot.references.append(
                     DisplaySlotReference(display_index=arm_ik_bone.index)
                 )
@@ -1088,10 +1120,12 @@ class ArmAlignUsecase:
                 # ひじIK親追加 ---------------
 
                 elbow_ik_parent_bone = Bone(
-                    index=model.bones[BoneNames.wrist(direction)].index,
+                    index=ik_model.bones[BoneNames.wrist(direction)].index,
                     name=BoneNames.elbow_ik_parent(direction),
                 )
-                elbow_ik_parent_bone.parent_index = model.bones[BoneNames.root()].index
+                elbow_ik_parent_bone.parent_index = ik_model.bones[
+                    BoneNames.root()
+                ].index
                 elbow_ik_parent_bone.position = MVector3D()
                 elbow_ik_parent_bone.is_system = True
                 elbow_ik_parent_bone.bone_flg |= (
@@ -1101,7 +1135,7 @@ class ArmAlignUsecase:
                     | BoneFlg.IS_VISIBLE
                 )
 
-                model.insert_bone(elbow_ik_parent_bone)
+                ik_model.insert_bone(elbow_ik_parent_bone)
                 sizing_display_slot.references.append(
                     DisplaySlotReference(display_index=elbow_ik_parent_bone.index)
                 )
@@ -1109,7 +1143,7 @@ class ArmAlignUsecase:
                 # ひじIK追加 ---------------
 
                 elbow_ik_bone = Bone(
-                    index=model.bones[BoneNames.wrist(direction)].index,
+                    index=ik_model.bones[BoneNames.wrist_rotate(direction)].index,
                     name=BoneNames.elbow_ik(direction),
                 )
                 elbow_ik_bone.parent_index = elbow_ik_parent_bone.index
@@ -1124,12 +1158,36 @@ class ArmAlignUsecase:
                 )
 
                 elbow_ik = Ik()
-                elbow_ik.bone_index = model.bones[BoneNames.wrist(direction)].index
+                elbow_ik.bone_index = ik_model.bones[
+                    BoneNames.wrist_rotate(direction)
+                ].index
                 elbow_ik.loop_count = 32
                 elbow_ik.unit_rotation.radians = MVector3D(1, 0, 0)
 
+                # 手首は動かさない
+                elbow_ik_link_wrist = IkLink()
+                elbow_ik_link_wrist.bone_index = ik_model.bones[
+                    BoneNames.wrist(direction)
+                ].index
+                elbow_ik.links.append(elbow_ik_link_wrist)
+
+                if BoneNames.wrist_twist(direction) in ik_model.bones:
+                    # 手捩がある場合、ひじIKに追加
+                    elbow_ik_link_twist = IkLink()
+                    elbow_ik_link_twist.bone_index = ik_model.bones[
+                        BoneNames.wrist_twist(direction)
+                    ].index
+                    elbow_ik.links.append(elbow_ik_link_twist)
+
+                    for b in ik_model.bones:
+                        if (
+                            BoneNames.wrist_twist(direction) in b.name
+                            and BoneNames.wrist_twist(direction) != b.name
+                        ):
+                            b.layer += 1
+
                 elbow_ik_link_elbow = IkLink()
-                elbow_ik_link_elbow.bone_index = model.bones[
+                elbow_ik_link_elbow.bone_index = ik_model.bones[
                     BoneNames.elbow(direction)
                 ].index
                 if is_twist:
@@ -1142,24 +1200,8 @@ class ArmAlignUsecase:
                     )
                 elbow_ik.links.append(elbow_ik_link_elbow)
 
-                if BoneNames.arm_twist(direction) in model.bones:
-                    elbow_ik_link_arm_twist = IkLink()
-                    elbow_ik_link_arm_twist.bone_index = model.bones[
-                        BoneNames.arm_twist(direction)
-                    ].index
-                    if not is_twist:
-                        elbow_ik_link_arm_twist.angle_limit = True
-                    elbow_ik.links.append(elbow_ik_link_arm_twist)
-
-                    for b in model.bones:
-                        if (
-                            BoneNames.arm_twist(direction) in b.name
-                            and BoneNames.arm_twist(direction) != b.name
-                        ):
-                            b.layer += 1
-
                 elbow_ik_bone.ik = elbow_ik
-                model.insert_bone(elbow_ik_bone)
+                ik_model.insert_bone(elbow_ik_bone)
                 sizing_display_slot.references.append(
                     DisplaySlotReference(display_index=elbow_ik_bone.index)
                 )
@@ -1167,10 +1209,12 @@ class ArmAlignUsecase:
                 # 手首IK親追加 ---------------
 
                 wrist_ik_parent_bone = Bone(
-                    index=model.bones[BoneNames.wrist_tail(direction)].index,
+                    index=ik_model.bones[BoneNames.wrist_tail(direction)].index,
                     name=BoneNames.wrist_ik_parent(direction),
                 )
-                wrist_ik_parent_bone.parent_index = model.bones[BoneNames.root()].index
+                wrist_ik_parent_bone.parent_index = ik_model.bones[
+                    BoneNames.root()
+                ].index
                 wrist_ik_parent_bone.position = MVector3D()
                 wrist_ik_parent_bone.is_system = True
                 wrist_ik_parent_bone.bone_flg |= (
@@ -1180,7 +1224,7 @@ class ArmAlignUsecase:
                     | BoneFlg.IS_VISIBLE
                 )
 
-                model.insert_bone(wrist_ik_parent_bone)
+                ik_model.insert_bone(wrist_ik_parent_bone)
                 sizing_display_slot.references.append(
                     DisplaySlotReference(display_index=wrist_ik_parent_bone.index)
                 )
@@ -1188,7 +1232,7 @@ class ArmAlignUsecase:
                 # 手首IK追加 ---------------
 
                 wrist_ik_bone = Bone(
-                    index=model.bones[BoneNames.wrist_tail(direction)].index,
+                    index=ik_model.bones[BoneNames.wrist_tail(direction)].index,
                     name=BoneNames.wrist_ik(direction),
                 )
                 wrist_ik_bone.parent_index = wrist_ik_parent_bone.index
@@ -1203,45 +1247,35 @@ class ArmAlignUsecase:
                 )
 
                 wrist_ik = Ik()
-                wrist_ik.bone_index = model.bones[BoneNames.wrist_tail(direction)].index
+                wrist_ik.bone_index = ik_model.bones[
+                    BoneNames.wrist_tail(direction)
+                ].index
                 wrist_ik.loop_count = 32
                 wrist_ik.unit_rotation.radians = MVector3D(1, 0, 0)
 
                 wrist_ik_link_wrist = IkLink()
-                wrist_ik_link_wrist.bone_index = model.bones[
+                wrist_ik_link_wrist.bone_index = ik_model.bones[
                     BoneNames.wrist(direction)
                 ].index
                 wrist_ik.links.append(wrist_ik_link_wrist)
 
-                if BoneNames.wrist_twist(direction) in model.bones:
-                    wrist_ik_link_wrist_twist = IkLink()
-                    wrist_ik_link_wrist_twist.bone_index = model.bones[
-                        BoneNames.wrist_twist(direction)
-                    ].index
-                    if not is_twist:
-                        wrist_ik_link_wrist_twist.angle_limit = True
-                    wrist_ik.links.append(wrist_ik_link_wrist_twist)
-
-                    for b in model.bones:
-                        if (
-                            BoneNames.wrist_twist(direction) in b.name
-                            and BoneNames.wrist_twist(direction) != b.name
-                        ):
-                            b.layer += 1
-
                 wrist_ik_bone.ik = wrist_ik
-                model.insert_bone(wrist_ik_bone)
+                ik_model.insert_bone(wrist_ik_bone)
                 sizing_display_slot.references.append(
                     DisplaySlotReference(display_index=wrist_ik_bone.index)
                 )
 
-            if is_align_finger_tail and BoneNames.thumb0(direction) in model.bones:
+            if (is_align_finger or is_align_finger_tail) and BoneNames.thumb0(
+                direction
+            ) in ik_model.bones:
                 # 親指IK親 追加 ---------------
                 thumb0_ik_parent_bone = Bone(
-                    index=model.bones[BoneNames.thumb_tail(direction)].index,
+                    index=ik_model.bones[BoneNames.thumb_tail(direction)].index,
                     name=BoneNames.thumb_ik_parent(direction),
                 )
-                thumb0_ik_parent_bone.parent_index = model.bones[BoneNames.root()].index
+                thumb0_ik_parent_bone.parent_index = ik_model.bones[
+                    BoneNames.root()
+                ].index
                 thumb0_ik_parent_bone.position = MVector3D()
                 thumb0_ik_parent_bone.is_system = True
                 thumb0_ik_parent_bone.bone_flg |= (
@@ -1251,14 +1285,14 @@ class ArmAlignUsecase:
                     | BoneFlg.IS_VISIBLE
                 )
 
-                model.insert_bone(thumb0_ik_parent_bone)
+                ik_model.insert_bone(thumb0_ik_parent_bone)
                 sizing_display_slot.references.append(
                     DisplaySlotReference(display_index=thumb0_ik_parent_bone.index)
                 )
 
                 # 親指IK追加 ---------------
                 thumb0_ik_bone = Bone(
-                    index=model.bones[BoneNames.thumb_tail(direction)].index,
+                    index=ik_model.bones[BoneNames.thumb_tail(direction)].index,
                     name=BoneNames.thumb_ik(direction),
                 )
                 thumb0_ik_bone.parent_index = thumb0_ik_parent_bone.index
@@ -1273,77 +1307,83 @@ class ArmAlignUsecase:
                 )
 
                 thumb0_ik = Ik()
-                thumb0_ik.bone_index = model.bones[
+                thumb0_ik.bone_index = ik_model.bones[
                     BoneNames.thumb_tail(direction)
                 ].index
-                thumb0_ik.loop_count = 16
+                thumb0_ik.loop_count = 32
                 thumb0_ik.unit_rotation.radians = MVector3D(1, 0, 0)
 
                 thumb0_ik_link_thumb2 = IkLink()
-                thumb0_ik_link_thumb2.bone_index = model.bones[
+                thumb0_ik_link_thumb2.bone_index = ik_model.bones[
                     BoneNames.thumb2(direction)
                 ].index
                 # thumb0_ik_link_thumb2.angle_limit = True
                 thumb0_ik.links.append(thumb0_ik_link_thumb2)
 
                 thumb0_ik_link_thumb1 = IkLink()
-                thumb0_ik_link_thumb1.bone_index = model.bones[
+                thumb0_ik_link_thumb1.bone_index = ik_model.bones[
                     BoneNames.thumb1(direction)
                 ].index
                 # thumb0_ik_link_thumb1.angle_limit = True
                 thumb0_ik.links.append(thumb0_ik_link_thumb1)
 
                 thumb0_ik_link_thumb0 = IkLink()
-                thumb0_ik_link_thumb0.bone_index = model.bones[
+                thumb0_ik_link_thumb0.bone_index = ik_model.bones[
                     BoneNames.thumb0(direction)
                 ].index
                 thumb0_ik.links.append(thumb0_ik_link_thumb0)
 
                 thumb0_ik_bone.ik = thumb0_ik
-                model.insert_bone(thumb0_ik_bone)
+                ik_model.insert_bone(thumb0_ik_bone)
                 sizing_display_slot.references.append(
                     DisplaySlotReference(display_index=thumb0_ik_bone.index)
                 )
 
         for direction in ("左", "右"):
-            if "全ての親" in model.bones:
-                model.bones["全ての親"].parent_index = model.bones[
+            if "全ての親" in ik_model.bones:
+                ik_model.bones["全ての親"].parent_index = ik_model.bones[
                     BoneNames.root()
                 ].index
             # 肩 -------
-            if BoneNames.shoulder_p(direction) in model.bones:
-                model.bones[BoneNames.shoulder_p(direction)].parent_index = model.bones[
+            if BoneNames.shoulder_p(direction) in ik_model.bones:
+                ik_model.bones[
+                    BoneNames.shoulder_p(direction)
+                ].parent_index = ik_model.bones[
                     BoneNames.shoulder_root(direction)
                 ].index
-            if BoneNames.shoulder(direction) in model.bones:
-                model.bones[BoneNames.shoulder(direction)].parent_index = model.bones[
+            if BoneNames.shoulder(direction) in ik_model.bones:
+                ik_model.bones[
+                    BoneNames.shoulder(direction)
+                ].parent_index = ik_model.bones[
                     BoneNames.shoulder_root(direction)
                 ].index
             # 腕 -------
-            if BoneNames.shoulder_ik_parent(direction) in model.bones:
-                model.bones[
+            if BoneNames.shoulder_ik_parent(direction) in ik_model.bones:
+                ik_model.bones[
                     BoneNames.shoulder_ik_parent(direction)
-                ].parent_index = model.bones[BoneNames.root()].index
-            if BoneNames.shoulder_ik(direction) in model.bones:
-                model.bones[
+                ].parent_index = ik_model.bones[BoneNames.root()].index
+            if BoneNames.shoulder_ik(direction) in ik_model.bones:
+                ik_model.bones[
                     BoneNames.shoulder_ik(direction)
-                ].parent_index = model.bones[
+                ].parent_index = ik_model.bones[
                     BoneNames.shoulder_ik_parent(direction)
                 ].index
                 # model.bones[BoneNames.shoulder_ik(direction)].layer = model.bones[BoneNames.shoulder_ik_parent(direction)].layer + 1
-            if BoneNames.arm(direction) in model.bones:
-                if BoneNames.shoulder_c(direction) in model.bones:
-                    model.bones[BoneNames.arm(direction)].parent_index = model.bones[
+            if BoneNames.arm(direction) in ik_model.bones:
+                if BoneNames.shoulder_c(direction) in ik_model.bones:
+                    ik_model.bones[
+                        BoneNames.arm(direction)
+                    ].parent_index = ik_model.bones[
                         BoneNames.shoulder_c(direction)
                     ].index
                 else:
-                    model.bones[BoneNames.arm(direction)].parent_index = model.bones[
-                        BoneNames.shoulder(direction)
-                    ].index
-            if BoneNames.elbow_center(direction) in model.bones:
-                model.bones[
+                    ik_model.bones[
+                        BoneNames.arm(direction)
+                    ].parent_index = ik_model.bones[BoneNames.shoulder(direction)].index
+            if BoneNames.elbow_center(direction) in ik_model.bones:
+                ik_model.bones[
                     BoneNames.elbow_center(direction)
-                ].parent_index = model.bones[BoneNames.elbow(direction)].index
+                ].parent_index = ik_model.bones[BoneNames.elbow(direction)].index
             # model.bones[BoneNames.arm(direction)].layer = model.bones[BoneNames.shoulder_ik(direction)].layer + 1
             # if BoneNames.arm_twist(direction) in model.bones:
             #     model.bones[BoneNames.arm_twist(direction)].layer = model.bones[BoneNames.arm(direction)].layer
@@ -1353,15 +1393,17 @@ class ArmAlignUsecase:
             #             b.layer = model.bones[BoneNames.arm_twist(direction)].layer + 1
 
             # 手首 -------
-            if BoneNames.arm_ik_parent(direction) in model.bones:
-                model.bones[
+            if BoneNames.arm_ik_parent(direction) in ik_model.bones:
+                ik_model.bones[
                     BoneNames.arm_ik_parent(direction)
-                ].parent_index = model.bones[BoneNames.root()].index
+                ].parent_index = ik_model.bones[BoneNames.root()].index
                 # model.bones[BoneNames.arm_ik_parent(direction)].layer = (
                 #     model.bones[BoneNames.arm_twist(direction)].layer if BoneNames.arm_twist(direction) in model.bones else model.bones[BoneNames.arm(direction)].layer
                 # ) + 1
-            if BoneNames.arm_ik(direction) in model.bones:
-                model.bones[BoneNames.arm_ik(direction)].parent_index = model.bones[
+            if BoneNames.arm_ik(direction) in ik_model.bones:
+                ik_model.bones[
+                    BoneNames.arm_ik(direction)
+                ].parent_index = ik_model.bones[
                     BoneNames.arm_ik_parent(direction)
                 ].index
                 # model.bones[BoneNames.arm_ik(direction)].layer = model.bones[BoneNames.arm_ik_parent(direction)].layer + 1
@@ -1388,48 +1430,54 @@ class ArmAlignUsecase:
             # if BoneNames.wrist(direction) in model.bones and BoneNames.elbow_ik(direction) in model.bones:
             #     model.bones[BoneNames.wrist(direction)].parent_index = model.bones[BoneNames.elbow_ik(direction)].index
             # model.bones[BoneNames.wrist(direction)].layer = model.bones[BoneNames.elbow_ik(direction)].layer + 1
-            if BoneNames.wrist_tail(direction) in model.bones:
-                model.bones[BoneNames.wrist_tail(direction)].parent_index = model.bones[
-                    BoneNames.wrist(direction)
-                ].index
-            if BoneNames.wrist_ik_parent(direction) in model.bones:
-                model.bones[
+            if BoneNames.wrist_tail(direction) in ik_model.bones:
+                ik_model.bones[
+                    BoneNames.wrist_tail(direction)
+                ].parent_index = ik_model.bones[BoneNames.wrist(direction)].index
+            if BoneNames.wrist_ik_parent(direction) in ik_model.bones:
+                ik_model.bones[
                     BoneNames.wrist_ik_parent(direction)
-                ].parent_index = model.bones[BoneNames.root()].index
+                ].parent_index = ik_model.bones[BoneNames.root()].index
                 # model.bones[BoneNames.wrist_ik_parent(direction)].layer = model.bones[BoneNames.wrist(direction)].layer + 1
-            if BoneNames.wrist_ik(direction) in model.bones:
-                model.bones[BoneNames.wrist_ik(direction)].parent_index = model.bones[
+            if BoneNames.wrist_ik(direction) in ik_model.bones:
+                ik_model.bones[
+                    BoneNames.wrist_ik(direction)
+                ].parent_index = ik_model.bones[
                     BoneNames.wrist_ik_parent(direction)
                 ].index
                 # model.bones[BoneNames.wrist_ik(direction)].layer = model.bones[BoneNames.wrist_ik_parent(direction)].layer + 1
             # 親指０ -------
-            if BoneNames.thumb0(direction) in model.bones:
-                model.bones[BoneNames.thumb0(direction)].parent_index = model.bones[
-                    BoneNames.wrist_tail(direction)
-                ].index
-            if BoneNames.thumb1(direction) in model.bones:
-                if BoneNames.thumb0(direction) in model.bones:
-                    model.bones[BoneNames.thumb1(direction)].parent_index = model.bones[
-                        BoneNames.thumb0(direction)
-                    ].index
+            if BoneNames.thumb0(direction) in ik_model.bones:
+                ik_model.bones[
+                    BoneNames.thumb0(direction)
+                ].parent_index = ik_model.bones[BoneNames.wrist_tail(direction)].index
+            if BoneNames.thumb1(direction) in ik_model.bones:
+                if BoneNames.thumb0(direction) in ik_model.bones:
+                    ik_model.bones[
+                        BoneNames.thumb1(direction)
+                    ].parent_index = ik_model.bones[BoneNames.thumb0(direction)].index
                 else:
-                    model.bones[BoneNames.thumb1(direction)].parent_index = model.bones[
+                    ik_model.bones[
+                        BoneNames.thumb1(direction)
+                    ].parent_index = ik_model.bones[
                         BoneNames.wrist_tail(direction)
                     ].index
-            if BoneNames.thumb_ik_parent(direction) in model.bones:
-                model.bones[
+            if BoneNames.thumb_ik_parent(direction) in ik_model.bones:
+                ik_model.bones[
                     BoneNames.thumb_ik_parent(direction)
-                ].parent_index = model.bones[BoneNames.root()].index
+                ].parent_index = ik_model.bones[BoneNames.root()].index
                 # model.bones[BoneNames.thumb_0_ik_parent(direction)].layer = model.bones[BoneNames.thumb_0(direction)].layer + 1
-            if BoneNames.thumb_ik(direction) in model.bones:
-                model.bones[BoneNames.thumb_ik(direction)].parent_index = model.bones[
+            if BoneNames.thumb_ik(direction) in ik_model.bones:
+                ik_model.bones[
+                    BoneNames.thumb_ik(direction)
+                ].parent_index = ik_model.bones[
                     BoneNames.thumb_ik_parent(direction)
                 ].index
                 # model.bones[BoneNames.thumb_0_ik(direction)].layer = model.bones[BoneNames.thumb_0_ik_parent(direction)].layer + 1
-            if BoneNames.thumb2(direction) in model.bones:
-                model.bones[BoneNames.thumb2(direction)].parent_index = model.bones[
-                    BoneNames.thumb1(direction)
-                ].index
+            if BoneNames.thumb2(direction) in ik_model.bones:
+                ik_model.bones[
+                    BoneNames.thumb2(direction)
+                ].parent_index = ik_model.bones[BoneNames.thumb1(direction)].index
             # model.bones[BoneNames.thumb_0(direction)].layer = model.bones[BoneNames.wrist_ik(direction)].layer + 1
             # for bname in ("親指１", "親指２"):
             #     if f"{direction}{bname}" in model.bones:
@@ -1443,14 +1491,14 @@ class ArmAlignUsecase:
             # if model.bones[BoneNames.thumb_2(direction)].tail_index in model.bones:
             #     model.bones[model.bones[BoneNames.thumb_2(direction)].tail_index].layer = model.bones[BoneNames.thumb_2(direction)].layer
             for bname in ("人指１", "中指１", "薬指１", "小指１"):
-                if f"{direction}{bname}" in model.bones:
-                    model.bones[f"{direction}{bname}"].parent_index = model.bones[
+                if f"{direction}{bname}" in ik_model.bones:
+                    ik_model.bones[f"{direction}{bname}"].parent_index = ik_model.bones[
                         BoneNames.wrist_tail(direction)
                     ].index
-            if BoneNames.middle2(direction) in model.bones:
-                model.bones[BoneNames.middle2(direction)].parent_index = model.bones[
-                    BoneNames.middle1(direction)
-                ].index
+            if BoneNames.middle2(direction) in ik_model.bones:
+                ik_model.bones[
+                    BoneNames.middle2(direction)
+                ].parent_index = ik_model.bones[BoneNames.middle1(direction)].index
                 # model.bones[f"{direction}{bname}"].layer = model.bones[BoneNames.wrist(direction)].layer + 1
                 # if model.bones[f"{direction}{bname}"].tail_index in model.bones:
                 #     model.bones[model.bones[f"{direction}{bname}"].tail_index].layer = model.bones[f"{direction}{bname}"].layer
@@ -1460,17 +1508,19 @@ class ArmAlignUsecase:
             #         if model.bones[f"{direction}{bname}"].tail_index in model.bones:
             #             model.bones[model.bones[f"{direction}{bname}"].tail_index].layer = model.bones[f"{direction}{bname}"].layer
 
-        model.setup()
+        ik_model.setup()
 
         if 10 >= logger.total_level:
             # デバッグレベルの場合、モデルを出力する
             from mlib.pmx.pmx_writer import PmxWriter
 
             PmxWriter(
-                model,
+                ik_model,
                 os.path.join(
-                    os.path.dirname(model.path),
-                    f"sizing_{os.path.basename(model.path)}",
+                    os.path.dirname(ik_model.path),
+                    f"sizing_{os.path.basename(ik_model.path)}",
                 ),
                 include_system=True,
             ).save()
+
+        return sizing_idx, is_src, ik_model
