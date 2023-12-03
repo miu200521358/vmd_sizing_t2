@@ -89,6 +89,7 @@ class SizingPanel(NotebookPanel):
         self.integrate_parent_check_ctrl.SetToolTip(
             __("全ての親の移動や回転を子ボーンに振り分けて、全ての親のキーフレームを削除します")
         )
+        self.integrate_parent_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_add_config)
         self.integrate_parent_sizer.Add(self.integrate_parent_check_ctrl, 0, wx.ALL, 3)
         self.integrate_parent_help_ctrl = ImageButton(
             self,
@@ -106,6 +107,7 @@ class SizingPanel(NotebookPanel):
             self, wx.ID_ANY, __("捩り分散"), wx.DefaultPosition, wx.DefaultSize, 0
         )
         self.twist_check_ctrl.SetToolTip(__("腕を腕捩りなど、捩りボーンに捩り回転を分散させます"))
+        self.twist_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_add_config)
         self.twist_sizer.Add(self.twist_check_ctrl, 0, wx.ALL, 3)
         self.twist_help_ctrl = ImageButton(
             self,
@@ -297,6 +299,10 @@ class SizingPanel(NotebookPanel):
         self.align_finger_tail_check_ctrl.SetValue(self.is_full_config)
 
         self.on_change_dest_model_pmx(event)
+
+    def on_check_add_config(self, event: wx.Event) -> None:
+        for sizing_set in self.sizing_sets:
+            sizing_set.create_output_path()
 
     def on_check_align_ctrl(self, event: wx.Event) -> None:
         if not self.align_check_ctrl.GetValue():

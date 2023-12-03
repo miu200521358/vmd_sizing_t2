@@ -1,5 +1,6 @@
 import os
 
+import numpy as np
 from service.usecase.bone_names import BoneNames
 
 from mlib.core.logger import MLogger
@@ -197,50 +198,50 @@ class IoUsecase:
                     DisplaySlotReference(display_index=shoulder_center_bone.index)
                 )
 
-                # # ひじ回転追加 ---------------
+                # ひじ回転追加 ---------------
 
-                # elbow_rotate_bone = Bone(
-                #     index=model.bones[BoneNames.elbow(direction)].index,
-                #     name=BoneNames.elbow_rotate(direction),
-                # )
-                # elbow_rotate_bone.parent_index = model.bones[
-                #     BoneNames.arm_twist(direction)
-                # ].index
-                # elbow_rotate_bone.position = (
-                #     model.bones[BoneNames.elbow(direction)].position
-                #     + (
-                #         model.bones[BoneNames.elbow(direction)].position
-                #         - model.bones[BoneNames.arm(direction)].position
-                #     )
-                #     .cross(
-                #         MVector3D(
-                #             0,
-                #             0,
-                #             -1
-                #             * np.sign(
-                #                 model.bones[BoneNames.wrist(direction)].position.x
-                #             ),
-                #         )
-                #     )
-                #     .normalized()
-                # )
+                elbow_rotate_bone = Bone(
+                    index=model.bones[BoneNames.elbow(direction)].index,
+                    name=BoneNames.elbow_rotate(direction),
+                )
+                elbow_rotate_bone.parent_index = model.bones[
+                    BoneNames.arm_twist(direction)
+                ].index
+                elbow_rotate_bone.position = (
+                    model.bones[BoneNames.elbow(direction)].position
+                    + (
+                        model.bones[BoneNames.elbow(direction)].position
+                        - model.bones[BoneNames.arm(direction)].position
+                    )
+                    .cross(
+                        MVector3D(
+                            0,
+                            0,
+                            -1
+                            * np.sign(
+                                model.bones[BoneNames.wrist(direction)].position.x
+                            ),
+                        )
+                    )
+                    .normalized()
+                )
 
-                # elbow_rotate_bone.is_system = True
-                # elbow_rotate_bone.bone_flg |= (
-                #     BoneFlg.CAN_TRANSLATE
-                #     | BoneFlg.CAN_ROTATE
-                #     | BoneFlg.CAN_MANIPULATE
-                #     | BoneFlg.IS_VISIBLE
-                #     | BoneFlg.TAIL_IS_BONE
-                # )
-                # elbow_rotate_bone.tail_index = model.bones[
-                #     BoneNames.elbow(direction)
-                # ].index
+                elbow_rotate_bone.is_system = True
+                elbow_rotate_bone.bone_flg |= (
+                    BoneFlg.CAN_TRANSLATE
+                    | BoneFlg.CAN_ROTATE
+                    | BoneFlg.CAN_MANIPULATE
+                    | BoneFlg.IS_VISIBLE
+                    | BoneFlg.TAIL_IS_BONE
+                )
+                elbow_rotate_bone.tail_index = model.bones[
+                    BoneNames.elbow(direction)
+                ].index
 
-                # model.insert_bone(elbow_rotate_bone)
-                # sizing_display_slot.references.append(
-                #     DisplaySlotReference(display_index=elbow_rotate_bone.index)
-                # )
+                model.insert_bone(elbow_rotate_bone)
+                sizing_display_slot.references.append(
+                    DisplaySlotReference(display_index=elbow_rotate_bone.index)
+                )
 
                 # ひじ中点追加 ---------------
 
@@ -269,50 +270,50 @@ class IoUsecase:
                     DisplaySlotReference(display_index=elbow_center_bone.index)
                 )
 
-                # # 手首回転追加 ---------------
+                # 手首回転追加 ---------------
 
-                # wrist_rotate_bone = Bone(
-                #     index=model.bones[BoneNames.wrist(direction)].index,
-                #     name=BoneNames.wrist_rotate(direction),
-                # )
-                # wrist_rotate_bone.parent_index = model.bones[
-                #     BoneNames.wrist_twist(direction)
-                # ].index
-                # wrist_rotate_bone.position = (
-                #     model.bones[BoneNames.wrist(direction)].position
-                #     + (
-                #         model.bones[BoneNames.wrist(direction)].position
-                #         - model.bones[BoneNames.elbow(direction)].position
-                #     )
-                #     .cross(
-                #         MVector3D(
-                #             0,
-                #             0,
-                #             -1
-                #             * np.sign(
-                #                 model.bones[BoneNames.wrist(direction)].position.x
-                #             ),
-                #         )
-                #     )
-                #     .normalized()
-                # )
+                wrist_rotate_bone = Bone(
+                    index=model.bones[BoneNames.wrist(direction)].index,
+                    name=BoneNames.wrist_rotate(direction),
+                )
+                wrist_rotate_bone.parent_index = model.bones[
+                    BoneNames.wrist_twist(direction)
+                ].index
+                wrist_rotate_bone.position = (
+                    model.bones[BoneNames.wrist(direction)].position
+                    + (
+                        model.bones[BoneNames.wrist(direction)].position
+                        - model.bones[BoneNames.elbow(direction)].position
+                    )
+                    .cross(
+                        MVector3D(
+                            0,
+                            0,
+                            -1
+                            * np.sign(
+                                model.bones[BoneNames.wrist(direction)].position.x
+                            ),
+                        )
+                    )
+                    .normalized()
+                )
 
-                # wrist_rotate_bone.is_system = True
-                # wrist_rotate_bone.bone_flg |= (
-                #     BoneFlg.CAN_TRANSLATE
-                #     | BoneFlg.CAN_ROTATE
-                #     | BoneFlg.CAN_MANIPULATE
-                #     | BoneFlg.IS_VISIBLE
-                #     | BoneFlg.TAIL_IS_BONE
-                # )
-                # wrist_rotate_bone.tail_index = model.bones[
-                #     BoneNames.wrist(direction)
-                # ].index
+                wrist_rotate_bone.is_system = True
+                wrist_rotate_bone.bone_flg |= (
+                    BoneFlg.CAN_TRANSLATE
+                    | BoneFlg.CAN_ROTATE
+                    | BoneFlg.CAN_MANIPULATE
+                    | BoneFlg.IS_VISIBLE
+                    | BoneFlg.TAIL_IS_BONE
+                )
+                wrist_rotate_bone.tail_index = model.bones[
+                    BoneNames.wrist(direction)
+                ].index
 
-                # model.insert_bone(wrist_rotate_bone)
-                # sizing_display_slot.references.append(
-                #     DisplaySlotReference(display_index=wrist_rotate_bone.index)
-                # )
+                model.insert_bone(wrist_rotate_bone)
+                sizing_display_slot.references.append(
+                    DisplaySlotReference(display_index=wrist_rotate_bone.index)
+                )
 
                 # 手首先追加 ---------------
 
@@ -334,8 +335,8 @@ class IoUsecase:
                 ].index
                 wrist_tail_bone.position = (
                     model.bones[BoneNames.wrist(direction)].position
-                    + (wrist_vector_qq * MVector3D(1, 0, 0))
-                    # + (wrist_vector_qq * MVector3D(0, 0, 1))
+                    # + (wrist_vector_qq * MVector3D(1, 0, 0))
+                    + (wrist_vector_qq * MVector3D(0, 0, 1))
                 )
                 wrist_tail_bone.is_system = True
                 wrist_tail_bone.bone_flg |= (

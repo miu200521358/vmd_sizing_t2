@@ -8,7 +8,7 @@ import wx
 from mlib.core.logger import LoggingMode, MLogger
 
 APP_NAME = "VmdSizing"
-VERSION_NAME = "6.00.00_β21"
+VERSION_NAME = "6.00.00_β22"
 
 # 指数表記なし、有効小数点桁数6、30を超えると省略あり、一行の文字数200
 np.set_printoptions(suppress=True, precision=6, threshold=30, linewidth=200)

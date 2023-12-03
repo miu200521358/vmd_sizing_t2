@@ -1,21 +1,32 @@
+# Translations template for PROJECT.
+# Copyright (C) 2023 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2023.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2023-04-06 02:14+0900\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.12.1\n"
 
 msgid "-- キーフレーム確認[{d}] [{i} ({p:.2f}%)]"
-msgstr ""
-
-"
-
+msgstr "-- 키프레임 확인[{d}] [{i} ({p:.2f}%)]"
 
 msgid "モデルセットアップ：ボーン"
-msgstr ""
-
+msgstr "모델 설정: 뼈"
 
 msgid "-- モデルセットアップ：ボーン [{i} ({p:.2f}%)]"
-msgstr ""
-
+msgstr "-- 모델 설정: 본 [{i} ({p:.2f}%)]"
 
 msgid "モデルセットアップ：ボーンツリー"
-msgstr ""
-
+msgstr "모델 셋업: 본트리"
 
 msgid "モデルセットアップ完了"
 msgstr "모델 설정 완료"
@@ -247,6 +258,9 @@ msgstr "정점 데이터 읽기"
 
 msgid "-- 頂点データ読み取り [{i} ({p:.2f}%)]"
 msgstr "-- 정점 데이터 읽기 [{i} ({p:.2f}%)]"
+
+msgid "-- IKデータ読み取り [{i} ({p:.2f}%)]"
+msgstr "-- IK 데이터 읽기 [{i} ({p:.2f}%)]"
 
 msgid "頂点データ読み取り完了: {c}"
 msgstr "정점 데이터 읽기 완료: {c}"
@@ -492,7 +506,7 @@ msgid "全ての親の移動や回転をセンター・上半身・下半身に�
 msgstr "모든 부모의 이동과 회전을 중앙, 상체, 하체로 나눠서 진행합니다"
 
 msgid "親指０位置合わせ"
-msgstr "엄지손가락 위치 맞추기
+msgstr "엄지손가락 위치 맞추기"
 msgid "【No.{i}】{b}:捩り分散事前準備"
 msgstr "【No.{i}】{b}:비틀림 분산 사전 준비"
 
@@ -527,10 +541,10 @@ msgid "捩り分散用初期位置取得"
 msgstr "비틀림 분산용 초기 위치 획득"
 
 msgid "[{v}]\n予期せぬエラーが発生しました"
-msgstr "[{v}]예기치 않은 오류가 발생했습니다"
+msgstr "[{v}]\n 예기치 않은 오류가 발생했습니다"
 
 msgid "[{v}]\n処理が継続できないため、中断しました\n----------------\n{m}"
-msgstr "[{v}]처리를 계속할 수 없어 중단되었습니다\n----------------\n{m}"
+msgstr "[{v}]\n처리를 계속할 수 없어 중단되었습니다\n----------------\n{m}"
 
 msgid "-- 剛体データ読み取り [{i} ({p:.2f}%)]"
 msgstr "-- 강체 데이터 읽기 [{i} ({p:.2f}%)]"
@@ -718,3 +732,23 @@ msgstr "【No.{x}】비틀림 분산: 추가 IK 설정({m})"
 msgid "【No.{x}】サイジング先モデルに肩・腕捩・腕・ひじ・手捩・手首の左右ボーンがないため、捩り分散をスキップします"
 msgstr "[No.{x}] 사이징 대상 모델에 어깨, 팔꿈치, 팔, 팔꿈치, 팔꿈치, 손목의 좌우 뼈가 없기 때문에 비틀림 분산을 건너 뜁니다"
 
+msgid "追加補正"
+msgstr "추가 보정"
+
+msgid "全追加補正ON"
+msgstr "전체 추가 보정 ON"
+
+msgid "作成元モデル"
+msgstr "제작자 모델"
+
+msgid "初期位置取得"
+msgstr "초기 위치 획득"
+
+msgid "【No.{i}】【{d}】捩り分散"
+msgstr "【No.{i}】【{d}】비틀림 분산"
+
+msgid "腕スタンス補正"
+msgstr "팔 자세 교정"
+
+msgid "移動補正"
+msgstr "이동 보정"

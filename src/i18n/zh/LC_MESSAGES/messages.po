@@ -1,21 +1,32 @@
+# Translations template for PROJECT.
+# Copyright (C) 2023 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2023.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2023-04-06 02:14+0900\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.12.1\n"
 
 msgid "-- キーフレーム確認[{d}] [{i} ({p:.2f}%)]"
-msgstr ""
-
-"
-
+msgstr "--关键帧确认 [{d}] [{i} ({p:.2f}%)]"
 
 msgid "モデルセットアップ：ボーン"
-msgstr ""
-
+msgstr "模型设置：骨骼"
 
 msgid "-- モデルセットアップ：ボーン [{i} ({p:.2f}%)]"
-msgstr ""
-
+msgstr "-- 模型设置：骨骼 [{i} ({p:.2f}%)]"
 
 msgid "モデルセットアップ：ボーンツリー"
-msgstr ""
-
+msgstr "模型设置：骨树"
 
 msgid "モデルセットアップ完了"
 msgstr "模型设置完成"
@@ -247,6 +258,9 @@ msgstr "顶点数据读取"
 
 msgid "-- 頂点データ読み取り [{i} ({p:.2f}%)]"
 msgstr "--顶点数据读取 [{i} ({p:.2f}%)]"
+
+msgid "-- IKデータ読み取り [{i} ({p:.2f}%)]"
+msgstr "-- IK 数据读取 [{i} ({p:.2f}%)]"
 
 msgid "頂点データ読み取り完了: {c}"
 msgstr "顶点数据读取完毕：{c}"
@@ -492,7 +506,7 @@ msgid "全ての親の移動や回転をセンター・上半身・下半身に�
 msgstr "所有父母的动作和旋转都分配给中心、上半身和下半身"
 
 msgid "親指０位置合わせ"
-msgstr "拇指 0 对齐
+msgstr "拇指 0 对齐"
 msgid "【No.{i}】{b}:捩り分散事前準備"
 msgstr "[编号{i}]{b}：扭力分散准备工作"
 
@@ -527,10 +541,10 @@ msgid "捩り分散用初期位置取得"
 msgstr "获取扭力分散的初始位置"
 
 msgid "[{v}]\n予期せぬエラーが発生しました"
-msgstr "[{v}]发生意外错误"
+msgstr "[{v}]/nUnexpected error occurred"
 
 msgid "[{v}]\n処理が継続できないため、中断しました\n----------------\n{m}"
-msgstr "[{v}]因进程无法继续而暂停"
+msgstr "[{v}]\nProcessing cannot continue and has been aborted,\n----------------\n{m}"
 
 msgid "-- 剛体データ読み取り [{i} ({p:.2f}%)]"
 msgstr "--刚性数据读取 [{i} ({p:.2f}%)]"
@@ -581,7 +595,7 @@ msgid "任意のIKボーンの計算を行い、IK管理下のボーンの角度
 msgstr "计算任意 IK 骨骼，并生成运动数据，其中包含 IK 管理下骨骼的计算角度。\n"
 
 msgid "極力MMDに近づけて計算していますが、差異が出てくる場合があります。"
-msgstr "计算结果尽可能接近 MMD，但可能会出现差异"
+msgstr "计算结果已尽可能接近 MMD，但可能会出现差异"
 
 msgid "モーションが読み込まれていない為、処理を中断します"
 msgstr "由于未加载动议，进程已中止"
@@ -590,7 +604,7 @@ msgid "モデルが読み込まれていない為、処理を中断します"
 msgstr "由于模型尚未加载，进程已中止"
 
 msgid "読み込み完了\n「焼き込み対象ボーン選択」ボタンから焼き込みたいIK管理下ボーンを選択してください"
-msgstr "请从 "加载完成 "的 "选择要刻录的骨骼 "按钮中选择要刻录的 IK 管理骨骼。
+msgstr "请从 "加载完成"（Load complete）窶ヲ的 "选择要刻录的骨骼"（Select bone to burn）按钮中选择要刻录的 IK 管理骨骼。
 
 msgid "焼き込みの細かさを設定できます\n値が大きいほど細かい変動に反応するようになります"
 msgstr "你可以设置刻录的精细度，n 值越高，对细微波动的反应就越灵敏"
@@ -602,7 +616,7 @@ msgid "焼き込みたいIK管理下のボーンを選択してください\n"
 msgstr "选择要刻录的 IK 管理骨骼。
 
 msgid "Shiftキーを押しながら選択すると、複数ボーンを一気に選択できます（IKボーンも一緒に選択しても問題ありません）"
-msgstr "您可以在选择骨骼时按住 Shift 键，同时选择多个骨骼（也可以同时选择 IK 骨骼）"
+msgstr "您可以按住 Shift 键同时选择多个骨骼（也可以同时选择 IK 骨骼）"
 
 msgid "Shiftキーを押しながら選択すると、複数ボーンを一気に選択できます\n"
 msgstr "您可以按住 Shift 键同时选择多个骨骼。
@@ -718,3 +732,23 @@ msgstr "[编号{x}] 扭转频散：额外的 IK 设置（{m}）"
 msgid "【No.{x}】サイジング先モデルに肩・腕捩・腕・ひじ・手捩・手首の左右ボーンがないため、捩り分散をスキップします"
 msgstr "[No.{x}]跳过扭转分散，因为尺寸目标模型没有肩部、手臂扭转、臂部、肘部、手部扭转和腕部的左右骨骼"
 
+msgid "追加補正"
+msgstr "补充更正"
+
+msgid "全追加補正ON"
+msgstr "所有附加更正开启"
+
+msgid "作成元モデル"
+msgstr "创建源模型"
+
+msgid "初期位置取得"
+msgstr "获取初始位置"
+
+msgid "【No.{i}】【{d}】捩り分散"
+msgstr "[第{i}号] [第{d}号] 扭转频散"
+
+msgid "腕スタンス補正"
+msgstr "手臂姿势矫正"
+
+msgid "移動補正"
+msgstr "运动矫正"
