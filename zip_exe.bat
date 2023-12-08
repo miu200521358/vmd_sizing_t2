@@ -18,7 +18,7 @@ python create_bat.py
 
 copy /y archive\Readme*.txt dist
 
-call python setup_clear.py
+python setup_clear.py
 
 rem -- 音を鳴らす
 rundll32 user32.dll,MessageBeep

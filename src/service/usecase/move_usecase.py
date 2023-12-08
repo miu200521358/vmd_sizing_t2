@@ -1,19 +1,18 @@
 import os
 
 import numpy as np
-from service.usecase.bone_names import BoneNames
-
 from mlib.core.logger import MLogger
 from mlib.core.math import MVector3D
 from mlib.pmx.pmx_collection import PmxModel
 from mlib.vmd.vmd_collection import VmdMotion
+from service.usecase.bone_names import BoneNames
 
 logger = MLogger(os.path.basename(__file__), level=1)
 __ = logger.get_text
 
 
 MOVE_ALL_BONE_NAMES = {
-    BoneNames.parent(),
+    BoneNames.root(),
     BoneNames.center(),
     BoneNames.groove(),
     BoneNames.leg_ik_parent("右"),

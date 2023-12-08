@@ -1,11 +1,10 @@
 import os
 
-from service.usecase.bone_names import BoneNames
-
 from mlib.core.logger import MLogger
 from mlib.core.math import MMatrix4x4, MVector3D
 from mlib.pmx.pmx_collection import PmxModel
 from mlib.vmd.vmd_collection import VmdMotion
+from service.usecase.bone_names import BoneNames
 
 logger = MLogger(os.path.basename(__file__), level=1)
 __ = logger.get_text
@@ -30,7 +29,7 @@ class ParentUsecase:
             "【No.{i}】全親統合", i=sizing_idx + 1, decoration=MLogger.Decoration.LINE
         )
 
-        if BoneNames.parent() not in motion.bones:
+        if BoneNames.root() not in motion.bones:
             logger.warning(
                 "【No.{x}】モーションに全ての親のキーフレームがないため、全親統合をスキップします",
                 x=sizing_idx + 1,
@@ -38,13 +37,11 @@ class ParentUsecase:
             )
             return sizing_idx, motion
 
-        parent_bone = model.bones[BoneNames.parent()]
+        parent_bone = model.bones[BoneNames.root()]
 
         # 全親のキーフレ
-        fnos_set: set[int] = {0} | set(
-            motion.bones[BoneNames.parent()].register_indexes
-        )
-        bone_names: list[str] = [BoneNames.parent()]
+        fnos_set: set[int] = {0} | set(motion.bones[BoneNames.root()].register_indexes)
+        bone_names: list[str] = [BoneNames.root()]
 
         # 全親の子ボーンのキーフレ
         for child_bone_index in parent_bone.child_bone_indexes:
@@ -72,7 +69,7 @@ class ParentUsecase:
 
             for fno in sorted(
                 set(motion.bones[child_bone_name].register_indexes)
-                | set(motion.bones[BoneNames.parent()].register_indexes)
+                | set(motion.bones[BoneNames.root()].register_indexes)
             ):
                 logger.count(
                     "【No.{x}】全親統合",
@@ -102,6 +99,6 @@ class ParentUsecase:
                 n += 1
 
         # 全親キーフレを削除
-        del motion.bones[BoneNames.parent()]
+        del motion.bones[BoneNames.root()]
 
         return sizing_idx, motion

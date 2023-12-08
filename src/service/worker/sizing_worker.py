@@ -6,15 +6,6 @@ from concurrent.futures import (
 )
 
 import wx
-from service.form.panel.sizing_panel import SizingPanel
-from service.form.widgets.sizing_bone_set import SizingBoneSet
-from service.usecase.arm_align_usecase import ArmAlignUsecase
-from service.usecase.arm_stance_usecase import ArmStanceUsecase
-from service.usecase.arm_twist_usecase import ArmTwistUsecase
-from service.usecase.io_usecase import IoUsecase
-from service.usecase.move_usecase import MoveUsecase
-from service.usecase.parent_usecase import ParentUsecase
-
 from mlib.core.exception import MApplicationException
 from mlib.core.logger import MLogger
 from mlib.core.math import MVector3D
@@ -23,6 +14,14 @@ from mlib.service.base_worker import BaseWorker
 from mlib.service.form.base_panel import BasePanel
 from mlib.utils.file_utils import get_root_dir
 from mlib.vmd.vmd_tree import VmdBoneFrameTrees
+from service.form.panel.sizing_panel import SizingPanel
+from service.form.widgets.sizing_bone_set import SizingBoneSet
+from service.usecase.arm_align_usecase import ArmAlignUsecase
+from service.usecase.arm_stance_usecase import ArmStanceUsecase
+from service.usecase.arm_twist_usecase import ArmTwistUsecase
+from service.usecase.io_usecase import IoUsecase
+from service.usecase.move_usecase import MoveUsecase
+from service.usecase.parent_usecase import ParentUsecase
 
 logger = MLogger(os.path.basename(__file__), level=1)
 __ = logger.get_text
@@ -59,11 +58,9 @@ class SizingWorker(BaseWorker):
             sizing_panel.align_check_ctrl.GetValue()
             or sizing_panel.twist_check_ctrl.GetValue()
         ):
-            initial_matrixes = self.get_initial_arm_matrixes()
-
             # 捩り分散
             if sizing_panel.twist_check_ctrl.GetValue():
-                self.sizing_arm_twist(initial_matrixes)
+                self.sizing_arm_twist()
 
             # # 腕位置合わせ
             # if sizing_panel.align_check_ctrl.GetValue():
@@ -127,51 +124,6 @@ class SizingWorker(BaseWorker):
                 ik_models[(sizing_idx, is_src)] = ik_model
 
         return ik_models
-
-    def get_initial_arm_matrixes(self) -> None:
-        """腕初期位置取得"""
-        logger.info("腕：初期位置取得", decoration=MLogger.Decoration.BOX)
-
-        usecase = ArmTwistUsecase()
-        sizing_panel: SizingPanel = self.frame.sizing_panel
-        initial_matrixes: dict[tuple[int, bool, str], VmdBoneFrameTrees] = {}
-
-        # 先にIKが無い状態でモーション行列を取得する
-        with ThreadPoolExecutor(
-            thread_name_prefix="arm_initial", max_workers=self.max_worker
-        ) as executor:
-            futures: list[Future] = []
-            for sizing_set in sizing_panel.sizing_sets:
-                for direction in ("右", "左"):
-                    futures.append(
-                        executor.submit(
-                            usecase.get_initial_matrixes,
-                            sizing_set.sizing_idx,
-                            True,
-                            sizing_set.src_model_ctrl.data,
-                            sizing_set.motion_ctrl.data,
-                            direction,
-                        )
-                    )
-
-                    futures.append(
-                        executor.submit(
-                            usecase.get_initial_matrixes,
-                            sizing_set.sizing_idx,
-                            False,
-                            sizing_set.dest_model_ctrl.data,
-                            sizing_set.output_motion_ctrl.data,
-                            direction,
-                        )
-                    )
-
-            for future in as_completed(futures):
-                if future.exception():
-                    raise future.exception()
-                sizing_idx, is_src, direction, matrixes = future.result()
-                initial_matrixes[(sizing_idx, is_src, direction)] = matrixes
-
-        return initial_matrixes
 
     def sizing_arm_align(self) -> None:
         """腕位置合わせ"""
@@ -297,10 +249,7 @@ class SizingWorker(BaseWorker):
                     sizing_idx
                 ].output_motion_ctrl.data = sizing_motion
 
-    def sizing_arm_twist(
-        self,
-        initial_matrixes: dict[tuple[int, bool, str], VmdBoneFrameTrees],
-    ) -> None:
+    def sizing_arm_twist(self) -> None:
         """捩り分散"""
         logger.info("捩り分散", decoration=MLogger.Decoration.BOX)
 
@@ -337,6 +286,33 @@ class SizingWorker(BaseWorker):
                 sizing_idx, is_src, ik_model = future.result()
                 ik_models[(sizing_idx, is_src)] = ik_model
 
+        # 初期位置を取得する
+        initial_matrixes: dict[tuple[int, bool, str], VmdBoneFrameTrees] = {}
+
+        with ThreadPoolExecutor(
+            thread_name_prefix="arm_initial", max_workers=self.max_worker
+        ) as executor:
+            futures: list[Future] = []
+            for sizing_set in sizing_panel.sizing_sets:
+                for direction in ("右", "左"):
+                    futures.append(
+                        executor.submit(
+                            usecase.get_initial_matrixes,
+                            sizing_set.sizing_idx,
+                            False,
+                            ik_models[(sizing_idx, False)],
+                            sizing_set.output_motion_ctrl.data,
+                            direction,
+                        )
+                    )
+
+            for future in as_completed(futures):
+                if future.exception():
+                    raise future.exception()
+                sizing_idx, is_src, direction, matrixes = future.result()
+                initial_matrixes[(sizing_idx, is_src, direction)] = matrixes
+
+        # 捩り分散を実行する
         with ThreadPoolExecutor(
             thread_name_prefix="arm_twist", max_workers=self.max_worker
         ) as executor:

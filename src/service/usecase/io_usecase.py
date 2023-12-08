@@ -1,18 +1,17 @@
 import os
 
 import numpy as np
-from service.usecase.bone_names import BoneNames
-
 from mlib.core.logger import MLogger
 from mlib.core.math import MVector3D
 from mlib.pmx.bone_setting import BoneFlg
 from mlib.pmx.pmx_collection import PmxModel
-from mlib.pmx.pmx_part import Bone, DisplaySlot, DisplaySlotReference
+from mlib.pmx.pmx_part import DisplaySlot
 from mlib.pmx.pmx_reader import PmxReader
 from mlib.utils.file_utils import get_path
 from mlib.vmd.vmd_collection import VmdMotion
 from mlib.vmd.vmd_reader import VmdReader
 from mlib.vmd.vmd_writer import VmdWriter
+from service.usecase.bone_names import BoneNames
 
 logger = MLogger(os.path.basename(__file__), level=1)
 __ = logger.get_text
@@ -77,16 +76,17 @@ class IoUsecase:
                 tail_relative_position = (
                     original_model.bones.get_tail_relative_position(original_bone.index)
                 )
-                if original_bone.is_tail_bone:
-                    # 表示先
-                    bone.bone_flg &= ~BoneFlg.TAIL_IS_BONE
-                    bone.tail_position = (
-                        original_matrixes[original_bone.name, 0].global_matrix
-                        * tail_relative_position
-                        - original_matrixes[original_bone.name, 0].position
-                    )
+                if bone.tail_index in model.bones:
+                    # 表示先ボーンがある場合はそこに繋ぐ
+                    bone.bone_flg |= BoneFlg.TAIL_IS_BONE
+                    bone.tail_index = model.bones[
+                        model.bones[bone.tail_index].name
+                    ].index
                 else:
-                    bone.tail_position = MVector3D()
+                    # 表示先ボーンがない場合、相対位置に変更
+                    bone.bone_flg &= ~BoneFlg.TAIL_IS_BONE
+                    bone.tail_position = tail_relative_position
+
                 if original_bone.has_fixed_axis:
                     # 軸制限
                     bone.fixed_axis = original_bone.fixed_axis.copy()
@@ -113,8 +113,164 @@ class IoUsecase:
                     ].index
                     bone.effect_factor = original_bone.effect_factor
 
+        if BoneNames.groove() not in original_model.bones:
+            # グルーブがなかったらセンターから再計算
+            model.bones[BoneNames.groove()].position = MVector3D(
+                0, original_model.bones[BoneNames.center()].position.y * 1.05, 0
+            )
+
+        if BoneNames.waist() not in original_model.bones:
+            # 腰がなかったら上半身と下半身の間
+            model.bones[BoneNames.waist()].position = (
+                model.bones[BoneNames.upper()].position
+                + model.bones[BoneNames.lower()].position
+            ) / 2
+
+        if BoneNames.upper2() not in original_model.bones:
+            # 上半身2がなかったら上半身と首の間
+            model.bones[BoneNames.upper2()].position = (
+                model.bones[BoneNames.upper()].position
+                + model.bones[BoneNames.neck()].position
+            ) / 2
+
+        if BoneNames.upper3() not in original_model.bones:
+            # 上半身3がなかったら上半身2と首の間
+            model.bones[BoneNames.upper3()].position = (
+                model.bones[BoneNames.upper2()].position
+                + model.bones[BoneNames.neck()].position
+            ) / 2
+
+        for direction in ("右", "左"):
+            # 肩Pは肩にあわせる
+            model.bones[
+                BoneNames.shoulder_p(direction)
+            ].position = original_model.bones[
+                BoneNames.shoulder(direction)
+            ].position.copy()
+            # 肩Cは腕にあわせる
+            model.bones[
+                BoneNames.shoulder_c(direction)
+            ].position = original_model.bones[BoneNames.arm(direction)].position.copy()
+            # 肩中点は肩根元と腕の間
+            model.bones[BoneNames.shoulder_center(direction)].position = (
+                model.bones[BoneNames.shoulder_root(direction)].position
+                + model.bones[BoneNames.arm(direction)].position
+            ) / 2
+
+            # 捩りボーンがなかったら削除
+            if BoneNames.wrist_twist(direction) not in original_model.bones:
+                for n in range(10):
+                    model.remove_bone(BoneNames.wrist_twist(direction, n))
+            if BoneNames.arm_twist(direction) not in original_model.bones:
+                for n in range(10):
+                    model.remove_bone(BoneNames.arm_twist(direction, n))
+            if BoneNames.thumb0(direction) not in original_model.bones:
+                # 親指0がなかったら親指1と手首の間
+                model.bones[BoneNames.thumb0(direction)].position = MVector3D(
+                    *np.average(
+                        [
+                            model.bones[BoneNames.wrist(direction)].position.vector,
+                            model.bones[BoneNames.thumb1(direction)].position.vector,
+                        ],
+                        weights=[0.2, 0.8],
+                        axis=0,
+                    )
+                )
+            # 手首先はひじと手首のベクトル
+            model.bones[BoneNames.wrist_tail(direction)].position = (
+                original_model.bones[BoneNames.wrist(direction)].position
+                + original_model.bones[
+                    BoneNames.elbow(direction)
+                ].tail_relative_position.normalized()
+            )
+            # 指先は指末端ボーンの表示先からコピー
+            model.bones[BoneNames.thumb_tail(direction)].position = (
+                original_model.bones[BoneNames.thumb2(direction)].position
+                + original_model.bones[
+                    BoneNames.thumb2(direction)
+                ].tail_relative_position
+            )
+            model.bones[BoneNames.index_tail(direction)].position = (
+                original_model.bones[BoneNames.index3(direction)].position
+                + original_model.bones[
+                    BoneNames.index3(direction)
+                ].tail_relative_position.copy()
+            )
+            model.bones[BoneNames.middle_tail(direction)].position = (
+                original_model.bones[BoneNames.middle3(direction)].position
+                + original_model.bones[
+                    BoneNames.middle3(direction)
+                ].tail_relative_position.copy()
+            )
+            model.bones[BoneNames.ring_tail(direction)].position = (
+                original_model.bones[BoneNames.ring3(direction)].position
+                + original_model.bones[
+                    BoneNames.ring3(direction)
+                ].tail_relative_position.copy()
+            )
+            model.bones[BoneNames.pinky_tail(direction)].position = (
+                original_model.bones[BoneNames.pinky3(direction)].position
+                + original_model.bones[
+                    BoneNames.pinky3(direction)
+                ].tail_relative_position.copy()
+            )
+
+            # 腰キャンセルボーンは足からコピー
+            model.bones[
+                BoneNames.waist_cancel(direction)
+            ].position = original_model.bones[BoneNames.leg(direction)].position.copy()
+
+            # Dボーンは付与親からコピー
+            model.bones[BoneNames.leg_d(direction)].position = original_model.bones[
+                BoneNames.leg(direction)
+            ].position.copy()
+            model.bones[BoneNames.knee_d(direction)].position = original_model.bones[
+                BoneNames.knee(direction)
+            ].position.copy()
+            model.bones[BoneNames.ankle_d(direction)].position = original_model.bones[
+                BoneNames.ankle(direction)
+            ].position.copy()
+
+            if BoneNames.leg_ik_parent(direction) not in original_model.bones:
+                # 足IK親がなかったら足IKから再計算
+                model.bones[
+                    BoneNames.leg_ik_parent(direction)
+                ].position = original_model.bones[
+                    BoneNames.leg_ik(direction)
+                ].position * MVector3D(
+                    1, 0, 1
+                )
+            if BoneNames.toe(direction) not in original_model.bones:
+                # つま先がなかったらつま先IKのターゲットボーンの位置
+                model.bones[BoneNames.toe(direction)].position = original_model.bones[
+                    original_model.bones[BoneNames.toe_ik(direction)].ik.bone_index
+                ].position.copy()
+            if BoneNames.toe_ex(direction) not in original_model.bones:
+                # 足先EXがなかったらつま先と足首の間
+                model.bones[BoneNames.toe_ex(direction)].position = MVector3D(
+                    *np.average(
+                        [
+                            model.bones[BoneNames.ankle(direction)].position.vector,
+                            model.bones[BoneNames.toe(direction)].position.vector,
+                        ],
+                        weights=[0.2, 0.8],
+                        axis=0,
+                    )
+                )
+
+        for bone in model.bones:
+            if (
+                bone.parent_index < 0
+                and bone.index != model.bones[BoneNames.root()].index
+            ):
+                bone.parent_index = model.bones[BoneNames.root()].index
+
+        sizing_display_slot = DisplaySlot(name=BoneNames.sizing_display_slot())
+        sizing_display_slot.is_system = True
+        model.display_slots.append(sizing_display_slot)
+
         # セットアップ
-        self.setup_model(sizing_idx, is_src, model)
+        model.setup()
 
         if 10 >= logger.total_level:
             # デバッグレベルの場合、モデルを出力する
@@ -129,406 +285,6 @@ class IoUsecase:
             ).save()
 
         return sizing_idx, digest, original_model, model
-
-    def setup_model(self, sizing_idx: int, is_src: bool, model: PmxModel) -> None:
-        logger.info(
-            "【No.{x}】サイジング追加セットアップ({m})",
-            x=sizing_idx + 1,
-            m=__("モーション作成元モデル" if is_src else "サイジング先モデル"),
-            decoration=MLogger.Decoration.LINE,
-        )
-
-        sizing_display_slot = DisplaySlot(name="SIZING")
-        sizing_display_slot.is_system = True
-        model.display_slots.append(sizing_display_slot)
-
-        root_bone = Bone(index=0, name=BoneNames.root())
-        root_bone.parent_index = -1
-        root_bone.is_system = True
-        root_bone.bone_flg |= (
-            BoneFlg.CAN_TRANSLATE
-            | BoneFlg.CAN_ROTATE
-            | BoneFlg.CAN_MANIPULATE
-            | BoneFlg.IS_VISIBLE
-        )
-
-        model.insert_bone(root_bone)
-        sizing_display_slot.references.append(
-            DisplaySlotReference(display_index=root_bone.index)
-        )
-
-        for bone in model.bones:
-            if bone.parent_index < 0 and bone.index != root_bone.index:
-                bone.parent_index = root_bone.index
-
-        for direction in ("左", "右"):
-            if not (
-                {
-                    BoneNames.shoulder_root(direction),
-                    BoneNames.shoulder(direction),
-                    BoneNames.arm(direction),
-                    BoneNames.wrist(direction),
-                }
-                - set(model.bones.names)
-            ):
-                # 肩中点追加 ---------------
-
-                shoulder_center_bone = Bone(
-                    index=model.bones[BoneNames.shoulder(direction)].index + 1,
-                    name=BoneNames.shoulder_center(direction),
-                )
-                shoulder_center_bone.parent_index = model.bones[
-                    BoneNames.shoulder(direction)
-                ].index
-                shoulder_center_bone.position = (
-                    model.bones[BoneNames.shoulder_root(direction)].position
-                    + model.bones[BoneNames.arm(direction)].position
-                ) / 2
-
-                shoulder_center_bone.is_system = True
-                shoulder_center_bone.bone_flg |= (
-                    BoneFlg.CAN_TRANSLATE
-                    | BoneFlg.CAN_ROTATE
-                    | BoneFlg.CAN_MANIPULATE
-                    | BoneFlg.IS_VISIBLE
-                )
-
-                model.insert_bone(shoulder_center_bone)
-                sizing_display_slot.references.append(
-                    DisplaySlotReference(display_index=shoulder_center_bone.index)
-                )
-
-                # ひじ回転追加 ---------------
-
-                elbow_rotate_bone = Bone(
-                    index=model.bones[BoneNames.elbow(direction)].index,
-                    name=BoneNames.elbow_rotate(direction),
-                )
-                elbow_rotate_bone.parent_index = model.bones[
-                    BoneNames.arm_twist(direction)
-                ].index
-                elbow_rotate_bone.position = (
-                    model.bones[BoneNames.elbow(direction)].position
-                    + (
-                        model.bones[BoneNames.elbow(direction)].position
-                        - model.bones[BoneNames.arm(direction)].position
-                    )
-                    .cross(
-                        MVector3D(
-                            0,
-                            0,
-                            -1
-                            * np.sign(
-                                model.bones[BoneNames.wrist(direction)].position.x
-                            ),
-                        )
-                    )
-                    .normalized()
-                )
-
-                elbow_rotate_bone.is_system = True
-                elbow_rotate_bone.bone_flg |= (
-                    BoneFlg.CAN_TRANSLATE
-                    | BoneFlg.CAN_ROTATE
-                    | BoneFlg.CAN_MANIPULATE
-                    | BoneFlg.IS_VISIBLE
-                    | BoneFlg.TAIL_IS_BONE
-                )
-                elbow_rotate_bone.tail_index = model.bones[
-                    BoneNames.elbow(direction)
-                ].index
-
-                model.insert_bone(elbow_rotate_bone)
-                sizing_display_slot.references.append(
-                    DisplaySlotReference(display_index=elbow_rotate_bone.index)
-                )
-
-                # ひじ中点追加 ---------------
-
-                elbow_center_bone = Bone(
-                    index=model.bones[BoneNames.elbow(direction)].index + 1,
-                    name=BoneNames.elbow_center(direction),
-                )
-                elbow_center_bone.parent_index = model.bones[
-                    BoneNames.elbow(direction)
-                ].index
-                elbow_center_bone.position = (
-                    model.bones[BoneNames.elbow(direction)].position
-                    + model.bones[BoneNames.wrist(direction)].position
-                ) / 2
-
-                elbow_center_bone.is_system = True
-                elbow_center_bone.bone_flg |= (
-                    BoneFlg.CAN_TRANSLATE
-                    | BoneFlg.CAN_ROTATE
-                    | BoneFlg.CAN_MANIPULATE
-                    | BoneFlg.IS_VISIBLE
-                )
-
-                model.insert_bone(elbow_center_bone)
-                sizing_display_slot.references.append(
-                    DisplaySlotReference(display_index=elbow_center_bone.index)
-                )
-
-                # 手首回転追加 ---------------
-
-                wrist_rotate_bone = Bone(
-                    index=model.bones[BoneNames.wrist(direction)].index,
-                    name=BoneNames.wrist_rotate(direction),
-                )
-                wrist_rotate_bone.parent_index = model.bones[
-                    BoneNames.wrist_twist(direction)
-                ].index
-                wrist_rotate_bone.position = (
-                    model.bones[BoneNames.wrist(direction)].position
-                    + (
-                        model.bones[BoneNames.wrist(direction)].position
-                        - model.bones[BoneNames.elbow(direction)].position
-                    )
-                    .cross(
-                        MVector3D(
-                            0,
-                            0,
-                            -1
-                            * np.sign(
-                                model.bones[BoneNames.wrist(direction)].position.x
-                            ),
-                        )
-                    )
-                    .normalized()
-                )
-
-                wrist_rotate_bone.is_system = True
-                wrist_rotate_bone.bone_flg |= (
-                    BoneFlg.CAN_TRANSLATE
-                    | BoneFlg.CAN_ROTATE
-                    | BoneFlg.CAN_MANIPULATE
-                    | BoneFlg.IS_VISIBLE
-                    | BoneFlg.TAIL_IS_BONE
-                )
-                wrist_rotate_bone.tail_index = model.bones[
-                    BoneNames.wrist(direction)
-                ].index
-
-                model.insert_bone(wrist_rotate_bone)
-                sizing_display_slot.references.append(
-                    DisplaySlotReference(display_index=wrist_rotate_bone.index)
-                )
-
-                # 手首先追加 ---------------
-
-                wrist_vector_qq = (
-                    (
-                        model.bones[BoneNames.wrist(direction)].position
-                        - model.bones[BoneNames.elbow(direction)].position
-                    )
-                    .to_local_matrix4x4()
-                    .to_quaternion()
-                )
-
-                wrist_tail_bone = Bone(
-                    index=model.bones[BoneNames.wrist(direction)].index + 1,
-                    name=BoneNames.wrist_tail(direction),
-                )
-                wrist_tail_bone.parent_index = model.bones[
-                    BoneNames.wrist(direction)
-                ].index
-                wrist_tail_bone.position = (
-                    model.bones[BoneNames.wrist(direction)].position
-                    # + (wrist_vector_qq * MVector3D(1, 0, 0))
-                    + (wrist_vector_qq * MVector3D(0, 0, 1))
-                )
-                wrist_tail_bone.is_system = True
-                wrist_tail_bone.bone_flg |= (
-                    BoneFlg.CAN_TRANSLATE
-                    | BoneFlg.CAN_ROTATE
-                    | BoneFlg.CAN_MANIPULATE
-                    | BoneFlg.IS_VISIBLE
-                )
-
-                model.insert_bone(wrist_tail_bone)
-                sizing_display_slot.references.append(
-                    DisplaySlotReference(display_index=wrist_tail_bone.index)
-                )
-
-                # 親指先 ---------------
-                if BoneNames.thumb2(direction) in model.bones:
-                    thumb_tail_bone = Bone(
-                        index=model.bones[BoneNames.thumb2(direction)].index + 1,
-                        name=BoneNames.thumb_tail(direction),
-                    )
-                    thumb_tail_bone.parent_index = model.bones[
-                        BoneNames.thumb2(direction)
-                    ].index
-                    thumb_tail_bone.position = model.bones[
-                        BoneNames.thumb2(direction)
-                    ].position + model.bones.get_tail_relative_position(
-                        model.bones[BoneNames.thumb2(direction)].index
-                    )
-                    thumb_tail_bone.is_system = True
-                    thumb_tail_bone.bone_flg |= (
-                        BoneFlg.CAN_TRANSLATE
-                        | BoneFlg.CAN_ROTATE
-                        | BoneFlg.CAN_MANIPULATE
-                        | BoneFlg.IS_VISIBLE
-                    )
-
-                    model.insert_bone(thumb_tail_bone)
-                    sizing_display_slot.references.append(
-                        DisplaySlotReference(display_index=thumb_tail_bone.index)
-                    )
-
-                # 人指先 ---------------
-                if BoneNames.index3(direction) in model.bones:
-                    index_tail_bone = Bone(
-                        index=model.bones[BoneNames.index3(direction)].index + 1,
-                        name=BoneNames.index_tail(direction),
-                    )
-                    index_tail_bone.parent_index = model.bones[
-                        BoneNames.index3(direction)
-                    ].index
-                    index_tail_bone.position = model.bones[
-                        BoneNames.index3(direction)
-                    ].position + model.bones.get_tail_relative_position(
-                        model.bones[BoneNames.index3(direction)].index
-                    )
-                    index_tail_bone.is_system = True
-                    index_tail_bone.bone_flg |= (
-                        BoneFlg.CAN_TRANSLATE
-                        | BoneFlg.CAN_ROTATE
-                        | BoneFlg.CAN_MANIPULATE
-                        | BoneFlg.IS_VISIBLE
-                    )
-
-                    model.insert_bone(index_tail_bone)
-                    sizing_display_slot.references.append(
-                        DisplaySlotReference(display_index=index_tail_bone.index)
-                    )
-
-                # 中指先 ---------------
-                if BoneNames.middle3(direction) in model.bones:
-                    middle_tail_bone = Bone(
-                        index=model.bones[BoneNames.middle3(direction)].index + 1,
-                        name=BoneNames.middle_tail(direction),
-                    )
-                    middle_tail_bone.parent_index = model.bones[
-                        BoneNames.middle3(direction)
-                    ].index
-                    middle_tail_bone.position = model.bones[
-                        BoneNames.middle3(direction)
-                    ].position + model.bones.get_tail_relative_position(
-                        model.bones[BoneNames.middle3(direction)].index
-                    )
-                    middle_tail_bone.is_system = True
-                    middle_tail_bone.bone_flg |= (
-                        BoneFlg.CAN_TRANSLATE
-                        | BoneFlg.CAN_ROTATE
-                        | BoneFlg.CAN_MANIPULATE
-                        | BoneFlg.IS_VISIBLE
-                    )
-
-                    model.insert_bone(middle_tail_bone)
-                    sizing_display_slot.references.append(
-                        DisplaySlotReference(display_index=middle_tail_bone.index)
-                    )
-
-                # 薬指先 ---------------
-                if BoneNames.ring3(direction) in model.bones:
-                    ring_tail_bone = Bone(
-                        index=model.bones[BoneNames.ring3(direction)].index + 1,
-                        name=BoneNames.ring_tail(direction),
-                    )
-                    ring_tail_bone.parent_index = model.bones[
-                        BoneNames.ring3(direction)
-                    ].index
-                    ring_tail_bone.position = model.bones[
-                        BoneNames.ring3(direction)
-                    ].position + model.bones.get_tail_relative_position(
-                        model.bones[BoneNames.ring3(direction)].index
-                    )
-                    ring_tail_bone.is_system = True
-                    ring_tail_bone.bone_flg |= (
-                        BoneFlg.CAN_TRANSLATE
-                        | BoneFlg.CAN_ROTATE
-                        | BoneFlg.CAN_MANIPULATE
-                        | BoneFlg.IS_VISIBLE
-                    )
-
-                    model.insert_bone(ring_tail_bone)
-                    sizing_display_slot.references.append(
-                        DisplaySlotReference(display_index=ring_tail_bone.index)
-                    )
-
-                # 小指先 ---------------
-                if BoneNames.pinky3(direction) in model.bones:
-                    pinky_tail_bone = Bone(
-                        index=model.bones[BoneNames.pinky3(direction)].index + 1,
-                        name=BoneNames.pinky_tail(direction),
-                    )
-                    pinky_tail_bone.parent_index = model.bones[
-                        BoneNames.pinky3(direction)
-                    ].index
-                    pinky_tail_bone.position = model.bones[
-                        BoneNames.pinky3(direction)
-                    ].position + model.bones.get_tail_relative_position(
-                        model.bones[BoneNames.pinky3(direction)].index
-                    )
-                    pinky_tail_bone.is_system = True
-                    pinky_tail_bone.bone_flg |= (
-                        BoneFlg.CAN_TRANSLATE
-                        | BoneFlg.CAN_ROTATE
-                        | BoneFlg.CAN_MANIPULATE
-                        | BoneFlg.IS_VISIBLE
-                    )
-
-                    model.insert_bone(pinky_tail_bone)
-                    sizing_display_slot.references.append(
-                        DisplaySlotReference(display_index=pinky_tail_bone.index)
-                    )
-
-        for direction in ("左", "右"):
-            if BoneNames.shoulder_p(direction) in model.bones:
-                model.bones[BoneNames.shoulder_p(direction)].parent_index = model.bones[
-                    BoneNames.shoulder_root(direction)
-                ].index
-            if BoneNames.shoulder(direction) in model.bones:
-                model.bones[BoneNames.shoulder(direction)].parent_index = model.bones[
-                    BoneNames.shoulder_root(direction)
-                ].index
-            if BoneNames.wrist_twist(direction) in model.bones:
-                model.bones[
-                    BoneNames.wrist_twist(direction)
-                ].parent_index = model.bones[BoneNames.elbow_center(direction)].index
-            elif BoneNames.wrist(direction) in model.bones:
-                model.bones[BoneNames.wrist(direction)].parent_index = model.bones[
-                    BoneNames.elbow_center(direction)
-                ].index
-            if BoneNames.wrist_tail(direction) in model.bones:
-                model.bones[BoneNames.wrist_tail(direction)].parent_index = model.bones[
-                    BoneNames.wrist(direction)
-                ].index
-            if BoneNames.thumb_tail(direction) in model.bones:
-                model.bones[BoneNames.thumb_tail(direction)].parent_index = model.bones[
-                    BoneNames.thumb2(direction)
-                ].index
-            if BoneNames.index_tail(direction) in model.bones:
-                model.bones[BoneNames.index_tail(direction)].parent_index = model.bones[
-                    BoneNames.index3(direction)
-                ].index
-            if BoneNames.middle_tail(direction) in model.bones:
-                model.bones[
-                    BoneNames.middle_tail(direction)
-                ].parent_index = model.bones[BoneNames.middle3(direction)].index
-            if BoneNames.ring_tail(direction) in model.bones:
-                model.bones[BoneNames.ring_tail(direction)].parent_index = model.bones[
-                    BoneNames.ring3(direction)
-                ].index
-            if BoneNames.pinky_tail(direction) in model.bones:
-                model.bones[BoneNames.pinky_tail(direction)].parent_index = model.bones[
-                    BoneNames.pinky3(direction)
-                ].index
-
-        model.setup()
 
     def load_model_no_copy(
         self, sizing_idx: int, model_path: str, cache_models: dict[str, PmxModel]

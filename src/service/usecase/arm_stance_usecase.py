@@ -1,13 +1,12 @@
 import os
 
 import numpy as np
-from numpy.linalg import inv
-from service.usecase.bone_names import SIZING_BONE_PREFIX, BoneNames
-
 from mlib.core.logger import MLogger
 from mlib.core.math import MMatrix4x4
 from mlib.pmx.pmx_collection import PmxModel
 from mlib.vmd.vmd_collection import VmdMotion
+from numpy.linalg import inv
+from service.usecase.bone_names import BoneNames
 
 logger = MLogger(os.path.basename(__file__), level=1)
 __ = logger.get_text
@@ -48,23 +47,8 @@ class ArmStanceUsecase:
             )
             return sizing_idx, motion
 
-        left_finger_bone_names = [
-            bone_name
-            for bone_name in BoneNames.fingers("左")
-            if bone_name in src_model.bones and bone_name in dest_model.bones
-        ]
-        right_finger_bone_names = [
-            bone_name
-            for bone_name in BoneNames.fingers("右")
-            if bone_name in src_model.bones and bone_name in dest_model.bones
-        ]
-
         offset_from_slope_matrixes, offset_to_slope_matrixes = self.get_slope_qq(
-            src_model,
-            dest_model,
-            motion,
-            left_finger_bone_names,
-            right_finger_bone_names,
+            src_model, dest_model, motion
         )
 
         logger.info(
@@ -72,13 +56,16 @@ class ArmStanceUsecase:
             i=sizing_idx + 1,
             a=MMatrix4x4(offset_to_slope_matrixes[BoneNames.arm("左")])
             .to_quaternion()
-            .to_euler_degrees(),
+            .to_euler_degrees()
+            .mmd,
             e=MMatrix4x4(offset_to_slope_matrixes[BoneNames.elbow("左")])
             .to_quaternion()
-            .to_euler_degrees(),
+            .to_euler_degrees()
+            .mmd,
             w=MMatrix4x4(offset_to_slope_matrixes[BoneNames.wrist("左")])
             .to_quaternion()
-            .to_euler_degrees(),
+            .to_euler_degrees()
+            .mmd,
             decoration=MLogger.Decoration.LINE,
         )
 
@@ -86,7 +73,7 @@ class ArmStanceUsecase:
         to_offsets: list[np.ndarray] = []
         rotations: list[np.ndarray] = []
         for bone_name in (
-            ARM_BONE_NAMES + left_finger_bone_names + right_finger_bone_names
+            ARM_BONE_NAMES + BoneNames.fingers("左") + BoneNames.fingers("右")
         ):
             if not (
                 bone_name in motion.bones
@@ -109,7 +96,7 @@ class ArmStanceUsecase:
             )
             n = 0
             for bone_name in (
-                ARM_BONE_NAMES + left_finger_bone_names + right_finger_bone_names
+                ARM_BONE_NAMES + BoneNames.fingers("左") + BoneNames.fingers("右")
             ):
                 if not (
                     bone_name in motion.bones
@@ -128,21 +115,8 @@ class ArmStanceUsecase:
         src_model: PmxModel,
         dest_model: PmxModel,
         motion: VmdMotion,
-        left_finger_bone_names: list[str],
-        right_finger_bone_names: list[str],
     ) -> tuple[dict[str, np.ndarray], dict[str, np.ndarray]]:
         """スタンス補正用比率算出"""
-        src_matrixes = VmdMotion().animate_bone(
-            [0],
-            src_model,
-            ARM_BONE_NAMES + left_finger_bone_names + right_finger_bone_names,
-        )
-        dest_matrixes = VmdMotion().animate_bone(
-            [0],
-            dest_model,
-            ARM_BONE_NAMES + left_finger_bone_names + right_finger_bone_names,
-        )
-
         offset_from_slope_matrixes: dict[str, np.ndarray] = {}
         offset_to_slope_matrixes: dict[str, np.ndarray] = {}
 
@@ -151,19 +125,15 @@ class ArmStanceUsecase:
                 ("", "腕", "ひじ"),
                 ("腕", "ひじ", "手首"),
                 ("ひじ", "手首", "中指１"),
-                ("", "親指１", "親先"),
-                ("", "人指１", "人先"),
-                ("", "中指１", "中先"),
-                ("", "薬指１", "薬先"),
-                ("", "小指１", "小先"),
+                ("", "親指１", "親指先"),
+                ("", "人指１", "人指先"),
+                ("", "中指１", "中指先"),
+                ("", "薬指１", "薬指先"),
+                ("", "小指１", "小指先"),
             ):
                 from_bone_name = f"{direction}{from_bone_suffix}"
                 target_bone_name = f"{direction}{target_bone_suffix}"
-                to_bone_name = (
-                    f"{direction}{to_bone_suffix}"
-                    if to_bone_suffix[-1] != "先"
-                    else f"{SIZING_BONE_PREFIX}{direction}{to_bone_suffix}"
-                )
+                to_bone_name = f"{direction}{to_bone_suffix}"
 
                 if (
                     from_bone_suffix
@@ -189,15 +159,15 @@ class ArmStanceUsecase:
                         offset_to_slope_matrixes[target_bone_name] = np.eye(4)
                     continue
 
-                src_from_bone_position = src_matrixes[target_bone_name, 0].position
-                src_to_bone_position = src_matrixes[to_bone_name, 0].position
+                src_from_bone_position = src_model.bones[target_bone_name].position
+                src_to_bone_position = src_model.bones[to_bone_name].position
                 src_bone_vector = (
                     src_to_bone_position - src_from_bone_position
                 ).normalized()
                 src_slope_qq = src_bone_vector.to_local_matrix4x4().to_quaternion()
 
-                dest_from_bone_position = dest_matrixes[target_bone_name, 0].position
-                dest_to_bone_position = dest_matrixes[to_bone_name, 0].position
+                dest_from_bone_position = dest_model.bones[target_bone_name].position
+                dest_to_bone_position = dest_model.bones[to_bone_name].position
                 dest_bone_vector = (
                     dest_to_bone_position - dest_from_bone_position
                 ).normalized()
