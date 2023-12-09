@@ -80,6 +80,10 @@ class BoneNames:
         return f"{direction}ひじ"
 
     @staticmethod
+    def elbow_vertical(direction: str) -> str:
+        return f"{direction}ひじ垂線"
+
+    @staticmethod
     def elbow_ik_parent(direction: str) -> str:
         return f"{direction}ひじIK親"
 
@@ -123,9 +127,9 @@ class BoneNames:
     def wrist_tail(direction: str) -> str:
         return f"{direction}手首先"
 
-    # @staticmethod
-    # def wrist_rotate(direction: str) -> str:
-    #     return f"{direction}手首回転"
+    @staticmethod
+    def wrist_vertical(direction: str) -> str:
+        return f"{direction}手首垂線"
 
     @staticmethod
     def wrist_ik_parent(direction: str) -> str:
@@ -134,6 +138,18 @@ class BoneNames:
     @staticmethod
     def wrist_ik(direction: str) -> str:
         return f"{direction}手首IK"
+
+    @staticmethod
+    def wrist_direction(direction: str) -> str:
+        return f"{direction}手首方向"
+
+    @staticmethod
+    def wrist_direction_tail(direction: str) -> str:
+        return f"{direction}手首方向先"
+
+    @staticmethod
+    def wrist_direction_ik(direction: str) -> str:
+        return f"{direction}手首方向IK"
 
     @staticmethod
     def thumb0(direction: str) -> str:

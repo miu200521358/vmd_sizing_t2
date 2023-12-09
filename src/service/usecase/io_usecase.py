@@ -176,6 +176,22 @@ class IoUsecase:
                         axis=0,
                     )
                 )
+            # ひじ垂線はひじと垂直
+            model.bones[
+                BoneNames.elbow_vertical(direction)
+            ].position = original_model.bones[
+                BoneNames.elbow(direction)
+            ].position + MVector3D(
+                0, 0, 1
+            )
+            # 手首垂線は手首と垂直
+            model.bones[
+                BoneNames.wrist_vertical(direction)
+            ].position = original_model.bones[
+                BoneNames.wrist(direction)
+            ].position + MVector3D(
+                0, 0, 1
+            )
             # 手首先はひじと手首のベクトル
             model.bones[BoneNames.wrist_tail(direction)].position = (
                 original_model.bones[BoneNames.wrist(direction)].position
