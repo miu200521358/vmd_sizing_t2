@@ -282,45 +282,41 @@ class ArmTwistUsecase:
                 fno
             ]
             arm_rotate_ik_bf.register = True
-            arm_rotate_ik_bf.position = (
-                after_matrixes[
-                    BoneNames.arm_rotate_ik(direction), 0
-                ].global_matrix.inverse()
-                * after_matrixes[BoneNames.elbow_vertical(direction), 0].position
+            arm_rotate_ik_bf.position = after_matrixes[
+                BoneNames.arm_rotate_ik(direction), 0
+            ].global_matrix.inverse() * (
+                dest_initial_matrixes[BoneNames.elbow(direction), fno].position
+                + (
+                    (
+                        dest_initial_matrixes[BoneNames.arm(direction), fno].position
+                        - dest_initial_matrixes[
+                            BoneNames.elbow(direction), fno
+                        ].position
+                    ).normalized()
+                )
+                .cross(
+                    (
+                        (
+                            dest_initial_matrixes[
+                                BoneNames.arm(direction), fno
+                            ].position
+                            - dest_initial_matrixes[
+                                BoneNames.elbow(direction), fno
+                            ].position
+                        ).normalized()
+                    ).cross(
+                        (
+                            dest_initial_matrixes[
+                                BoneNames.wrist(direction), fno
+                            ].position
+                            - dest_initial_matrixes[
+                                BoneNames.elbow(direction), fno
+                            ].position
+                        ).normalized()
+                    )
+                )
+                .normalized()
             )
-            # (
-            #     dest_initial_matrixes[BoneNames.elbow(direction), fno].position
-            #     + (
-            #         (
-            #             dest_initial_matrixes[BoneNames.arm(direction), fno].position
-            #             - dest_initial_matrixes[
-            #                 BoneNames.elbow(direction), fno
-            #             ].position
-            #         ).normalized()
-            #     )
-            #     .cross(
-            #         (
-            #             (
-            #                 dest_initial_matrixes[
-            #                     BoneNames.arm(direction), fno
-            #                 ].position
-            #                 - dest_initial_matrixes[
-            #                     BoneNames.elbow(direction), fno
-            #                 ].position
-            #             ).normalized()
-            #         ).cross(
-            #             (
-            #                 dest_initial_matrixes[
-            #                     BoneNames.wrist(direction), fno
-            #                 ].position
-            #                 - dest_initial_matrixes[
-            #                     BoneNames.elbow(direction), fno
-            #                 ].position
-            #             ).normalized()
-            #         )
-            #     )
-            #     .normalized()
-            # )
             dest_motion.insert_bone_frame(arm_rotate_ik_bf)
 
             # ■ --------------
@@ -474,6 +470,7 @@ class ArmTwistUsecase:
             )
 
             # ひじ回転(手首から垂直に出たIKターゲット位置)
+
             elbow_rotate_ik_bf = dest_motion.bones[
                 BoneNames.elbow_rotate_ik(direction)
             ][fno]
@@ -482,7 +479,9 @@ class ArmTwistUsecase:
                 after_matrixes[
                     BoneNames.elbow_rotate_ik(direction), 0
                 ].global_matrix.inverse()
-                * after_matrixes[BoneNames.wrist_vertical(direction), 0].position
+                * dest_initial_matrixes[
+                    BoneNames.wrist_vertical(direction), fno
+                ].position
             )
             dest_motion.insert_bone_frame(elbow_rotate_ik_bf)
 
