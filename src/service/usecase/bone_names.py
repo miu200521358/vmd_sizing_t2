@@ -44,6 +44,10 @@ class BoneNames:
         return f"{direction}腕捩" if index == 0 else f"{direction}腕捩{index}"
 
     @staticmethod
+    def arm_twist_vertical(direction: str):
+        return f"{direction}腕捩垂線"
+
+    @staticmethod
     def arm_ik_parent(direction: str) -> str:
         return f"{direction}腕IK親"
 
@@ -120,6 +124,10 @@ class BoneNames:
         return f"{direction}手捩" if index == 0 else f"{direction}手捩{index}"
 
     @staticmethod
+    def wrist_twist_vertical(direction: str):
+        return f"{direction}手捩垂線"
+
+    @staticmethod
     def wrist(direction: str) -> str:
         return f"{direction}手首"
 
@@ -138,6 +146,18 @@ class BoneNames:
     @staticmethod
     def wrist_ik(direction: str) -> str:
         return f"{direction}手首IK"
+
+    @staticmethod
+    def wrist_rotate(direction: str) -> str:
+        return f"{direction}手首回転"
+
+    @staticmethod
+    def wrist_rotate_tail(direction: str) -> str:
+        return f"{direction}手首回転先"
+
+    @staticmethod
+    def wrist_rotate_ik(direction: str) -> str:
+        return f"{direction}手首回転IK"
 
     @staticmethod
     def wrist_direction(direction: str) -> str:

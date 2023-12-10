@@ -190,6 +190,32 @@ class IoUsecase:
                     )
                 )
 
+            # 腕捩垂線は腕捩と垂直
+            arm_twist_vertical_relative_position = (
+                (
+                    original_model.bones[BoneNames.elbow(direction)].position
+                    - original_model.bones[BoneNames.arm(direction)].position
+                )
+                .cross(
+                    MVector3D(
+                        0,
+                        1
+                        * np.sign(
+                            original_model.bones[BoneNames.elbow(direction)].position.x
+                        ),
+                        0,
+                    )
+                )
+                .normalized()
+            )
+            model.bones[BoneNames.arm_twist_vertical(direction)].position = (
+                model.bones[BoneNames.arm_twist(direction)].position
+                + arm_twist_vertical_relative_position
+            )
+            model.bones[
+                BoneNames.arm_twist_vertical(direction)
+            ].tail_position = -arm_twist_vertical_relative_position
+
             # ひじ垂線はひじと垂直
             elbow_vertical_relative_position = (
                 (
@@ -215,6 +241,32 @@ class IoUsecase:
             model.bones[
                 BoneNames.elbow_vertical(direction)
             ].tail_position = -elbow_vertical_relative_position
+
+            # 手捩垂線は手捩と垂直
+            wrist_twist_vertical_relative_position = (
+                (
+                    original_model.bones[BoneNames.wrist(direction)].position
+                    - original_model.bones[BoneNames.elbow(direction)].position
+                )
+                .cross(
+                    MVector3D(
+                        0,
+                        1
+                        * np.sign(
+                            original_model.bones[BoneNames.wrist(direction)].position.x
+                        ),
+                        0,
+                    )
+                )
+                .normalized()
+            )
+            model.bones[BoneNames.wrist_twist_vertical(direction)].position = (
+                model.bones[BoneNames.wrist_twist(direction)].position
+                + wrist_twist_vertical_relative_position
+            )
+            model.bones[
+                BoneNames.wrist_twist_vertical(direction)
+            ].tail_position = -wrist_twist_vertical_relative_position
 
             # 手首垂線は手首と垂直
             wrist_vertical_relative_position = (
