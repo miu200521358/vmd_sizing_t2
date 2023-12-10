@@ -157,13 +157,26 @@ class IoUsecase:
                 + model.bones[BoneNames.arm(direction)].position
             ) / 2
 
-            # 捩りボーンがなかったら削除
-            if BoneNames.wrist_twist(direction) not in original_model.bones:
-                for n in range(10):
-                    model.remove_bone(BoneNames.wrist_twist(direction, n))
+            # 捩りボーンがなかったら中間に配置
             if BoneNames.arm_twist(direction) not in original_model.bones:
-                for n in range(10):
-                    model.remove_bone(BoneNames.arm_twist(direction, n))
+                model.bones[BoneNames.arm_twist(direction)].position = (
+                    model.bones[BoneNames.elbow(direction)].position
+                    + model.bones[BoneNames.arm(direction)].position
+                ) / 2
+                model.bones[BoneNames.arm_twist(direction)].fixed_axis = (
+                    model.bones[BoneNames.elbow(direction)].position
+                    - model.bones[BoneNames.arm(direction)].position
+                ).normalized()
+            if BoneNames.wrist_twist(direction) not in original_model.bones:
+                model.bones[BoneNames.wrist_twist(direction)].position = (
+                    model.bones[BoneNames.wrist(direction)].position
+                    + model.bones[BoneNames.elbow(direction)].position
+                ) / 2
+                model.bones[BoneNames.wrist_twist(direction)].fixed_axis = (
+                    model.bones[BoneNames.wrist(direction)].position
+                    - model.bones[BoneNames.elbow(direction)].position
+                ).normalized()
+
             if BoneNames.thumb0(direction) not in original_model.bones:
                 # 親指0がなかったら親指1と手首の間
                 model.bones[BoneNames.thumb0(direction)].position = MVector3D(
@@ -176,22 +189,59 @@ class IoUsecase:
                         axis=0,
                     )
                 )
+
             # ひじ垂線はひじと垂直
+            elbow_vertical_relative_position = (
+                (
+                    original_model.bones[BoneNames.elbow(direction)].position
+                    - original_model.bones[BoneNames.arm(direction)].position
+                )
+                .cross(
+                    MVector3D(
+                        0,
+                        0,
+                        -1
+                        * np.sign(
+                            original_model.bones[BoneNames.elbow(direction)].position.x
+                        ),
+                    )
+                )
+                .normalized()
+            )
+            model.bones[BoneNames.elbow_vertical(direction)].position = (
+                original_model.bones[BoneNames.elbow(direction)].position
+                + elbow_vertical_relative_position
+            )
             model.bones[
                 BoneNames.elbow_vertical(direction)
-            ].position = original_model.bones[
-                BoneNames.elbow(direction)
-            ].position + MVector3D(
-                0, 0, 1
-            )
+            ].tail_position = -elbow_vertical_relative_position
+
             # 手首垂線は手首と垂直
+            wrist_vertical_relative_position = (
+                (
+                    original_model.bones[BoneNames.wrist(direction)].position
+                    - original_model.bones[BoneNames.elbow(direction)].position
+                )
+                .cross(
+                    MVector3D(
+                        0,
+                        0,
+                        -1
+                        * np.sign(
+                            original_model.bones[BoneNames.wrist(direction)].position.x
+                        ),
+                    )
+                )
+                .normalized()
+            )
+            model.bones[BoneNames.wrist_vertical(direction)].position = (
+                original_model.bones[BoneNames.wrist(direction)].position
+                + wrist_vertical_relative_position
+            )
             model.bones[
                 BoneNames.wrist_vertical(direction)
-            ].position = original_model.bones[
-                BoneNames.wrist(direction)
-            ].position + MVector3D(
-                0, 0, 1
-            )
+            ].tail_position = -wrist_vertical_relative_position
+
             # 手首先はひじと手首のベクトル
             model.bones[BoneNames.wrist_tail(direction)].position = (
                 original_model.bones[BoneNames.wrist(direction)].position

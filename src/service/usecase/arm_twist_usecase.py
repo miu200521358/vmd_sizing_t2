@@ -113,7 +113,7 @@ class ArmTwistUsecase:
             )
 
             # --------------
-            # ひじの捩りを取得
+            # ひじの捩りを除いた角度を取得
             elbow_bf = dest_motion.bones[BoneNames.elbow(direction)][fno]
             _, _, _, elbow_yz_qq = dest_initial_matrixes[
                 BoneNames.elbow(direction), fno
@@ -181,33 +181,6 @@ class ArmTwistUsecase:
             wrist_direction_ik_bf.register = True
             dest_motion.insert_bone_frame(wrist_direction_ik_bf)
 
-        # 処理対象ボーン名取得
-        target_bone_names = dest_motion.bones.get_animate_bone_names(
-            dest_model,
-            [
-                BoneNames.arm_direction_ik(direction),
-                BoneNames.arm_rotate_ik(direction),
-                BoneNames.elbow_direction_ik(direction),
-                BoneNames.elbow_rotate_ik(direction),
-                BoneNames.wrist_direction_ik(direction),
-                BoneNames.arm_direction_tail(direction),
-                BoneNames.arm_rotate_tail(direction),
-                BoneNames.elbow_direction_tail(direction),
-                BoneNames.elbow_rotate_tail(direction),
-                BoneNames.wrist_direction_tail(direction),
-                BoneNames.elbow_vertical(direction),
-                BoneNames.wrist_vertical(direction),
-                BoneNames.wrist_tail(direction),
-            ],
-        )
-
-        # 処理対象ボーンの行列取得
-        (
-            bone_dict,
-            bone_offset_matrixes,
-            bone_pos_matrixes,
-        ) = dest_motion.bones.create_bone_matrixes(dest_model, target_bone_names)
-
         for fidx, fno in enumerate(fnos):
             logger.count(
                 "【No.{x}】【{d}】捩り分散",
@@ -218,40 +191,15 @@ class ArmTwistUsecase:
                 display_block=50,
             )
 
-            # モーションボーンの初期値を取得
-            (
-                is_motion_identity_poses,
-                is_motion_identity_qqs,
-                is_motion_identity_scales,
-                is_motion_identity_local_poses,
-                is_motion_identity_local_qqs,
-                is_motion_identity_local_scales,
-                motion_bone_poses,
-                motion_bone_qqs,
-                motion_bone_scales,
-                motion_bone_local_poses,
-                motion_bone_local_qqs,
-                motion_bone_local_scales,
-                motion_bone_fk_qqs,
-            ) = dest_motion.bones.get_bone_matrixes(
-                [fno],
-                dest_model,
-                target_bone_names,
-                out_fno_log=False,
-            )
-
             # --------------
 
             # 腕方向(ひじ位置)
             arm_direction_ik_bf = dest_motion.bones[
                 BoneNames.arm_direction_ik(direction)
             ][fno]
-            arm_direction_ik_bf.position = (
-                dest_initial_matrixes[
-                    BoneNames.arm_direction_ik(direction), fno
-                ].global_matrix.inverse()
-                * dest_initial_matrixes[BoneNames.elbow(direction), fno].position
-            )
+            arm_direction_ik_bf.position = dest_initial_matrixes[
+                BoneNames.elbow(direction), fno
+            ].position
             dest_motion.insert_bone_frame(arm_direction_ik_bf)
 
             # # ■ --------------
@@ -288,47 +236,23 @@ class ArmTwistUsecase:
             arm_bf.rotation = ik_qqs[
                 dest_model.bones[BoneNames.arm_direction(direction)].index
             ]
-            motion_bone_qqs[
-                0, dest_model.bones[BoneNames.arm_direction(direction)].index
-            ] = motion_bone_qqs[
-                0, dest_model.bones[BoneNames.arm(direction)].index
-            ] = arm_bf.rotation.to_matrix4x4().vector
             dest_motion.insert_bone_frame(arm_bf)
 
             # 腕方向 結果解決後の行列取得
-            after_matrixes = dest_motion.bones.calc_bone_matrixes(
-                [fno],
-                dest_model,
-                bone_dict,
-                bone_offset_matrixes,
-                bone_pos_matrixes,
-                is_motion_identity_poses,
-                is_motion_identity_qqs,
-                is_motion_identity_scales,
-                is_motion_identity_local_poses,
-                is_motion_identity_local_qqs,
-                is_motion_identity_local_scales,
-                motion_bone_poses,
-                motion_bone_qqs,
-                motion_bone_scales,
-                motion_bone_local_poses,
-                motion_bone_local_qqs,
-                motion_bone_local_scales,
-                motion_bone_fk_qqs,
-                out_fno_log=False,
+            after_matrixes = dest_motion.animate_bone(
+                [fno], dest_model, [BoneNames.elbow(direction)]
             )
 
             # 腕回転(ひじから垂直に出たIKターゲット位置)
             arm_rotate_ik_bf = dest_motion.bones[BoneNames.arm_rotate_ik(direction)][
                 fno
             ]
-            arm_rotate_ik_bf.position = (
-                after_matrixes[
-                    BoneNames.arm_rotate_ik(direction), fno
-                ].global_matrix.inverse()
-                * dest_initial_matrixes[
-                    BoneNames.elbow_vertical(direction), fno
-                ].position
+            # ひじ垂線が最終的に初期値になるよう、配置
+            arm_rotate_ik_bf.position = after_matrixes[
+                BoneNames.elbow(direction), fno
+            ].position + (
+                dest_initial_matrixes[BoneNames.elbow_vertical(direction), fno].position
+                - dest_initial_matrixes[BoneNames.elbow(direction), fno].position
             )
             dest_motion.insert_bone_frame(arm_rotate_ik_bf)
 
@@ -360,11 +284,6 @@ class ArmTwistUsecase:
             arm_twist_bf.rotation = ik_qqs[
                 dest_model.bones[BoneNames.arm_rotate(direction)].index
             ]
-            motion_bone_qqs[
-                0, dest_model.bones[BoneNames.arm_rotate(direction)].index
-            ] = motion_bone_qqs[
-                0, dest_model.bones[BoneNames.arm_twist(direction)].index
-            ] = arm_bf.rotation.to_matrix4x4().vector
             dest_motion.insert_bone_frame(arm_twist_bf)
 
             # ひじ方向にYひじを入れておく
@@ -382,12 +301,9 @@ class ArmTwistUsecase:
             elbow_direction_ik_bf = dest_motion.bones[
                 BoneNames.elbow_direction_ik(direction)
             ][fno]
-            elbow_direction_ik_bf.position = (
-                dest_initial_matrixes[
-                    BoneNames.elbow_direction_ik(direction), fno
-                ].global_matrix.inverse()
-                * dest_initial_matrixes[BoneNames.wrist(direction), fno].position
-            )
+            elbow_direction_ik_bf.position = dest_initial_matrixes[
+                BoneNames.wrist(direction), fno
+            ].position
             dest_motion.insert_bone_frame(elbow_direction_ik_bf)
 
             # # ■ --------------
@@ -420,48 +336,23 @@ class ArmTwistUsecase:
             elbow_bf.rotation = ik_qqs[
                 dest_model.bones[BoneNames.elbow_direction(direction)].index
             ]
-            motion_bone_qqs[
-                0, dest_model.bones[BoneNames.elbow_direction(direction)].index
-            ] = motion_bone_qqs[
-                0, dest_model.bones[BoneNames.elbow(direction)].index
-            ] = elbow_bf.rotation.to_matrix4x4().vector
             dest_motion.insert_bone_frame(elbow_bf)
 
             # ひじ方向 結果解決後の行列取得
-            after_matrixes = dest_motion.bones.calc_bone_matrixes(
-                [fno],
-                dest_model,
-                bone_dict,
-                bone_offset_matrixes,
-                bone_pos_matrixes,
-                is_motion_identity_poses,
-                is_motion_identity_qqs,
-                is_motion_identity_scales,
-                is_motion_identity_local_poses,
-                is_motion_identity_local_qqs,
-                is_motion_identity_local_scales,
-                motion_bone_poses,
-                motion_bone_qqs,
-                motion_bone_scales,
-                motion_bone_local_poses,
-                motion_bone_local_qqs,
-                motion_bone_local_scales,
-                motion_bone_fk_qqs,
-                out_fno_log=False,
+            after_matrixes = dest_motion.animate_bone(
+                [fno], dest_model, [BoneNames.wrist(direction)]
             )
 
             # ひじ回転(手首から垂直に出たIKターゲット位置)
-
             elbow_rotate_ik_bf = dest_motion.bones[
                 BoneNames.elbow_rotate_ik(direction)
             ][fno]
-            elbow_rotate_ik_bf.position = (
-                after_matrixes[
-                    BoneNames.elbow_rotate_ik(direction), fno
-                ].global_matrix.inverse()
-                * dest_initial_matrixes[
-                    BoneNames.wrist_vertical(direction), fno
-                ].position
+            # 手首垂線が最終的に初期値になるよう、配置
+            elbow_rotate_ik_bf.position = after_matrixes[
+                BoneNames.wrist(direction), fno
+            ].position + (
+                dest_initial_matrixes[BoneNames.wrist_vertical(direction), fno].position
+                - dest_initial_matrixes[BoneNames.wrist(direction), fno].position
             )
             dest_motion.insert_bone_frame(elbow_rotate_ik_bf)
 
@@ -493,22 +384,23 @@ class ArmTwistUsecase:
             wrist_twist_bf.rotation = ik_qqs[
                 dest_model.bones[BoneNames.elbow_rotate(direction)].index
             ]
-            motion_bone_qqs[
-                0, dest_model.bones[BoneNames.elbow_rotate(direction)].index
-            ] = motion_bone_qqs[
-                0, dest_model.bones[BoneNames.wrist_twist(direction)].index
-            ] = wrist_twist_bf.rotation.to_matrix4x4().vector
             dest_motion.insert_bone_frame(wrist_twist_bf)
+
+            # ひじ回転 結果解決後の行列取得
+            after_matrixes = dest_motion.animate_bone(
+                [fno], dest_model, [BoneNames.wrist_tail(direction)]
+            )
 
             # 手首方向(手首先位置)
             wrist_direction_ik_bf = dest_motion.bones[
                 BoneNames.wrist_direction_ik(direction)
             ][fno]
-            wrist_direction_ik_bf.position = (
-                dest_initial_matrixes[
-                    BoneNames.wrist_direction_ik(direction), fno
-                ].global_matrix.inverse()
-                * dest_initial_matrixes[BoneNames.wrist_tail(direction), fno].position
+            # 手首先が最終的に初期値になるよう、配置
+            wrist_direction_ik_bf.position = after_matrixes[
+                BoneNames.wrist(direction), fno
+            ].position + (
+                dest_initial_matrixes[BoneNames.wrist_tail(direction), fno].position
+                - dest_initial_matrixes[BoneNames.wrist(direction), fno].position
             )
             dest_motion.insert_bone_frame(wrist_direction_ik_bf)
 
@@ -634,7 +526,7 @@ class ArmTwistUsecase:
                 index=arm_direction_tail_bone.index + 1,
                 name=BoneNames.arm_direction_ik(direction),
             )
-            arm_direction_ik_bone.position = arm_direction_tail_bone.position.copy()
+            arm_direction_ik_bone.position = MVector3D()
             arm_direction_ik_bone.is_system = True
             arm_direction_ik_bone.bone_flg |= (
                 BoneFlg.IS_IK
@@ -721,7 +613,7 @@ class ArmTwistUsecase:
                 index=arm_rotate_tail_bone.index + 1,
                 name=BoneNames.arm_rotate_ik(direction),
             )
-            arm_rotate_ik_bone.position = arm_rotate_tail_bone.position.copy()
+            arm_rotate_ik_bone.position = MVector3D()
             arm_rotate_ik_bone.is_system = True
             arm_rotate_ik_bone.bone_flg |= (
                 BoneFlg.IS_IK
@@ -801,7 +693,7 @@ class ArmTwistUsecase:
                 index=elbow_direction_tail_bone.index + 1,
                 name=BoneNames.elbow_direction_ik(direction),
             )
-            elbow_direction_ik_bone.position = elbow_direction_tail_bone.position.copy()
+            elbow_direction_ik_bone.position = MVector3D()
             elbow_direction_ik_bone.is_system = True
             elbow_direction_ik_bone.bone_flg |= (
                 BoneFlg.IS_IK
@@ -896,7 +788,7 @@ class ArmTwistUsecase:
                 index=elbow_rotate_tail_bone.index + 1,
                 name=BoneNames.elbow_rotate_ik(direction),
             )
-            elbow_rotate_ik_bone.position = elbow_rotate_tail_bone.position.copy()
+            elbow_rotate_ik_bone.position = MVector3D()
             elbow_rotate_ik_bone.is_system = True
             elbow_rotate_ik_bone.bone_flg |= (
                 BoneFlg.IS_IK
@@ -976,7 +868,7 @@ class ArmTwistUsecase:
                 index=wrist_direction_tail_bone.index + 1,
                 name=BoneNames.wrist_direction_ik(direction),
             )
-            wrist_direction_ik_bone.position = wrist_direction_tail_bone.position.copy()
+            wrist_direction_ik_bone.position = MVector3D()
             wrist_direction_ik_bone.is_system = True
             wrist_direction_ik_bone.bone_flg |= (
                 BoneFlg.IS_IK
@@ -1016,7 +908,7 @@ class ArmTwistUsecase:
 
             ik_model.bones[
                 BoneNames.arm_direction_ik(direction)
-            ].parent_index = ik_model.bones[BoneNames.shoulder_c(direction)].index
+            ].parent_index = ik_model.bones[BoneNames.root()].index
 
             # 腕回転
             ik_model.bones[
@@ -1029,7 +921,7 @@ class ArmTwistUsecase:
 
             ik_model.bones[
                 BoneNames.arm_rotate_ik(direction)
-            ].parent_index = ik_model.bones[BoneNames.shoulder_c(direction)].index
+            ].parent_index = ik_model.bones[BoneNames.root()].index
 
             # ひじ方向
             ik_model.bones[
@@ -1042,7 +934,7 @@ class ArmTwistUsecase:
 
             ik_model.bones[
                 BoneNames.elbow_direction_ik(direction)
-            ].parent_index = ik_model.bones[BoneNames.shoulder_c(direction)].index
+            ].parent_index = ik_model.bones[BoneNames.root()].index
 
             # ひじ回転
             ik_model.bones[
@@ -1055,7 +947,7 @@ class ArmTwistUsecase:
 
             ik_model.bones[
                 BoneNames.elbow_rotate_ik(direction)
-            ].parent_index = ik_model.bones[BoneNames.shoulder_c(direction)].index
+            ].parent_index = ik_model.bones[BoneNames.root()].index
 
             # 手首方向
             ik_model.bones[
@@ -1068,7 +960,7 @@ class ArmTwistUsecase:
 
             ik_model.bones[
                 BoneNames.wrist_direction_ik(direction)
-            ].parent_index = ik_model.bones[BoneNames.shoulder_c(direction)].index
+            ].parent_index = ik_model.bones[BoneNames.root()].index
 
             # ひじの親は腕捩
             ik_model.bones[BoneNames.elbow(direction)].parent_index = ik_model.bones[
@@ -1076,16 +968,14 @@ class ArmTwistUsecase:
             ].index
 
             # 腕捩の親は腕
-            for n in range(0, 4):
-                ik_model.bones[
-                    BoneNames.arm_twist(direction, n)
-                ].parent_index = ik_model.bones[BoneNames.arm(direction)].index
+            ik_model.bones[
+                BoneNames.arm_twist(direction)
+            ].parent_index = ik_model.bones[BoneNames.arm(direction)].index
 
             # 手捩の親はひじ
-            for n in range(0, 4):
-                ik_model.bones[
-                    BoneNames.wrist_twist(direction, n)
-                ].parent_index = ik_model.bones[BoneNames.elbow(direction)].index
+            ik_model.bones[
+                BoneNames.wrist_twist(direction)
+            ].parent_index = ik_model.bones[BoneNames.elbow(direction)].index
 
             # 足IK親の親は全親
             ik_model.bones[
