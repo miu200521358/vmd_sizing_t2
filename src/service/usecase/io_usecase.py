@@ -199,11 +199,11 @@ class IoUsecase:
                 .cross(
                     MVector3D(
                         0,
-                        0,
-                        -1
+                        1
                         * np.sign(
                             original_model.bones[BoneNames.elbow(direction)].position.x
                         ),
+                        0,
                     )
                 )
                 .normalized()
@@ -225,11 +225,11 @@ class IoUsecase:
                 .cross(
                     MVector3D(
                         0,
-                        0,
-                        -1
+                        1
                         * np.sign(
                             original_model.bones[BoneNames.wrist(direction)].position.x
                         ),
+                        0,
                     )
                 )
                 .normalized()
