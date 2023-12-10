@@ -322,40 +322,13 @@ class ArmTwistUsecase:
             arm_rotate_ik_bf = dest_motion.bones[BoneNames.arm_rotate_ik(direction)][
                 fno
             ]
-            arm_rotate_ik_bf.position = after_matrixes[
-                BoneNames.arm_rotate_ik(direction), fno
-            ].global_matrix.inverse() * (
-                dest_initial_matrixes[BoneNames.elbow(direction), fno].position
-                + (
-                    (
-                        dest_initial_matrixes[BoneNames.arm(direction), fno].position
-                        - dest_initial_matrixes[
-                            BoneNames.elbow(direction), fno
-                        ].position
-                    ).normalized()
-                )
-                .cross(
-                    (
-                        (
-                            dest_initial_matrixes[
-                                BoneNames.arm(direction), fno
-                            ].position
-                            - dest_initial_matrixes[
-                                BoneNames.elbow(direction), fno
-                            ].position
-                        ).normalized()
-                    ).cross(
-                        (
-                            dest_initial_matrixes[
-                                BoneNames.wrist(direction), fno
-                            ].position
-                            - dest_initial_matrixes[
-                                BoneNames.elbow(direction), fno
-                            ].position
-                        ).normalized()
-                    )
-                )
-                .normalized()
+            arm_rotate_ik_bf.position = (
+                after_matrixes[
+                    BoneNames.arm_rotate_ik(direction), fno
+                ].global_matrix.inverse()
+                * dest_initial_matrixes[
+                    BoneNames.elbow_vertical(direction), fno
+                ].position
             )
             dest_motion.insert_bone_frame(arm_rotate_ik_bf)
 
@@ -526,29 +499,6 @@ class ArmTwistUsecase:
                 0, dest_model.bones[BoneNames.wrist_twist(direction)].index
             ] = wrist_twist_bf.rotation.to_matrix4x4().vector
             dest_motion.insert_bone_frame(wrist_twist_bf)
-
-            # ひじ回転 結果解決後の行列取得
-            after_matrixes = dest_motion.bones.calc_bone_matrixes(
-                [fno],
-                dest_model,
-                bone_dict,
-                bone_offset_matrixes,
-                bone_pos_matrixes,
-                is_motion_identity_poses,
-                is_motion_identity_qqs,
-                is_motion_identity_scales,
-                is_motion_identity_local_poses,
-                is_motion_identity_local_qqs,
-                is_motion_identity_local_scales,
-                motion_bone_poses,
-                motion_bone_qqs,
-                motion_bone_scales,
-                motion_bone_local_poses,
-                motion_bone_local_qqs,
-                motion_bone_local_scales,
-                motion_bone_fk_qqs,
-                out_fno_log=False,
-            )
 
             # 手首方向(手首先位置)
             wrist_direction_ik_bf = dest_motion.bones[
