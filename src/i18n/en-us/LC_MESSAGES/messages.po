@@ -717,12 +717,6 @@ msgstr "Preparation for All Parents Integration"
 msgid "【No.{x}】【{d}】初期位置取得({m})"
 msgstr "[No.{x}][{d}] Get initial position ({m})"
 
-msgid "【No.{x}】【{d}】捩り分散"
-msgstr "[No.{x}][{d}] torsional dispersion"
-
-msgid "-- 【No.{x}】【{d}】捩り分散 [{i} ({p:.2f}%)]"
-msgstr "-- [No.{x}] [{d}] torsional variance [{i} ({p:.2f}%)]"
-
 msgid "【No.{x}】モーションに全ての親のキーフレームがないため、全親統合をスキップします"
 msgstr "[No.{x}] Skip all parent integration because motion does not have all parent keyframes"
 
@@ -744,8 +738,11 @@ msgstr "Source model"
 msgid "初期位置取得"
 msgstr "Get initial position"
 
-msgid "【No.{i}】【{d}】捩り分散"
-msgstr "[No.{i}][{d}] torsional dispersion"
+msgid "【No.{x}】【{d}】捩り分散"
+msgstr "[No.{x}][{d}] torsional dispersion"
+
+msgid "-- 【No.{x}】【{d}】捩り分散 [{i} ({p:.2f}%)]"
+msgstr "-- [No.{x}] [{d}] torsional variance [{i} ({p:.2f}%)]"
 
 msgid "腕スタンス補正"
 msgstr "Arm Stance Correction"
@@ -761,3 +758,5 @@ msgstr "-- [No.{x}][{d}] torsional dispersion - preparation [{i} ({p:.2f}%)]"
 
 msgid "サイジング先モデルが指定されていません。"
 msgstr "The model to which you are sizing is not specified"
+msgid "【No.{i}】【{d}】捩り分散"
+msgstr "[No.{i}][{d}] torsional dispersion"

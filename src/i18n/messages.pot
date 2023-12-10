@@ -951,14 +951,6 @@ msgid "【No.{x}】【{d}】初期位置取得({m})"
 msgstr ""
 
 
-msgid "【No.{x}】【{d}】捩り分散"
-msgstr ""
-
-
-msgid "-- 【No.{x}】【{d}】捩り分散 [{i} ({p:.2f}%)]"
-msgstr ""
-
-
 msgid "【No.{x}】モーションに全ての親のキーフレームがないため、全親統合をスキップします"
 msgstr ""
 
@@ -987,7 +979,11 @@ msgid "初期位置取得"
 msgstr ""
 
 
-msgid "【No.{i}】【{d}】捩り分散"
+msgid "【No.{x}】【{d}】捩り分散"
+msgstr ""
+
+
+msgid "-- 【No.{x}】【{d}】捩り分散 [{i} ({p:.2f}%)]"
 msgstr ""
 
 
@@ -1010,139 +1006,6 @@ msgstr ""
 msgid "サイジング先モデルが指定されていません。"
 msgstr ""
 
-
-msgid "腕方向"
-msgstr ""
-
-
-msgid "ひじ方向"
-msgstr ""
-
-
-msgid "ひじ回転"
-msgstr ""
-
-
-msgid "【No.{x}】【{d}】捩り分散 - 腕方向"
-msgstr ""
-
-
-msgid "-- 【No.{x}】【{d}】捩り分散 - 腕方向 [{i} ({p:.2f}%)]"
-msgstr ""
-
-
-msgid "【No.{x}】【{d}】捩り分散 - 腕回転"
-msgstr ""
-
-
-msgid "-- 【No.{x}】【{d}】捩り分散 - 腕回転 [{i} ({p:.2f}%)]"
-msgstr ""
-
-
-msgid "【No.{x}】【{d}】捩り分散 - ひじ方向"
-msgstr ""
-
-
-msgid "-- 【No.{x}】【{d}】捩り分散 - ひじ方向 [{i} ({p:.2f}%)]"
-msgstr ""
-
-
-msgid "【No.{x}】【{d}】捩り分散 - ひじ回転"
-msgstr ""
-
-
-msgid "-- 【No.{x}】【{d}】捩り分散 - ひじ回転 [{i} ({p:.2f}%)]"
-msgstr ""
-
-
-msgid "【No.{x}】【{d}】捩り分散 - 手首方向"
-msgstr ""
-
-
-msgid "-- 【No.{x}】【{d}】捩り分散 - 手首方向 [{i} ({p:.2f}%)]"
-msgstr ""
-
-
-msgid "最終結果"
-msgstr ""
-
-
-msgid "【No.{x}】【{d}】捩り分散 - ひじ登録"
-msgstr ""
-
-
-msgid "-- 【No.{x}】【{d}】捩り分散 - ひじ登録 [{i} ({p:.2f}%)]"
-msgstr ""
-
-
-msgid "【No.{x}】【{d}】捩り分散 - 結果保存"
-msgstr ""
-
-
-msgid "-- 【No.{x}】【{d}】捩り分散 - 結果保存 [{i} ({p:.2f}%)]"
-msgstr ""
-
-
-msgid "【No.{x}】【{d}】捩り分散 - 腕方向 - 準備"
-msgstr ""
-
-
-msgid "-- 【No.{x}】【{d}】捩り分散 - 腕方向 - 準備 [{i} ({p:.2f}%)]"
-msgstr ""
-
-
-msgid "【No.{x}】【{d}】捩り分散 - 腕回転 - 結果"
-msgstr ""
-
-
-msgid "-- 【No.{x}】【{d}】捩り分散 - 腕回転 - 結果 [{i} ({p:.2f}%)]"
-msgstr ""
-
-
-msgid "腕回転 - 準備"
-msgstr ""
-
-
-msgid "【No.{x}】【{d}】捩り分散 - 腕回転 - 準備"
-msgstr ""
-
-
-msgid "-- 【No.{x}】【{d}】捩り分散 - 腕回転 - 準備 [{i} ({p:.2f}%)]"
-msgstr ""
-
-
-msgid "ひじ方向 - 準備"
-msgstr ""
-
-
-msgid "【No.{x}】【{d}】捩り分散 - ひじ方向 - 準備"
-msgstr ""
-
-
-msgid "-- 【No.{x}】【{d}】捩り分散 - ひじ方向 - 準備 [{i} ({p:.2f}%)]"
-msgstr ""
-
-
-msgid "ひじ回転 - 準備"
-msgstr ""
-
-
-msgid "【No.{x}】【{d}】捩り分散 - ひじ回転 - 準備"
-msgstr ""
-
-
-msgid "-- 【No.{x}】【{d}】捩り分散 - ひじ回転 - 準備 [{i} ({p:.2f}%)]"
-msgstr ""
-
-
-msgid "手首方向 - 準備"
-msgstr ""
-
-
-msgid "【No.{x}】【{d}】捩り分散 - 手首方向 - 準備"
-msgstr ""
-
-
-msgid "-- 【No.{x}】【{d}】捩り分散 - 手首方向 - 準備 [{i} ({p:.2f}%)]"
+msgid "【No.{i}】【{d}】捩り分散"
 msgstr ""
 

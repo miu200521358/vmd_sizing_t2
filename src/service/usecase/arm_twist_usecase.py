@@ -1,5 +1,4 @@
 import os
-from math import radians
 from typing import Optional
 
 import numpy as np
@@ -27,9 +26,6 @@ ARM_BONE_NAMES = [
     BoneNames.wrist_twist("左"),
     BoneNames.wrist("左"),
 ]
-
-# 逆ひじを許可する角度
-ELBOW_REVERSE_Y_RAD = radians(5)
 
 
 class ArmTwistUsecase:
@@ -176,9 +172,6 @@ class ArmTwistUsecase:
             elbow_yz_axis = elbow_yz_qq.to_axis()
             elbow_yz_rad = elbow_yz_qq.to_radian()
             elbow_yz_sign = np.sign(elbow_y_axis.dot(elbow_yz_axis))
-            if elbow_yz_sign < 0 and elbow_yz_rad > ELBOW_REVERSE_Y_RAD:
-                # 逆ひじは一定角度以上は正ひじに直す
-                elbow_yz_sign = 1
 
             # ひじY
             elbow_bf.rotation = MQuaternion.from_axis_angles(
