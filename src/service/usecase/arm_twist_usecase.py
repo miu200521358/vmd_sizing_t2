@@ -209,17 +209,17 @@ class ArmTwistUsecase:
             ].position
             dest_motion.insert_bone_frame(arm_rotate_ik_bf)
 
-            # ■ --------------
-            from datetime import datetime
+            # # ■ --------------
+            # from datetime import datetime
 
-            from mlib.vmd.vmd_writer import VmdWriter
+            # from mlib.vmd.vmd_writer import VmdWriter
 
-            VmdWriter(
-                dest_motion,
-                f"E:/MMD/サイジング/足IK/IK_step/{datetime.now():%Y%m%d_%H%M%S_%f}_{direction}腕回転_{fno:04d}.vmd",
-                model_name="Test Model",
-            ).save()
-            # ■ --------------
+            # VmdWriter(
+            #     dest_motion,
+            #     f"E:/MMD/サイジング/足IK/IK_step/{datetime.now():%Y%m%d_%H%M%S_%f}_{direction}腕回転_{fno:04d}.vmd",
+            #     model_name="Test Model",
+            # ).save()
+            # # ■ --------------
 
             # IK解決する
             _, _, ik_qqs = dest_motion.bones.get_ik_rotation(
@@ -253,13 +253,13 @@ class ArmTwistUsecase:
             )
             dest_motion.insert_bone_frame(wrist_rotate_ik_bf)
 
-            # ■ --------------
-            VmdWriter(
-                dest_motion,
-                f"E:/MMD/サイジング/足IK/IK_step/{datetime.now():%Y%m%d_%H%M%S_%f}_{direction}手首回転_{fno:04d}.vmd",
-                model_name="Test Model",
-            ).save()
-            # ■ --------------
+            # # ■ --------------
+            # VmdWriter(
+            #     dest_motion,
+            #     f"E:/MMD/サイジング/足IK/IK_step/{datetime.now():%Y%m%d_%H%M%S_%f}_{direction}手首回転_{fno:04d}.vmd",
+            #     model_name="Test Model",
+            # ).save()
+            # # ■ --------------
 
             # IK解決する
             _, _, ik_qqs = dest_motion.bones.get_ik_rotation(
@@ -294,13 +294,13 @@ class ArmTwistUsecase:
             )
             dest_motion.insert_bone_frame(wrist_direction_ik_bf)
 
-            # ■ --------------
-            VmdWriter(
-                dest_motion,
-                f"E:/MMD/サイジング/足IK/IK_step/{datetime.now():%Y%m%d_%H%M%S_%f}_{direction}手首方向_{fno:04d}.vmd",
-                model_name="Test Model",
-            ).save()
-            # ■ --------------
+            # # ■ --------------
+            # VmdWriter(
+            #     dest_motion,
+            #     f"E:/MMD/サイジング/足IK/IK_step/{datetime.now():%Y%m%d_%H%M%S_%f}_{direction}手首方向_{fno:04d}.vmd",
+            #     model_name="Test Model",
+            # ).save()
+            # # ■ --------------
 
             # IK解決する
             _, _, ik_qqs = dest_motion.bones.get_ik_rotation(
@@ -317,13 +317,13 @@ class ArmTwistUsecase:
             ]
             dest_motion.insert_bone_frame(wrist_bf)
 
-            # ■ --------------
-            VmdWriter(
-                dest_motion,
-                f"E:/MMD/サイジング/足IK/IK_step/{datetime.now():%Y%m%d_%H%M%S_%f}_{direction}手首方向結果_{fno:04d}.vmd",
-                model_name="Test Model",
-            ).save()
-            # ■ --------------
+            # # ■ --------------
+            # VmdWriter(
+            #     dest_motion,
+            #     f"E:/MMD/サイジング/足IK/IK_step/{datetime.now():%Y%m%d_%H%M%S_%f}_{direction}手首方向結果_{fno:04d}.vmd",
+            #     model_name="Test Model",
+            # ).save()
+            # # ■ --------------
 
         # 終わったらIKボーンのキーフレを削除
         del dest_motion.bones[BoneNames.arm_rotate_ik(direction)]
