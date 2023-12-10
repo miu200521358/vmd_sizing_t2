@@ -100,6 +100,10 @@ class BoneNames:
         return f"{direction}手首回転IK"
 
     @staticmethod
+    def wrist_direction_ik(direction: str) -> str:
+        return f"{direction}手首方向IK"
+
+    @staticmethod
     def thumb0(direction: str) -> str:
         return f"{direction}親指０"
 
