@@ -52,14 +52,6 @@ class BoneNames:
         return f"{direction}腕IK"
 
     @staticmethod
-    def arm_rotate(direction: str) -> str:
-        return f"{direction}腕回転"
-
-    @staticmethod
-    def arm_rotate_tail(direction: str) -> str:
-        return f"{direction}腕回転先"
-
-    @staticmethod
     def arm_rotate_ik(direction: str) -> str:
         return f"{direction}腕回転IK"
 
@@ -102,14 +94,6 @@ class BoneNames:
     @staticmethod
     def wrist_ik(direction: str) -> str:
         return f"{direction}手首IK"
-
-    @staticmethod
-    def wrist_rotate(direction: str) -> str:
-        return f"{direction}手首回転"
-
-    @staticmethod
-    def wrist_rotate_tail(direction: str) -> str:
-        return f"{direction}手首回転先"
 
     @staticmethod
     def wrist_rotate_ik(direction: str) -> str:
