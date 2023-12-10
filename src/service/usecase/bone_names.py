@@ -44,10 +44,6 @@ class BoneNames:
         return f"{direction}腕捩" if index == 0 else f"{direction}腕捩{index}"
 
     @staticmethod
-    def arm_twist_vertical(direction: str):
-        return f"{direction}腕捩垂線"
-
-    @staticmethod
     def arm_ik_parent(direction: str) -> str:
         return f"{direction}腕IK親"
 
@@ -55,17 +51,17 @@ class BoneNames:
     def arm_ik(direction: str) -> str:
         return f"{direction}腕IK"
 
-    @staticmethod
-    def arm_direction(direction: str) -> str:
-        return f"{direction}腕方向"
+    # @staticmethod
+    # def arm_direction(direction: str) -> str:
+    #     return f"{direction}腕方向"
 
-    @staticmethod
-    def arm_direction_tail(direction: str) -> str:
-        return f"{direction}腕方向先"
+    # @staticmethod
+    # def arm_direction_tail(direction: str) -> str:
+    #     return f"{direction}腕方向先"
 
-    @staticmethod
-    def arm_direction_ik(direction: str) -> str:
-        return f"{direction}腕方向IK"
+    # @staticmethod
+    # def arm_direction_ik(direction: str) -> str:
+    #     return f"{direction}腕方向IK"
 
     @staticmethod
     def arm_rotate(direction: str) -> str:
@@ -95,37 +91,33 @@ class BoneNames:
     def elbow_ik(direction: str) -> str:
         return f"{direction}ひじIK"
 
-    @staticmethod
-    def elbow_direction(direction: str) -> str:
-        return f"{direction}ひじ方向"
+    # @staticmethod
+    # def elbow_direction(direction: str) -> str:
+    #     return f"{direction}ひじ方向"
 
-    @staticmethod
-    def elbow_direction_tail(direction: str) -> str:
-        return f"{direction}ひじ方向先"
+    # @staticmethod
+    # def elbow_direction_tail(direction: str) -> str:
+    #     return f"{direction}ひじ方向先"
 
-    @staticmethod
-    def elbow_direction_ik(direction: str) -> str:
-        return f"{direction}ひじ方向IK"
+    # @staticmethod
+    # def elbow_direction_ik(direction: str) -> str:
+    #     return f"{direction}ひじ方向IK"
 
-    @staticmethod
-    def elbow_rotate(direction: str) -> str:
-        return f"{direction}ひじ回転"
+    # @staticmethod
+    # def elbow_rotate(direction: str) -> str:
+    #     return f"{direction}ひじ回転"
 
-    @staticmethod
-    def elbow_rotate_tail(direction: str) -> str:
-        return f"{direction}ひじ回転先"
+    # @staticmethod
+    # def elbow_rotate_tail(direction: str) -> str:
+    #     return f"{direction}ひじ回転先"
 
-    @staticmethod
-    def elbow_rotate_ik(direction: str) -> str:
-        return f"{direction}ひじ回転IK"
+    # @staticmethod
+    # def elbow_rotate_ik(direction: str) -> str:
+    #     return f"{direction}ひじ回転IK"
 
     @staticmethod
     def wrist_twist(direction: str, index: int = 0):
         return f"{direction}手捩" if index == 0 else f"{direction}手捩{index}"
-
-    @staticmethod
-    def wrist_twist_vertical(direction: str):
-        return f"{direction}手捩垂線"
 
     @staticmethod
     def wrist(direction: str) -> str:
@@ -159,17 +151,17 @@ class BoneNames:
     def wrist_rotate_ik(direction: str) -> str:
         return f"{direction}手首回転IK"
 
-    @staticmethod
-    def wrist_direction(direction: str) -> str:
-        return f"{direction}手首方向"
+    # @staticmethod
+    # def wrist_direction(direction: str) -> str:
+    #     return f"{direction}手首方向"
 
-    @staticmethod
-    def wrist_direction_tail(direction: str) -> str:
-        return f"{direction}手首方向先"
+    # @staticmethod
+    # def wrist_direction_tail(direction: str) -> str:
+    #     return f"{direction}手首方向先"
 
-    @staticmethod
-    def wrist_direction_ik(direction: str) -> str:
-        return f"{direction}手首方向IK"
+    # @staticmethod
+    # def wrist_direction_ik(direction: str) -> str:
+    #     return f"{direction}手首方向IK"
 
     @staticmethod
     def thumb0(direction: str) -> str:

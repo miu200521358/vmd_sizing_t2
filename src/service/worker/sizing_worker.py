@@ -1,8 +1,10 @@
 import os
 from concurrent.futures import (
+    FIRST_EXCEPTION,
     Future,
     ThreadPoolExecutor,
     as_completed,
+    wait,
 )
 
 import wx
@@ -279,6 +281,8 @@ class SizingWorker(BaseWorker):
                         )
                     )
 
+            wait(futures, return_when=FIRST_EXCEPTION)
+
             for future in as_completed(futures):
                 if future.exception():
                     raise future.exception()
@@ -306,6 +310,8 @@ class SizingWorker(BaseWorker):
                         )
                     )
 
+            wait(futures, return_when=FIRST_EXCEPTION)
+
             for future in as_completed(futures):
                 if future.exception():
                     raise future.exception()
@@ -320,26 +326,26 @@ class SizingWorker(BaseWorker):
             for sizing_set in sizing_panel.sizing_sets:
                 if usecase.validate(
                     sizing_set.sizing_idx,
-                    ik_models[(sizing_set.sizing_idx, False)],
+                    sizing_set.dest_model_ctrl.data,
                     sizing_panel.twist_check_ctrl.GetValue(),
                 ):
-                    futures.append(
-                        executor.submit(
-                            usecase.sizing_arm_twist,
-                            sizing_set.sizing_idx,
-                            ik_models[(sizing_set.sizing_idx, False)],
-                            sizing_set.output_motion_ctrl.data,
-                            initial_matrixes,
+                    for direction in ("右", "左"):
+                        futures.append(
+                            executor.submit(
+                                usecase.sizing_arm_twist,
+                                sizing_set.sizing_idx,
+                                ik_models[(sizing_idx, False)],
+                                sizing_set.output_motion_ctrl.data,
+                                initial_matrixes[sizing_idx, False, direction],
+                                direction,
+                            )
                         )
-                    )
+
+            wait(futures, return_when=FIRST_EXCEPTION)
 
             for future in as_completed(futures):
                 if future.exception():
                     raise future.exception()
-                sizing_idx, sizing_motion = future.result()
-                sizing_panel.sizing_sets[
-                    sizing_idx
-                ].output_motion_ctrl.data = sizing_motion
 
     def sizing_arm_stance(self):
         """腕スタンス補正"""
@@ -362,6 +368,8 @@ class SizingWorker(BaseWorker):
                         sizing_set.output_motion_ctrl.data,
                     )
                 )
+
+            wait(futures, return_when=FIRST_EXCEPTION)
 
             for future in as_completed(futures):
                 if future.exception():
@@ -392,6 +400,8 @@ class SizingWorker(BaseWorker):
                         sizing_set.output_motion_ctrl.data,
                     )
                 )
+
+            wait(futures, return_when=FIRST_EXCEPTION)
 
             for future in as_completed(futures):
                 if future.exception():
@@ -448,6 +458,8 @@ class SizingWorker(BaseWorker):
                         sizing_set.output_motion_ctrl.data,
                     )
                 )
+
+            wait(futures, return_when=FIRST_EXCEPTION)
 
             for future in as_completed(futures):
                 if future.exception():
