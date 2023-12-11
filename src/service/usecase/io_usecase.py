@@ -311,7 +311,7 @@ class IoUsecase:
                 .normalized()
             )
             model.bones[BoneNames.wrist_vertical(direction)].position = (
-                model.bones[BoneNames.wrist_tail(direction)].position
+                model.bones[BoneNames.wrist(direction)].position
                 + wrist_vertical_relative_position
             )
             model.bones[
