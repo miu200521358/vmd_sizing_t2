@@ -289,20 +289,20 @@ class ArmTwistUsecase:
             # ひじ垂線はYひじの場合、手首から垂線までの角度が絶対に変わらない
             # そのため、手首からの垂線の相対位置を最初の手首位置に加算する
             # ひじ垂線が最終的に初期値になるよう、配置
+            arm_rotate_ik_bf.position = (
+                dest_initial_matrixes[BoneNames.wrist(direction), fno].position
+            ) + (
+                twist_off_matrixes[BoneNames.elbow_vertical(direction), fno].position
+                - twist_off_matrixes[BoneNames.wrist(direction), fno].position
+            )
             # arm_rotate_ik_bf.position = dest_initial_matrixes[
             #     BoneNames.wrist(direction), fno
-            # ].position + (
-            #     twist_off_matrixes[BoneNames.elbow_vertical(direction), fno].position
-            #     - twist_off_matrixes[BoneNames.wrist(direction), fno].position
+            # ].global_matrix * (
+            #     twist_off_matrixes[
+            #         BoneNames.wrist(direction), fno
+            #     ].global_matrix.inverse()
+            #     * twist_off_matrixes[BoneNames.elbow_vertical(direction), fno].position
             # )
-            arm_rotate_ik_bf.position = dest_initial_matrixes[
-                BoneNames.wrist(direction), fno
-            ].global_matrix * (
-                twist_off_matrixes[
-                    BoneNames.wrist(direction), fno
-                ].global_matrix.inverse()
-                * twist_off_matrixes[BoneNames.elbow_vertical(direction), fno].position
-            )
             dest_motion.insert_bone_frame(arm_rotate_ik_bf)
 
             # # ■ --------------
