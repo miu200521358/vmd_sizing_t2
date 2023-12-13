@@ -1,9 +1,6 @@
 import os
-import webbrowser
 
 import wx
-from service.form.widgets.sizing_bone_set import SizingBoneSet
-
 from mlib.core.logger import ConsoleHandler, MLogger
 from mlib.service.form.notebook_frame import NotebookFrame
 from mlib.service.form.notebook_panel import NotebookPanel
@@ -11,6 +8,7 @@ from mlib.service.form.widgets.console_ctrl import ConsoleCtrl
 from mlib.service.form.widgets.exec_btn_ctrl import ExecButton
 from mlib.service.form.widgets.image_btn_ctrl import ImageButton
 from mlib.utils.file_utils import save_histories
+from service.form.widgets.sizing_bone_set import SizingBoneSet
 
 logger = MLogger(os.path.basename(__file__))
 __ = logger.get_text
@@ -95,8 +93,16 @@ class SizingPanel(NotebookPanel):
             self,
             "resources/icon/help.png",
             wx.Size(12, 12),
-            lambda event: self.on_help(event, "https://bowlroll.net/file/index"),
-            __("詳しい解説ページをデフォルトブラウザで開きます"),
+            lambda event: self.on_help(
+                event,
+                "全親統合",
+                [
+                    "サイジング先モデルを任意の位置に置きやすくできるよう、全ての親の値を子ボーンに移し替えます",
+                    "　・全ての親の移動や回転を、センターや足IKなどの子ボーンに割り当てます",
+                    "　・全ての親のキーフレを削除するので、モデルを全ての親で移動させた後にモーションを読み込んでも、原点に戻ったりしなくなります",
+                ],
+            ),
+            __("解説をメッセージ欄に表示します"),
         )
         self.integrate_parent_sizer.Add(self.integrate_parent_help_ctrl, 0, wx.ALL, 0)
         self.config_sizer.Add(self.integrate_parent_sizer, 0, wx.ALL, 1)
@@ -113,8 +119,17 @@ class SizingPanel(NotebookPanel):
             self,
             "resources/icon/help.png",
             wx.Size(12, 12),
-            lambda event: self.on_help(event, "https://bowlroll.net/file/index"),
-            __("詳しい解説ページをデフォルトブラウザで開きます"),
+            lambda event: self.on_help(
+                event,
+                "捩り分散",
+                [
+                    "サイジング先モデルの腕の変形が綺麗になるよう、腕捩と手捩を再計算します",
+                    "　・腕の軸回転、腕捩の回転、をまとめて腕捩ボーンに割り当てます",
+                    "　・ひじの軸回転、手捩の回転、手首の軸回転、をまとめて手捩ボーンに割り当てます",
+                    "　・ひじの軸方向以外の回転を、人間のひじ構造と同じようにひじのY方向を曲げるよう、回転軸を調整します",
+                ],
+            ),
+            __("解説をメッセージ欄に表示します"),
         )
         self.twist_sizer.Add(self.twist_help_ctrl, 0, wx.ALL, 0)
         self.config_sizer.Add(self.twist_sizer, 0, wx.ALL, 1)
@@ -125,7 +140,7 @@ class SizingPanel(NotebookPanel):
         self.align_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
         self.align_check_ctrl = wx.CheckBox(
-            self, wx.ID_ANY, __("手首位置合わせ"), wx.DefaultPosition, wx.DefaultSize, 0
+            self, wx.ID_ANY, __("位置合わせ"), wx.DefaultPosition, wx.DefaultSize, 0
         )
         self.align_check_ctrl.SetToolTip(__("手首の位置を元モーションと大体同じ位置になるよう合わせます"))
         self.align_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_align_ctrl)
@@ -135,8 +150,16 @@ class SizingPanel(NotebookPanel):
             self,
             "resources/icon/help.png",
             wx.Size(12, 12),
-            lambda event: self.on_help(event, "https://bowlroll.net/file/index"),
-            __("詳しい解説ページをデフォルトブラウザで開きます"),
+            lambda event: self.on_help(
+                event,
+                "位置合わせ",
+                [
+                    "サイジング先モデルが元モデルと同じポーズになるように、手首の位置などを調整します",
+                    "　・特に手を合わせたり、ハートを作るポーズなどが崩れにくくなります",
+                    "　・指位置合わせ・指先位置合わせは特にフィンガータットモーションが崩れにくくなります",
+                ],
+            ),
+            __("解説をメッセージ欄に表示します"),
         )
         self.align_sizer.Add(self.align_help_ctrl, 0, wx.ALL, 0)
         self.align_group_sizer.Add(self.align_sizer, 0, wx.ALL, 0)
@@ -274,8 +297,12 @@ class SizingPanel(NotebookPanel):
         self.console_ctrl = ConsoleCtrl(self, self.frame, self, rows=150)
         self.console_ctrl.set_parent_sizer(self.root_sizer)
 
-    def on_help(self, event: wx.Event, url: str) -> None:
-        webbrowser.open(url)
+    def on_help(self, event: wx.Event, title: str, messages: list[str]) -> None:
+        self.console_ctrl.write("-------------------------------")
+        self.console_ctrl.write(__(title))
+        self.console_ctrl.write("-------------------------------")
+        for message in messages:
+            self.console_ctrl.write(__(message))
 
     def on_full_config(self, event: wx.Event) -> None:
         self.is_full_config = not self.is_full_config
