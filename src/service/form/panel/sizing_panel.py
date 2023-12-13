@@ -108,13 +108,15 @@ class SizingPanel(NotebookPanel):
         self.config_sizer.Add(self.integrate_parent_sizer, 0, wx.ALL, 1)
 
         # 捩り分散 ------------------------
-        self.twist_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.twist_group_sizer = wx.BoxSizer(wx.VERTICAL)
+
+        self.twist_check_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.twist_check_ctrl = wx.CheckBox(
             self, wx.ID_ANY, __("捩り分散"), wx.DefaultPosition, wx.DefaultSize, 0
         )
         self.twist_check_ctrl.SetToolTip(__("腕を腕捩りなど、捩りボーンに捩り回転を分散させます"))
         self.twist_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_add_config)
-        self.twist_sizer.Add(self.twist_check_ctrl, 0, wx.ALL, 3)
+        self.twist_check_sizer.Add(self.twist_check_ctrl, 0, wx.ALL, 3)
         self.twist_help_ctrl = ImageButton(
             self,
             "resources/icon/help.png",
@@ -127,12 +129,31 @@ class SizingPanel(NotebookPanel):
                     "　・腕の軸回転、腕捩の回転、をまとめて腕捩ボーンに割り当てます",
                     "　・ひじの軸回転、手捩の回転、手首の軸回転、をまとめて手捩ボーンに割り当てます",
                     "　・ひじの軸方向以外の回転を、人間のひじ構造と同じようにひじのY方向を曲げるよう、回転軸を調整します",
+                    "　・腕の軌跡がズレないよう、腕・腕捩・ひじ・手捩・手首のいずれかのキーが打たれているキーフレームに対して処理を行います",
+                    "　・中間点追加にチェックを入れると、更に2Fごとに中間キーフレームを追加します",
                 ],
             ),
             __("解説をメッセージ欄に表示します"),
         )
-        self.twist_sizer.Add(self.twist_help_ctrl, 0, wx.ALL, 0)
-        self.config_sizer.Add(self.twist_sizer, 0, wx.ALL, 1)
+        self.twist_check_sizer.Add(self.twist_help_ctrl, 0, wx.ALL, 0)
+        self.twist_group_sizer.Add(self.twist_check_sizer, 0, wx.ALL, 3)
+
+        self.twist_middle_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.twist_middle_blank = wx.StaticText(self, wx.ID_ANY, "     ")
+        self.twist_middle_sizer.Add(self.twist_middle_blank)
+
+        self.twist_middle_check_ctrl = wx.CheckBox(
+            self, wx.ID_ANY, __("中間点追加"), wx.DefaultPosition, wx.DefaultSize, 0
+        )
+        self.twist_middle_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_align_sub_ctrl)
+        self.twist_middle_check_ctrl.SetToolTip(
+            __("腕系キーの間で腕の軌跡がズレないよう、2Fごとに捩り分散処理を行います")
+        )
+
+        self.twist_middle_sizer.Add(self.twist_middle_check_ctrl, 0, wx.ALL, 0)
+        self.twist_group_sizer.Add(self.twist_middle_sizer, 0, wx.ALL, 3)
+
+        self.config_sizer.Add(self.twist_group_sizer, 0, wx.ALL, 1)
 
         # 位置合わせ ------------------------
         self.align_group_sizer = wx.BoxSizer(wx.VERTICAL)
