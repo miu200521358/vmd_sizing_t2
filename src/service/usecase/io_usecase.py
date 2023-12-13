@@ -272,6 +272,10 @@ class IoUsecase:
                     )
                 )
 
+            # ひじ先
+            model.bones[BoneNames.elbow_tail(direction)].position = model.bones[
+                BoneNames.wrist(direction)
+            ].position.copy()
             # ひじ垂線
             elbow_vertical_relative_position = (
                 (
@@ -281,19 +285,17 @@ class IoUsecase:
                 .cross(
                     MVector3D(
                         0,
-                        1 * np.sign(model.bones[BoneNames.wrist(direction)].position.x),
+                        -1
+                        * np.sign(model.bones[BoneNames.wrist(direction)].position.x),
                         0,
                     )
                 )
                 .normalized()
             )
             model.bones[BoneNames.elbow_vertical(direction)].position = (
-                model.bones[BoneNames.wrist(direction)].position
+                model.bones[BoneNames.elbow_tail(direction)].position
                 + elbow_vertical_relative_position
             )
-            model.bones[
-                BoneNames.elbow_vertical(direction)
-            ].tail_position = -elbow_vertical_relative_position
 
             # 手首垂線
             wrist_vertical_relative_position = (

@@ -60,6 +60,10 @@ class BoneNames:
         return f"{direction}ひじ"
 
     @staticmethod
+    def elbow_tail(direction: str) -> str:
+        return f"{direction}ひじ先"
+
+    @staticmethod
     def elbow_vertical(direction: str) -> str:
         return f"{direction}ひじ垂線"
 
