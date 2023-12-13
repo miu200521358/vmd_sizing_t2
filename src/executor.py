@@ -4,11 +4,10 @@ from multiprocessing import freeze_support
 
 import numpy as np
 import wx
-
 from mlib.core.logger import LoggingMode, MLogger
 
 APP_NAME = "VmdSizing"
-VERSION_NAME = "6.00.00_β22"
+VERSION_NAME = "6.00.00_β23"
 
 # 指数表記なし、有効小数点桁数6、30を超えると省略あり、一行の文字数200
 np.set_printoptions(suppress=True, precision=6, threshold=30, linewidth=200)
@@ -40,9 +39,8 @@ if __name__ == "__main__":
         is_out_log=args.out_log,
     )
 
-    from service.form.main_frame import MainFrame
-
     from mlib.utils.file_utils import get_path
+    from service.form.main_frame import MainFrame
 
     # アプリの起動
     app = wx.App(False)

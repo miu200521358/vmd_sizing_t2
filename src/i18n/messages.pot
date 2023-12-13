@@ -1109,3 +1109,55 @@ msgstr ""
 msgid "細かさ"
 msgstr ""
 
+
+msgid "全ての親統合"
+msgstr ""
+
+
+msgid "腰統合"
+msgstr ""
+
+
+msgid "腰の移動や回転を上半身・下半身に振り分けて、腰のキーフレームを削除します"
+msgstr ""
+
+
+msgid "サイジング先モデルが元モデルと同じポーズになるように、腰の値を子ボーンに移し替えます"
+msgstr ""
+
+
+msgid "　・腰の移動や回転を、上半身や下半身の子ボーンに割り当てます"
+msgstr ""
+
+
+msgid "　・チェックをONにした場合、サイジングモーションに「W」を追加します"
+msgstr ""
+
+
+msgid "{b}統合"
+msgstr ""
+
+
+msgid "【No.{i}】{b}統合"
+msgstr ""
+
+
+msgid "全ての親統合準備"
+msgstr ""
+
+
+msgid "【No.{x}】{b}統合"
+msgstr ""
+
+
+msgid "-- 【No.{x}】{b}統合 [{i} ({p:.2f}%)]"
+msgstr ""
+
+
+msgid "【No.{x}】モーションに{b}のキーフレームがないため、{b}統合をスキップします"
+msgstr ""
+
+
+msgid "腰統合準備"
+msgstr ""
+

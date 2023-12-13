@@ -2,7 +2,6 @@ import os
 from datetime import datetime
 
 import wx
-
 from mlib.core.logger import MLogger
 from mlib.service.form.notebook_frame import NotebookFrame
 from mlib.service.form.notebook_panel import NotebookPanel
@@ -286,8 +285,10 @@ class SizingBoneSet:
             ) = self.dest_model_ctrl.separated_path
 
             sizing_types: list[str] = []
-            if self.panel.integrate_parent_check_ctrl.GetValue():
+            if self.panel.integrate_root_check_ctrl.GetValue():
                 sizing_types.append("I")
+            if self.panel.integrate_waist_check_ctrl.GetValue():
+                sizing_types.append("W")
             if (
                 self.panel.align_check_ctrl.GetValue()
                 or self.panel.align_finger_check_ctrl.GetValue()

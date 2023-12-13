@@ -79,23 +79,23 @@ class SizingPanel(NotebookPanel):
         self.full_config_btn_ctrl.Bind(wx.EVT_BUTTON, self.on_full_config)
         self.config_sizer.Add(self.full_config_btn_ctrl, 0, wx.ALL | wx.ALIGN_RIGHT, 3)
 
-        # 全親統合 ------------------------
-        self.integrate_parent_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.integrate_parent_check_ctrl = wx.CheckBox(
-            self, wx.ID_ANY, __("全親統合"), wx.DefaultPosition, wx.DefaultSize, 0
+        # 全ての親統合 ------------------------
+        self.integrate_root_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.integrate_root_check_ctrl = wx.CheckBox(
+            self, wx.ID_ANY, __("全ての親統合"), wx.DefaultPosition, wx.DefaultSize, 0
         )
-        self.integrate_parent_check_ctrl.SetToolTip(
+        self.integrate_root_check_ctrl.SetToolTip(
             __("全ての親の移動や回転を子ボーンに振り分けて、全ての親のキーフレームを削除します")
         )
-        self.integrate_parent_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_add_config)
-        self.integrate_parent_sizer.Add(self.integrate_parent_check_ctrl, 0, wx.ALL, 3)
-        self.integrate_parent_help_ctrl = ImageButton(
+        self.integrate_root_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_add_config)
+        self.integrate_root_sizer.Add(self.integrate_root_check_ctrl, 0, wx.ALL, 3)
+        self.integrate_root_help_ctrl = ImageButton(
             self,
             "resources/icon/help.png",
             wx.Size(12, 12),
             lambda event: self.on_help(
                 event,
-                "全親統合",
+                "全ての親統合",
                 [
                     "サイジング先モデルを任意の位置に置きやすくできるよう、全ての親の値を子ボーンに移し替えます",
                     "　・全ての親の移動や回転を、センターや足IKなどの子ボーンに割り当てます",
@@ -105,8 +105,36 @@ class SizingPanel(NotebookPanel):
             ),
             __("解説をメッセージ欄に表示します"),
         )
-        self.integrate_parent_sizer.Add(self.integrate_parent_help_ctrl, 0, wx.ALL, 0)
-        self.config_sizer.Add(self.integrate_parent_sizer, 0, wx.ALL, 1)
+        self.integrate_root_sizer.Add(self.integrate_root_help_ctrl, 0, wx.ALL, 0)
+        self.config_sizer.Add(self.integrate_root_sizer, 0, wx.ALL, 1)
+
+        # 腰統合 ------------------------
+        self.integrate_waist_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.integrate_waist_check_ctrl = wx.CheckBox(
+            self, wx.ID_ANY, __("腰統合"), wx.DefaultPosition, wx.DefaultSize, 0
+        )
+        self.integrate_waist_check_ctrl.SetToolTip(
+            __("腰の移動や回転を上半身・下半身に振り分けて、腰のキーフレームを削除します")
+        )
+        self.integrate_waist_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_add_config)
+        self.integrate_waist_sizer.Add(self.integrate_waist_check_ctrl, 0, wx.ALL, 3)
+        self.integrate_waist_help_ctrl = ImageButton(
+            self,
+            "resources/icon/help.png",
+            wx.Size(12, 12),
+            lambda event: self.on_help(
+                event,
+                "腰統合",
+                [
+                    "サイジング先モデルが元モデルと同じポーズになるように、腰の値を子ボーンに移し替えます",
+                    "　・腰の移動や回転を、上半身や下半身の子ボーンに割り当てます",
+                    "　・チェックをONにした場合、サイジングモーションに「W」を追加します",
+                ],
+            ),
+            __("解説をメッセージ欄に表示します"),
+        )
+        self.integrate_waist_sizer.Add(self.integrate_waist_help_ctrl, 0, wx.ALL, 0)
+        self.config_sizer.Add(self.integrate_waist_sizer, 0, wx.ALL, 1)
 
         # 捩り分散 ------------------------
         self.twist_group_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -343,7 +371,8 @@ class SizingPanel(NotebookPanel):
             else wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNFACE)
         )
 
-        self.integrate_parent_check_ctrl.SetValue(self.is_full_config)
+        self.integrate_root_check_ctrl.SetValue(self.is_full_config)
+        self.integrate_waist_check_ctrl.SetValue(self.is_full_config)
         self.twist_check_ctrl.SetValue(self.is_full_config)
         self.twist_middle_check_ctrl.SetValue(self.is_full_config)
         self.align_check_ctrl.SetValue(self.is_full_config)
@@ -438,8 +467,10 @@ class SizingPanel(NotebookPanel):
         self.clear_set_btn_ctrl.Enable(enable)
 
         self.full_config_btn_ctrl.Enable(enable)
-        self.integrate_parent_check_ctrl.Enable(enable)
-        self.integrate_parent_help_ctrl.Enable(enable)
+        self.integrate_root_check_ctrl.Enable(enable)
+        self.integrate_root_help_ctrl.Enable(enable)
+        self.integrate_waist_check_ctrl.Enable(enable)
+        self.integrate_waist_help_ctrl.Enable(enable)
         self.twist_check_ctrl.Enable(enable)
         self.twist_middle_check_ctrl.Enable(enable)
         self.twist_help_ctrl.Enable(enable)

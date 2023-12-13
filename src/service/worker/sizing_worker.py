@@ -21,9 +21,10 @@ from service.form.widgets.sizing_bone_set import SizingBoneSet
 from service.usecase.arm_align_usecase import ArmAlignUsecase
 from service.usecase.arm_stance_usecase import ArmStanceUsecase
 from service.usecase.arm_twist_usecase import ArmTwistUsecase
+from service.usecase.bone_names import BoneNames
+from service.usecase.integrate_usecase import IntegrateUsecase
 from service.usecase.io_usecase import IoUsecase
 from service.usecase.move_usecase import MoveUsecase
-from service.usecase.parent_usecase import ParentUsecase
 
 logger = MLogger(os.path.basename(__file__), level=1)
 __ = logger.get_text
@@ -45,28 +46,27 @@ class SizingWorker(BaseWorker):
         # まずは読み込み
         self.load()
 
-        # 全親統合
-        if sizing_panel.integrate_parent_check_ctrl.GetValue():
-            self.integrate_parent()
-
         # 移動補正
         self.sizing_move()
+
+        # 全親統合
+        if sizing_panel.integrate_root_check_ctrl.GetValue():
+            self.integrate_root()
+
+        # 腰統合
+        if sizing_panel.integrate_waist_check_ctrl.GetValue():
+            self.integrate_waist()
 
         # 腕スタンス補正
         self.sizing_arm_stance()
 
-        # 捩り分散・腕位置合わせがある場合、腕の回転の初期位置を取得
-        if (
-            sizing_panel.align_check_ctrl.GetValue()
-            or sizing_panel.twist_check_ctrl.GetValue()
-        ):
-            # 捩り分散
-            if sizing_panel.twist_check_ctrl.GetValue():
-                self.sizing_arm_twist()
+        # # 腕位置合わせ
+        # if sizing_panel.align_check_ctrl.GetValue():
+        #     self.sizing_arm_align()
 
-            # # 腕位置合わせ
-            # if sizing_panel.align_check_ctrl.GetValue():
-            #     self.sizing_arm_align(initial_matrixes)
+        # 捩り分散
+        if sizing_panel.twist_check_ctrl.GetValue():
+            self.sizing_arm_twist()
 
         # 保存
         self.save()
@@ -378,25 +378,40 @@ class SizingWorker(BaseWorker):
                     sizing_idx
                 ].output_motion_ctrl.data = sizing_motion
 
-    def integrate_parent(self):
-        """全親統合"""
+    def integrate_root(self):
+        """全ての親統合"""
 
-        logger.info("全親統合", decoration=MLogger.Decoration.BOX)
+        logger.info("全ての親統合", decoration=MLogger.Decoration.BOX)
 
-        usecase = ParentUsecase()
+        self.integrate(BoneNames.root())
+
+    def integrate_waist(self):
+        """腰統合"""
+
+        logger.info("腰統合", decoration=MLogger.Decoration.BOX)
+
+        self.integrate(BoneNames.waist())
+
+    def integrate(self, bone_name: str):
+        """ボーン統合"""
+
+        logger.info("{b}統合", b=bone_name, decoration=MLogger.Decoration.BOX)
+
+        usecase = IntegrateUsecase()
         sizing_panel: SizingPanel = self.frame.sizing_panel
 
         with ThreadPoolExecutor(
-            thread_name_prefix="parent", max_workers=self.max_worker
+            thread_name_prefix="integrate", max_workers=self.max_worker
         ) as executor:
             futures: list[Future] = []
             for sizing_set in sizing_panel.sizing_sets:
                 futures.append(
                     executor.submit(
-                        usecase.integrate_parent,
+                        usecase.integrate,
                         sizing_set.sizing_idx,
-                        sizing_set.src_model_ctrl.data,
+                        sizing_set.dest_model_ctrl.data,
                         sizing_set.output_motion_ctrl.data,
+                        bone_name,
                     )
                 )
 
