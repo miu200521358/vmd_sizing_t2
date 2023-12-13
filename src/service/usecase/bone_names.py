@@ -253,6 +253,26 @@ class BoneNames:
         return "下半身"
 
     @staticmethod
+    def lower_tail() -> str:
+        return "下半身先"
+
+    @staticmethod
+    def lower_ik() -> str:
+        return "下半身IK"
+
+    @staticmethod
+    def center_leg() -> str:
+        return "足中心"
+
+    @staticmethod
+    def center_leg_tail() -> str:
+        return "足中心先"
+
+    @staticmethod
+    def center_knee() -> str:
+        return "ひざ中心"
+
+    @staticmethod
     def neck() -> str:
         return "首"
 

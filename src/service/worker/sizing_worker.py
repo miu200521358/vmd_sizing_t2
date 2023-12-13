@@ -25,6 +25,7 @@ from service.usecase.bone_names import BoneNames
 from service.usecase.integrate_usecase import IntegrateUsecase
 from service.usecase.io_usecase import IoUsecase
 from service.usecase.move_usecase import MoveUsecase
+from service.usecase.stance_lower_usecase import StanceLowerUsecase
 
 logger = MLogger(os.path.basename(__file__), level=1)
 __ = logger.get_text
@@ -56,6 +57,10 @@ class SizingWorker(BaseWorker):
         # 腰統合
         if sizing_panel.integrate_waist_check_ctrl.GetValue():
             self.integrate_waist()
+
+        # 下半身補正
+        if sizing_panel.stance_lower_check_ctrl.GetValue():
+            self.stance_lower()
 
         # 腕スタンス補正
         self.sizing_arm_stance()
@@ -251,12 +256,147 @@ class SizingWorker(BaseWorker):
                     sizing_idx
                 ].output_motion_ctrl.data = sizing_motion
 
+    def stance_lower(self) -> None:
+        """下半身補正"""
+        logger.info("下半身補正", decoration=MLogger.Decoration.BOX)
+
+        usecase = StanceLowerUsecase()
+        sizing_panel: SizingPanel = self.frame.sizing_panel
+
+        # 初期位置を取得する
+        initial_matrixes: dict[tuple[int, bool, str], VmdBoneFrameTrees] = {}
+
+        with ThreadPoolExecutor(
+            thread_name_prefix="lower_initial", max_workers=self.max_worker
+        ) as executor:
+            futures: list[Future] = []
+            for sizing_set in sizing_panel.sizing_sets:
+                futures.append(
+                    executor.submit(
+                        usecase.get_initial_matrixes,
+                        sizing_set.sizing_idx,
+                        True,
+                        sizing_set.src_model_ctrl.data,
+                        sizing_set.motion_ctrl.data,
+                    )
+                )
+
+                futures.append(
+                    executor.submit(
+                        usecase.get_initial_matrixes,
+                        sizing_set.sizing_idx,
+                        False,
+                        sizing_set.dest_model_ctrl.data,
+                        sizing_set.output_motion_ctrl.data,
+                    )
+                )
+
+            wait(futures, return_when=FIRST_EXCEPTION)
+
+            for future in as_completed(futures):
+                if future.exception():
+                    raise future.exception()
+                sizing_idx, is_src, matrixes = future.result()
+                initial_matrixes[(sizing_idx, is_src)] = matrixes
+
+        ik_models: dict[tuple[int, bool], PmxModel] = {}
+
+        # IKセットアップする
+        with ThreadPoolExecutor(
+            thread_name_prefix="ik_setup", max_workers=self.max_worker
+        ) as executor:
+            futures: list[Future] = []
+
+            for sizing_set in sizing_panel.sizing_sets:
+                if usecase.validate(
+                    sizing_set.sizing_idx,
+                    sizing_set.src_model_ctrl.data,
+                    sizing_set.dest_model_ctrl.data,
+                    sizing_panel.stance_lower_check_ctrl.GetValue(),
+                ):
+                    futures.append(
+                        executor.submit(
+                            usecase.setup_model_ik,
+                            sizing_set.sizing_idx,
+                            False,
+                            sizing_set.dest_model_ctrl.data,
+                        )
+                    )
+
+            wait(futures, return_when=FIRST_EXCEPTION)
+
+            for future in as_completed(futures):
+                if future.exception():
+                    raise future.exception()
+
+                sizing_idx, is_src, ik_model = future.result()
+                ik_models[(sizing_idx, is_src)] = ik_model
+
+        # 下半身補正を実行する
+        with ThreadPoolExecutor(
+            thread_name_prefix="sizing_stance_lower", max_workers=self.max_worker
+        ) as executor:
+            futures: list[Future] = []
+            for sizing_set in sizing_panel.sizing_sets:
+                if usecase.validate(
+                    sizing_set.sizing_idx,
+                    sizing_set.src_model_ctrl.data,
+                    sizing_set.dest_model_ctrl.data,
+                    sizing_panel.stance_lower_check_ctrl.GetValue(),
+                ):
+                    futures.append(
+                        executor.submit(
+                            usecase.sizing_stance_lower,
+                            sizing_set.sizing_idx,
+                            sizing_set.src_model_ctrl.data,
+                            ik_models[(sizing_idx, False)],
+                            sizing_set.output_motion_ctrl.data,
+                            initial_matrixes[(sizing_idx, True)],
+                            initial_matrixes[(sizing_idx, False)],
+                        )
+                    )
+
+            wait(futures, return_when=FIRST_EXCEPTION)
+
+            for future in as_completed(futures):
+                if future.exception():
+                    raise future.exception()
+
     def sizing_arm_twist(self) -> None:
         """捩り分散"""
         logger.info("捩り分散", decoration=MLogger.Decoration.BOX)
 
         usecase = ArmTwistUsecase()
         sizing_panel: SizingPanel = self.frame.sizing_panel
+
+        # 初期位置を取得する
+        initial_matrixes: dict[tuple[int, bool, str], VmdBoneFrameTrees] = {}
+
+        with ThreadPoolExecutor(
+            thread_name_prefix="arm_initial", max_workers=self.max_worker
+        ) as executor:
+            futures: list[Future] = []
+            for sizing_set in sizing_panel.sizing_sets:
+                for direction in ("右", "左"):
+                    futures.append(
+                        executor.submit(
+                            usecase.get_initial_matrixes,
+                            sizing_set.sizing_idx,
+                            False,
+                            sizing_set.dest_model_ctrl.data,
+                            sizing_set.output_motion_ctrl.data,
+                            direction,
+                            sizing_panel.twist_middle_check_ctrl.GetValue(),
+                        )
+                    )
+
+            wait(futures, return_when=FIRST_EXCEPTION)
+
+            for future in as_completed(futures):
+                if future.exception():
+                    raise future.exception()
+                sizing_idx, is_src, direction, matrixes = future.result()
+                initial_matrixes[(sizing_idx, is_src, direction)] = matrixes
 
         ik_models: dict[tuple[int, bool], PmxModel] = {}
 
@@ -289,35 +429,6 @@ class SizingWorker(BaseWorker):
 
                 sizing_idx, is_src, ik_model = future.result()
                 ik_models[(sizing_idx, is_src)] = ik_model
-
-        # 初期位置を取得する
-        initial_matrixes: dict[tuple[int, bool, str], VmdBoneFrameTrees] = {}
-
-        with ThreadPoolExecutor(
-            thread_name_prefix="arm_initial", max_workers=self.max_worker
-        ) as executor:
-            futures: list[Future] = []
-            for sizing_set in sizing_panel.sizing_sets:
-                for direction in ("右", "左"):
-                    futures.append(
-                        executor.submit(
-                            usecase.get_initial_matrixes,
-                            sizing_set.sizing_idx,
-                            False,
-                            ik_models[(sizing_idx, False)],
-                            sizing_set.output_motion_ctrl.data,
-                            direction,
-                            sizing_panel.twist_middle_check_ctrl.GetValue(),
-                        )
-                    )
-
-            wait(futures, return_when=FIRST_EXCEPTION)
-
-            for future in as_completed(futures):
-                if future.exception():
-                    raise future.exception()
-                sizing_idx, is_src, direction, matrixes = future.result()
-                initial_matrixes[(sizing_idx, is_src, direction)] = matrixes
 
         # 捩り分散を実行する
         with ThreadPoolExecutor(

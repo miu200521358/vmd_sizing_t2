@@ -136,6 +136,32 @@ class SizingPanel(NotebookPanel):
         self.integrate_waist_sizer.Add(self.integrate_waist_help_ctrl, 0, wx.ALL, 0)
         self.config_sizer.Add(self.integrate_waist_sizer, 0, wx.ALL, 1)
 
+        # 下半身補正 ------------------------
+        self.stance_lower_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.stance_lower_check_ctrl = wx.CheckBox(
+            self, wx.ID_ANY, __("下半身補正"), wx.DefaultPosition, wx.DefaultSize, 0
+        )
+        self.stance_lower_check_ctrl.SetToolTip(__("足の傾きが同じになるよう、下半身の傾きを調整します"))
+        self.stance_lower_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_add_config)
+        self.stance_lower_sizer.Add(self.stance_lower_check_ctrl, 0, wx.ALL, 3)
+        self.stance_lower_help_ctrl = ImageButton(
+            self,
+            "resources/icon/help.png",
+            wx.Size(12, 12),
+            lambda event: self.on_help(
+                event,
+                "下半身補正",
+                [
+                    "サイジング先モデルが元モデルと同じポーズになるように、下半身の傾きを調整します",
+                    "　・特にしゃがんでいる時の足の向きが違っている時に有効です",
+                    "　・チェックをONにした場合、サイジングモーションに「L」を追加します",
+                ],
+            ),
+            __("解説をメッセージ欄に表示します"),
+        )
+        self.stance_lower_sizer.Add(self.stance_lower_help_ctrl, 0, wx.ALL, 0)
+        self.config_sizer.Add(self.stance_lower_sizer, 0, wx.ALL, 1)
+
         # 捩り分散 ------------------------
         self.twist_group_sizer = wx.BoxSizer(wx.VERTICAL)
 
@@ -373,6 +399,7 @@ class SizingPanel(NotebookPanel):
 
         self.integrate_root_check_ctrl.SetValue(self.is_full_config)
         self.integrate_waist_check_ctrl.SetValue(self.is_full_config)
+        self.stance_lower_check_ctrl.SetValue(self.is_full_config)
         self.twist_check_ctrl.SetValue(self.is_full_config)
         self.twist_middle_check_ctrl.SetValue(self.is_full_config)
         self.align_check_ctrl.SetValue(self.is_full_config)
@@ -471,6 +498,8 @@ class SizingPanel(NotebookPanel):
         self.integrate_root_help_ctrl.Enable(enable)
         self.integrate_waist_check_ctrl.Enable(enable)
         self.integrate_waist_help_ctrl.Enable(enable)
+        self.stance_lower_check_ctrl.Enable(enable)
+        self.stance_lower_help_ctrl.Enable(enable)
         self.twist_check_ctrl.Enable(enable)
         self.twist_middle_check_ctrl.Enable(enable)
         self.twist_help_ctrl.Enable(enable)

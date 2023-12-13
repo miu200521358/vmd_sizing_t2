@@ -10,21 +10,6 @@ from mlib.service.form.widgets.file_ctrl import MPmxFilePickerCtrl, MVmdFilePick
 logger = MLogger(os.path.basename(__file__))
 __ = logger.get_text
 
-STANCE_DETAIL_CHOICES = [
-    __("全ての親補正: 【注目点: 全ての親の位置】【補正対象: 全ての親をセンター・体幹に合併】【有効例: 全ての親】"),
-    __("センターXZ補正: 【注目点: 腰あたりの位置】【補正対象: センターXZ】【有効例: ターン】"),
-    __("センターY補正:【注目点: 手首の接地】【補正対象: センターYの位置】【有効例: 倒立】"),
-    __("上半身補正:【注目点: 頭の位置】【補正対象: 上半身・上半身2の傾き】【有効例: 上体反らし】"),
-    __("下半身補正:【注目点: 足ボーンの傾き】【補正対象: 下半身の傾き】【有効例: 四つ足モデル】"),
-    __("足IK補正:【注目点: 足首の位置】【補正対象: 足IKの位置】【有効例: 低頭身モデル】"),
-    __("足FK補正:【注目点: 足FK系の回転】【補正対象: 足FKの焼き込み】【有効例: 足IK使用モーション】"),
-    __("足D補正:【注目点: 足D系の回転】【補正対象: 足D系を足に合併】【有効例: 足D使用モーション】"),
-    __("つま先補正:【注目点: つま先の接地】【補正対象: 足IKの位置】【有効例: つま先立ち】"),
-    __("つま先IK補正:【注目点: 足首の向き】【補正対象: つま先IKを足IKに合併】【有効例: つま先IK使用モーション】"),
-]
-
-INITIAL_STANCE_DETAIL_CHOICES = [0, 1, 2, 3, 4, 5, 7, 8, 9, 10]
-
 
 class SizingBoneSet:
     def __init__(
@@ -289,6 +274,8 @@ class SizingBoneSet:
                 sizing_types.append("I")
             if self.panel.integrate_waist_check_ctrl.GetValue():
                 sizing_types.append("W")
+            if self.panel.stance_lower_check_ctrl.GetValue():
+                sizing_types.append("L")
             if (
                 self.panel.align_check_ctrl.GetValue()
                 or self.panel.align_finger_check_ctrl.GetValue()

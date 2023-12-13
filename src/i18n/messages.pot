@@ -1161,3 +1161,31 @@ msgstr ""
 msgid "腰統合準備"
 msgstr ""
 
+
+msgid "足の傾きが同じになるよう、下半身の傾きを調整します"
+msgstr ""
+
+
+msgid "【No.{x}】初期位置取得({m})"
+msgstr ""
+
+
+msgid "【No.{i}】下半身補正"
+msgstr ""
+
+
+msgid "【No.{x}】下半身補正 - 準備"
+msgstr ""
+
+
+msgid "-- 【No.{x}】下半身補正 - 準備 [{i} ({p:.2f}%)]"
+msgstr ""
+
+
+msgid "-- 【No.{x}】下半身補正 [{i} ({p:.2f}%)]"
+msgstr ""
+
+
+msgid "【No.{x}】下半身補正：追加IKセットアップ({m})"
+msgstr ""
+
