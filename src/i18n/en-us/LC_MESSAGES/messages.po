@@ -814,3 +814,6 @@ msgstr "・If checked ON, add "I" to the sizing motion"
 
 msgid "　・チェックをONにした場合、サイジングモーションに「A」を追加します"
 msgstr "・If the check is turned on, "A" will be added to the sizing motion"
+
+msgid "位置合わせ"
+msgstr "Alignment"

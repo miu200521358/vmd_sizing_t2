@@ -330,17 +330,15 @@ class SizingWorker(BaseWorker):
                     sizing_set.dest_model_ctrl.data,
                     sizing_panel.twist_check_ctrl.GetValue(),
                 ):
-                    for direction in ("右", "左"):
-                        futures.append(
-                            executor.submit(
-                                usecase.sizing_arm_twist,
-                                sizing_set.sizing_idx,
-                                ik_models[(sizing_idx, False)],
-                                sizing_set.output_motion_ctrl.data,
-                                initial_matrixes[sizing_idx, False, direction],
-                                direction,
-                            )
+                    futures.append(
+                        executor.submit(
+                            usecase.sizing_arm_twist,
+                            sizing_set.sizing_idx,
+                            ik_models[(sizing_idx, False)],
+                            sizing_set.output_motion_ctrl.data,
+                            initial_matrixes,
                         )
+                    )
 
             wait(futures, return_when=FIRST_EXCEPTION)
 

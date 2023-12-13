@@ -61,6 +61,22 @@ class ArmTwistUsecase:
         sizing_idx: int,
         dest_model: PmxModel,
         dest_motion: VmdMotion,
+        dest_all_initial_matrixes: dict[tuple[int, bool, str], VmdBoneFrameTrees],
+    ) -> tuple[int, str, VmdMotion]:
+        for direction in ("右", "左"):
+            self.sizing_arm_twist_direction(
+                sizing_idx,
+                dest_model,
+                dest_motion,
+                dest_all_initial_matrixes[sizing_idx, False, direction],
+                direction,
+            )
+
+    def sizing_arm_twist_direction(
+        self,
+        sizing_idx: int,
+        dest_model: PmxModel,
+        dest_motion: VmdMotion,
         dest_initial_matrixes: VmdBoneFrameTrees,
         direction: str,
     ) -> tuple[int, str, VmdMotion]:
@@ -699,12 +715,13 @@ class ArmTwistUsecase:
         )
 
         tail_bone_names: list[str] = [
+            BoneNames.elbow_tail(direction),
+            BoneNames.wrist_tail(direction),
             BoneNames.elbow_vertical(direction),
             BoneNames.wrist_vertical(direction),
-            BoneNames.wrist_tail(direction),
         ]
 
-        fnos = sorted(
+        fnos_set = (
             {0}
             | set(motion.bones[BoneNames.arm(direction)].register_indexes)
             | set(motion.bones[BoneNames.arm_twist(direction)].register_indexes)
@@ -713,14 +730,21 @@ class ArmTwistUsecase:
             | set(motion.bones[BoneNames.wrist(direction)].register_indexes)
         )
 
+        fnos = sorted(fnos_set)
+
         if 1 < len(fnos) and is_middle:
             # 中間点を追加する場合、3Fごとに分割する
             # 2F連続で打たないよう、endのひとつ前で判定を終了する
-            fnos = [
-                num
-                for start, end in zip(fnos, fnos[1:])
-                for num in range(start, end - 1, 3)
-            ] + [fnos[-1]]
+            # ただし元々登録されているキーフレであれば必ず打つ
+            fnos = sorted(
+                {
+                    num
+                    for start, end in zip(fnos, fnos[1:])
+                    for num in range(start, end - 1, 3)
+                }
+                | {fnos[-1]}
+                | fnos_set
+            )
 
         initial_matrixes = motion.animate_bone(
             fnos,
