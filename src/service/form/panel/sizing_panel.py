@@ -100,6 +100,7 @@ class SizingPanel(NotebookPanel):
                     "サイジング先モデルを任意の位置に置きやすくできるよう、全ての親の値を子ボーンに移し替えます",
                     "　・全ての親の移動や回転を、センターや足IKなどの子ボーンに割り当てます",
                     "　・全ての親のキーフレを削除するので、モデルを全ての親で移動させた後にモーションを読み込んでも、原点に戻ったりしなくなります",
+                    "　・チェックをONにした場合、サイジングモーションに「I」を追加します",
                 ],
             ),
             __("解説をメッセージ欄に表示します"),
@@ -115,7 +116,7 @@ class SizingPanel(NotebookPanel):
             self, wx.ID_ANY, __("捩り分散"), wx.DefaultPosition, wx.DefaultSize, 0
         )
         self.twist_check_ctrl.SetToolTip(__("腕を腕捩りなど、捩りボーンに捩り回転を分散させます"))
-        self.twist_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_add_config)
+        self.twist_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_twist_ctrl)
         self.twist_check_sizer.Add(self.twist_check_ctrl, 0, wx.ALL, 3)
         self.twist_help_ctrl = ImageButton(
             self,
@@ -130,13 +131,14 @@ class SizingPanel(NotebookPanel):
                     "　・ひじの軸回転、手捩の回転、手首の軸回転、をまとめて手捩ボーンに割り当てます",
                     "　・ひじの軸方向以外の回転を、人間のひじ構造と同じようにひじのY方向を曲げるよう、回転軸を調整します",
                     "　・腕の軌跡がズレないよう、腕・腕捩・ひじ・手捩・手首のいずれかのキーが打たれているキーフレームに対して処理を行います",
-                    "　・中間点追加にチェックを入れると、更に2Fごとに中間キーフレームを追加します",
+                    "　・中間点追加にチェックを入れると、更に3Fごとに中間キーフレームを追加します",
+                    "　・チェックをONにした場合、サイジングモーションに「T」を追加します",
                 ],
             ),
             __("解説をメッセージ欄に表示します"),
         )
         self.twist_check_sizer.Add(self.twist_help_ctrl, 0, wx.ALL, 0)
-        self.twist_group_sizer.Add(self.twist_check_sizer, 0, wx.ALL, 3)
+        self.twist_group_sizer.Add(self.twist_check_sizer, 0, wx.ALL, 0)
 
         self.twist_middle_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.twist_middle_blank = wx.StaticText(self, wx.ID_ANY, "     ")
@@ -145,13 +147,13 @@ class SizingPanel(NotebookPanel):
         self.twist_middle_check_ctrl = wx.CheckBox(
             self, wx.ID_ANY, __("中間点追加"), wx.DefaultPosition, wx.DefaultSize, 0
         )
-        self.twist_middle_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_align_sub_ctrl)
+        self.twist_middle_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_twist_sub_ctrl)
         self.twist_middle_check_ctrl.SetToolTip(
-            __("腕系キーの間で腕の軌跡がズレないよう、2Fごとに捩り分散処理を行います")
+            __("腕系キーの間で腕の軌跡がズレないよう、3Fごとに捩り分散処理を行います")
         )
 
-        self.twist_middle_sizer.Add(self.twist_middle_check_ctrl, 0, wx.ALL, 0)
-        self.twist_group_sizer.Add(self.twist_middle_sizer, 0, wx.ALL, 3)
+        self.twist_middle_sizer.Add(self.twist_middle_check_ctrl, 0, wx.ALL, 3)
+        self.twist_group_sizer.Add(self.twist_middle_sizer, 0, wx.ALL, 0)
 
         self.config_sizer.Add(self.twist_group_sizer, 0, wx.ALL, 1)
 
@@ -178,6 +180,7 @@ class SizingPanel(NotebookPanel):
                     "サイジング先モデルが元モデルと同じポーズになるように、手首の位置などを調整します",
                     "　・特に手を合わせたり、ハートを作るポーズなどが崩れにくくなります",
                     "　・指位置合わせ・指先位置合わせは特にフィンガータットモーションが崩れにくくなります",
+                    "　・チェックをONにした場合、サイジングモーションに「A」を追加します",
                 ],
             ),
             __("解説をメッセージ欄に表示します"),
@@ -197,8 +200,8 @@ class SizingPanel(NotebookPanel):
             __("鎖骨あたりに対する指の位置を元モーションと大体同じ位置になるよう合わせます")
         )
 
-        self.align_finger_sizer.Add(self.align_finger_check_ctrl, 0, wx.ALL, 0)
-        self.align_group_sizer.Add(self.align_finger_sizer, 0, wx.ALL, 3)
+        self.align_finger_sizer.Add(self.align_finger_check_ctrl, 0, wx.ALL, 3)
+        self.align_group_sizer.Add(self.align_finger_sizer, 0, wx.ALL, 0)
 
         self.align_finger_tail_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.align_finger_tail_blank = wx.StaticText(self, wx.ID_ANY, "     ")
@@ -214,9 +217,9 @@ class SizingPanel(NotebookPanel):
             __("手のひらに対する指先の位置を元モーションと大体同じ位置になるよう合わせます")
         )
         self.align_finger_tail_sizer.Add(
-            self.align_finger_tail_check_ctrl, 0, wx.ALL, 0
+            self.align_finger_tail_check_ctrl, 0, wx.ALL, 3
         )
-        self.align_group_sizer.Add(self.align_finger_tail_sizer, 0, wx.ALL, 3)
+        self.align_group_sizer.Add(self.align_finger_tail_sizer, 0, wx.ALL, 0)
 
         self.config_sizer.Add(self.align_group_sizer, 0, wx.ALL, 1)
 
@@ -342,6 +345,7 @@ class SizingPanel(NotebookPanel):
 
         self.integrate_parent_check_ctrl.SetValue(self.is_full_config)
         self.twist_check_ctrl.SetValue(self.is_full_config)
+        self.twist_middle_check_ctrl.SetValue(self.is_full_config)
         self.align_check_ctrl.SetValue(self.is_full_config)
         self.align_finger_check_ctrl.SetValue(self.is_full_config)
         self.align_finger_tail_check_ctrl.SetValue(self.is_full_config)
@@ -351,6 +355,16 @@ class SizingPanel(NotebookPanel):
     def on_check_add_config(self, event: wx.Event) -> None:
         for sizing_set in self.sizing_sets:
             sizing_set.create_output_path()
+
+    def on_check_twist_ctrl(self, event: wx.Event) -> None:
+        if not self.twist_check_ctrl.GetValue():
+            self.twist_middle_check_ctrl.SetValue(0)
+        self.on_change_dest_model_pmx(event)
+
+    def on_check_twist_sub_ctrl(self, event: wx.Event) -> None:
+        if self.twist_middle_check_ctrl.GetValue():
+            self.twist_check_ctrl.SetValue(1)
+        self.on_change_dest_model_pmx(event)
 
     def on_check_align_ctrl(self, event: wx.Event) -> None:
         if not self.align_check_ctrl.GetValue():
@@ -427,6 +441,7 @@ class SizingPanel(NotebookPanel):
         self.integrate_parent_check_ctrl.Enable(enable)
         self.integrate_parent_help_ctrl.Enable(enable)
         self.twist_check_ctrl.Enable(enable)
+        self.twist_middle_check_ctrl.Enable(enable)
         self.twist_help_ctrl.Enable(enable)
         self.align_check_ctrl.Enable(enable)
         self.align_finger_check_ctrl.Enable(enable)

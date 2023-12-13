@@ -307,6 +307,7 @@ class SizingWorker(BaseWorker):
                             ik_models[(sizing_idx, False)],
                             sizing_set.output_motion_ctrl.data,
                             direction,
+                            sizing_panel.twist_middle_check_ctrl.GetValue(),
                         )
                     )
 

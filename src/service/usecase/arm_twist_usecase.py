@@ -87,15 +87,6 @@ class ArmTwistUsecase:
             BoneNames.wrist_twist(direction)
         ].corrected_fixed_axis
 
-        fnos = sorted(
-            {0}
-            | set(dest_motion.bones[BoneNames.arm(direction)].register_indexes)
-            | set(dest_motion.bones[BoneNames.arm_twist(direction)].register_indexes)
-            | set(dest_motion.bones[BoneNames.elbow(direction)].register_indexes)
-            | set(dest_motion.bones[BoneNames.wrist_twist(direction)].register_indexes)
-            | set(dest_motion.bones[BoneNames.wrist(direction)].register_indexes)
-        )
-
         # 処理対象ボーン名取得
         target_bone_names = dest_motion.bones.get_animate_bone_names(
             dest_model,
@@ -113,13 +104,13 @@ class ArmTwistUsecase:
             bone_pos_matrixes,
         ) = dest_motion.bones.create_bone_matrixes(dest_model, target_bone_names)
 
-        for fidx, fno in enumerate(fnos):
+        for fidx, fno in enumerate(dest_initial_matrixes.indexes):
             logger.count(
                 "【No.{x}】【{d}】捩り分散 - 準備",
                 x=sizing_idx + 1,
                 d=__(direction),
                 index=fidx,
-                total_index_count=len(fnos),
+                total_index_count=len(dest_initial_matrixes.indexes),
                 display_block=1000,
             )
 
@@ -164,13 +155,13 @@ class ArmTwistUsecase:
             wrist_direction_ik_bf.register = True
             dest_motion.insert_bone_frame(wrist_direction_ik_bf)
 
-        for fidx, fno in enumerate(fnos):
+        for fidx, fno in enumerate(dest_initial_matrixes.indexes):
             logger.count(
                 "【No.{x}】【{d}】捩り分散",
                 x=sizing_idx + 1,
                 d=__(direction),
                 index=fidx,
-                total_index_count=len(fnos),
+                total_index_count=len(dest_initial_matrixes.indexes),
                 display_block=50,
             )
 
@@ -695,6 +686,7 @@ class ArmTwistUsecase:
         model: PmxModel,
         motion: VmdMotion,
         direction: str,
+        is_middle: bool,
     ) -> tuple[int, bool, str, VmdBoneFrameTrees]:
         model_type = __("作成元モデル" if is_src else "サイジング先モデル")
 
@@ -711,13 +703,24 @@ class ArmTwistUsecase:
             BoneNames.wrist_vertical(direction),
             BoneNames.wrist_tail(direction),
         ]
-        fnos_set: set[int] = {0}
 
-        for tail_bone_name in tail_bone_names:
-            for tree_bone_name in model.bone_trees[tail_bone_name].names:
-                fnos_set |= set(motion.bones[tree_bone_name].register_indexes)
+        fnos = sorted(
+            {0}
+            | set(motion.bones[BoneNames.arm(direction)].register_indexes)
+            | set(motion.bones[BoneNames.arm_twist(direction)].register_indexes)
+            | set(motion.bones[BoneNames.elbow(direction)].register_indexes)
+            | set(motion.bones[BoneNames.wrist_twist(direction)].register_indexes)
+            | set(motion.bones[BoneNames.wrist(direction)].register_indexes)
+        )
 
-        fnos: list[int] = sorted(fnos_set)
+        if 1 < len(fnos) and is_middle:
+            # 中間点を追加する場合、3Fごとに分割する
+            # 2F連続で打たないよう、endのひとつ前で判定を終了する
+            fnos = [
+                num
+                for start, end in zip(fnos, fnos[1:])
+                for num in range(start, end - 1, 3)
+            ] + [fnos[-1]]
 
         initial_matrixes = motion.animate_bone(
             fnos,

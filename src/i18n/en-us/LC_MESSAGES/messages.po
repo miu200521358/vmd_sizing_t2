@@ -760,3 +760,57 @@ msgid "サイジング先モデルが指定されていません。"
 msgstr "The model to which you are sizing is not specified"
 msgid "【No.{i}】【{d}】捩り分散"
 msgstr "[No.{i}][{d}] torsional dispersion"
+
+msgid "解説をメッセージ欄に表示します"
+msgstr "Display the commentary in the message field"
+
+msgid "サイジング先モデルを任意の位置に置きやすくできるよう、全ての親の値を子ボーンに移し替えます"
+msgstr "Transfers all parent values to child bones to make it easier to place the sizing target model in any position"
+
+msgid "　・全ての親の移動や回転を、センターや足IKなどの子ボーンに割り当てます"
+msgstr "- Assign all parent moves and rotations to child bones such as center and foot IK"
+
+msgid "　・全ての親のキーフレを削除するので、モデルを全ての親で移動させた後にモーションを読み込んでも、原点に戻ったりしなくなります"
+msgstr "- Removes the keyfre of all parents, so if you move the model with all parents and then load the motion, it will not go back to the origin"
+
+msgid "サイジング先モデルの腕の変形が綺麗になるよう、腕捩と手捩を再計算します"
+msgstr "Recalculate the arm torsion and hand torsion so that the arm deformation of the sizing destination model is clean"
+
+msgid "　・腕の軸回転、腕捩の回転、をまとめて腕捩ボーンに割り当てます"
+msgstr "-Axial rotation of the arm and arm-torsion, collectively, are assigned to the arm-torsion bone"
+
+msgid "　・ひじの軸回転、手捩の回転、手首の軸回転、をまとめて手捩ボーンに割り当てます"
+msgstr "-Axial rotation of the elbow, rotation of the hand torsion, and axial rotation of the wrist, collectively, are assigned to the hand torsion bone"
+
+msgid "　・ひじの軸方向以外の回転を、人間のひじ構造と同じようにひじのY方向を曲げるよう、回転軸を調整します"
+msgstr "- Adjust the axis of rotation so that the non-axial rotation of the elbow bends the Y direction of the elbow in the same way as the human elbow structure"
+
+msgid "サイジング先モデルが元モデルと同じポーズになるように、手首の位置などを調整します"
+msgstr "Adjust the position of the wrists, etc. so that the sizing destination model is in the same pose as the original model"
+
+msgid "　・特に手を合わせたり、ハートを作るポーズなどが崩れにくくなります"
+msgstr "-It's harder to break down, especially in poses such as putting hands together or making hearts"
+
+msgid "　・指位置合わせ・指先位置合わせは特にフィンガータットモーションが崩れにくくなります"
+msgstr "-Finger positioning and fingertip positioning are particularly difficult to break finger-tattoo motion"
+
+msgid "中間点追加"
+msgstr "Add midpoint"
+
+msgid "腕系キーの間で腕の軌跡がズレないよう、3Fごとに捩り分散処理を行います"
+msgstr "Torsional dispersion processing is performed every 3F to prevent the arm trajectory from deviating between the arm system keys"
+
+msgid "　・腕の軌跡がズレないよう、腕・腕捩・ひじ・手捩・手首のいずれかのキーが打たれているキーフレームに対して処理を行います"
+msgstr "・Processes keyframes where the arm, arm-twist, elbow, hand-twist, or wrist key is struck so that the trajectory of the arm is not shifted"
+
+msgid "　・中間点追加にチェックを入れると、更に3Fごとに中間キーフレームを追加します"
+msgstr "・Check the Add midpoint checkbox to add a midpoint keyframe every 3F more"
+
+msgid "　・チェックをONにした場合、サイジングモーションに「T」を追加します"
+msgstr "・If the check is turned on, "T" will be added to the sizing motion"
+
+msgid "　・チェックをONにした場合、サイジングモーションに「I」を追加します"
+msgstr "・If checked ON, add "I" to the sizing motion"
+
+msgid "　・チェックをONにした場合、サイジングモーションに「A」を追加します"
+msgstr "・If the check is turned on, "A" will be added to the sizing motion"
