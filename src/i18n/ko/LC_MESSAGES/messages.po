@@ -817,3 +817,21 @@ msgstr " ・체크가 ON인 경우, 사이징 모션에 'A'를 추가합니다"
 
 msgid "位置合わせ"
 msgstr "위치 조정"
+
+msgid "サイジング"
+msgstr "사이징"
+
+msgid "IK焼き込み"
+msgstr "IK 구워내기"
+
+msgid "ファイル"
+msgstr "파일"
+
+msgid "対象ボーン"
+msgstr "대상 뼈"
+
+msgid "ボーン選択"
+msgstr "뼈 선택"
+
+msgid "細かさ"
+msgstr "섬세함"

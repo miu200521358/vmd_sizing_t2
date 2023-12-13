@@ -1085,3 +1085,27 @@ msgstr ""
 msgid "位置合わせ"
 msgstr ""
 
+
+msgid "サイジング"
+msgstr ""
+
+
+msgid "IK焼き込み"
+msgstr ""
+
+
+msgid "ファイル"
+msgstr ""
+
+
+msgid "対象ボーン"
+msgstr ""
+
+
+msgid "ボーン選択"
+msgstr ""
+
+
+msgid "細かさ"
+msgstr ""
+

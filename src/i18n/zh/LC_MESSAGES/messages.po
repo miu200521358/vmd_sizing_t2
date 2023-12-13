@@ -817,3 +817,21 @@ msgstr "--如果复选 "ON"，则在尺寸调整动作中添加 "A"
 
 msgid "位置合わせ"
 msgstr "对齐"
+
+msgid "サイジング"
+msgstr "上浆"
+
+msgid "IK焼き込み"
+msgstr "谥号烘托"
+
+msgid "ファイル"
+msgstr "文件"
+
+msgid "対象ボーン"
+msgstr "目标骨"
+
+msgid "ボーン選択"
+msgstr "骨骼选择"
+
+msgid "細かさ"
+msgstr "细度"

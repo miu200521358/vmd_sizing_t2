@@ -817,3 +817,21 @@ msgstr "　・チェックをONにした場合、サイジングモーション�
 
 msgid "位置合わせ"
 msgstr "位置合わせ"
+
+msgid "サイジング"
+msgstr "サイジング"
+
+msgid "IK焼き込み"
+msgstr "IK焼き込み"
+
+msgid "ファイル"
+msgstr "ファイル"
+
+msgid "対象ボーン"
+msgstr "対象ボーン"
+
+msgid "ボーン選択"
+msgstr "ボーン選択"
+
+msgid "細かさ"
+msgstr "細かさ"

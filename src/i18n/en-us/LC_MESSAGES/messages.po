@@ -817,3 +817,21 @@ msgstr "・If the check is turned on, "A" will be added to the sizing motion"
 
 msgid "位置合わせ"
 msgstr "Alignment"
+
+msgid "サイジング"
+msgstr "Sizing"
+
+msgid "IK焼き込み"
+msgstr "IK Baked in"
+
+msgid "ファイル"
+msgstr "File"
+
+msgid "対象ボーン"
+msgstr "Subject Bone"
+
+msgid "ボーン選択"
+msgstr "Bone Selection"
+
+msgid "細かさ"
+msgstr "fineness"
