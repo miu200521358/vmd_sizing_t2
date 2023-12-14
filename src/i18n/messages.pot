@@ -1189,3 +1189,7 @@ msgstr ""
 msgid "【No.{x}】下半身補正：追加IKセットアップ({m})"
 msgstr ""
 
+
+msgid "下半身補正"
+msgstr ""
+

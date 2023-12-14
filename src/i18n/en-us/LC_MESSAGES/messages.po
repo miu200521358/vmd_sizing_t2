@@ -835,3 +835,66 @@ msgstr "Bone Selection"
 
 msgid "細かさ"
 msgstr "fineness"
+
+msgid "全ての親統合"
+msgstr "All parent integration"
+
+msgid "腰統合"
+msgstr "Lumbar integration"
+
+msgid "腰の移動や回転を上半身・下半身に振り分けて、腰のキーフレームを削除します"
+msgstr "Delete the waist keyframe by distributing the waist movement and rotation to the upper and lower body"
+
+msgid "サイジング先モデルが元モデルと同じポーズになるように、腰の値を子ボーンに移し替えます"
+msgstr "Transfers the waist values to the child bones so that the sizing destination model is in the same pose as the source model"
+
+msgid "　・腰の移動や回転を、上半身や下半身の子ボーンに割り当てます"
+msgstr "- Assign the movement and rotation of the hips to the child bones of the upper and lower body"
+
+msgid "　・チェックをONにした場合、サイジングモーションに「W」を追加します"
+msgstr "・When checked ON, "W" will be added to the sizing motion"
+
+msgid "{b}統合"
+msgstr "{b}Integration"
+
+msgid "【No.{i}】{b}統合"
+msgstr "[No.{i}]{b} integration"
+
+msgid "全ての親統合準備"
+msgstr "All Parent Integration Preparation"
+
+msgid "【No.{x}】{b}統合"
+msgstr "[No.{x}]{b} integration"
+
+msgid "-- 【No.{x}】{b}統合 [{i} ({p:.2f}%)]"
+msgstr "-- [No.{x}]{b} integration [{i} ({p:.2f}%)]"
+
+msgid "【No.{x}】モーションに{b}のキーフレームがないため、{b}統合をスキップします"
+msgstr "[No.{x}] Skip {b} integration because there are no {b} keyframes in the motion"
+
+msgid "腰統合準備"
+msgstr "Preparing for hip consolidation"
+
+msgid "足の傾きが同じになるよう、下半身の傾きを調整します"
+msgstr "Adjust the tilt of the lower body so that the feet are at the same tilt"
+
+msgid "【No.{x}】初期位置取得({m})"
+msgstr "[No.{x}] Get initial position ({m})"
+
+msgid "【No.{i}】下半身補正"
+msgstr "[No.{i}] Lower body correction"
+
+msgid "【No.{x}】下半身補正 - 準備"
+msgstr "[No.{x}] Lower body correction - preparation"
+
+msgid "-- 【No.{x}】下半身補正 - 準備 [{i} ({p:.2f}%)]"
+msgstr "-- [No.{x}] Lower Body Correction - Preparation [{i} ({p:.2f}%)]"
+
+msgid "-- 【No.{x}】下半身補正 [{i} ({p:.2f}%)]"
+msgstr "-- [No.{x}] lower body correction [{i} ({p:.2f}%)]"
+
+msgid "【No.{x}】下半身補正：追加IKセットアップ({m})"
+msgstr "[No.{x}] Lower body correction: additional IK setup ({m})"
+
+msgid "下半身補正"
+msgstr "Lower body correction"

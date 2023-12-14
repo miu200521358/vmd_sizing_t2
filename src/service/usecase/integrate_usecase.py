@@ -21,7 +21,7 @@ class IntegrateUsecase:
         logger.info(
             "【No.{i}】{b}統合",
             i=sizing_idx + 1,
-            b=bone_name,
+            b=__(bone_name),
             decoration=MLogger.Decoration.LINE,
         )
 
@@ -29,7 +29,7 @@ class IntegrateUsecase:
             logger.warning(
                 "【No.{x}】モーションに{b}のキーフレームがないため、{b}統合をスキップします",
                 x=sizing_idx + 1,
-                b=bone_name,
+                b=__(bone_name),
                 decoration=MLogger.Decoration.BOX,
             )
             return sizing_idx, motion
@@ -75,7 +75,7 @@ class IntegrateUsecase:
                 logger.count(
                     "【No.{x}】{b}統合",
                     x=sizing_idx + 1,
-                    b=bone_name,
+                    b=__(bone_name),
                     index=n,
                     total_index_count=total_count,
                     display_block=1000,
@@ -125,7 +125,7 @@ class IntegrateUsecase:
                 logger.count(
                     "【No.{x}】{b}統合 - センター",
                     x=sizing_idx + 1,
-                    b=bone_name,
+                    b=__(bone_name),
                     index=n,
                     total_index_count=total_count,
                     display_block=1000,
