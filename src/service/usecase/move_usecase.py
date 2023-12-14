@@ -187,13 +187,14 @@ class MoveUsecase:
         # XZ比率は足の長さの合計を参照する
         dest_xz_leg_length = dest_upper_length + dest_lower_length
 
-        # XZ比率(足の長さ) ------------------
+        # XZ比率(足の長さ)
         xz_leg_ratio = (
             dest_xz_leg_length / src_xz_leg_length
             if src_xz_leg_length and dest_xz_leg_length
             else 1
         )
 
+        # ---------------------
         src_y_leg_length = (
             (
                 src_model.bones[BoneNames.leg("左")].position
@@ -216,7 +217,7 @@ class MoveUsecase:
             ).y
         ) / 2
 
-        # Y比率(股下のY差) ------------------
+        # Y比率(股下のY差)
         y_leg_ratio = (
             dest_y_leg_length / src_y_leg_length
             if src_y_leg_length and dest_y_leg_length
