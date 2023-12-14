@@ -217,7 +217,7 @@ class SizingPanel(NotebookPanel):
         self.align_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
         self.align_check_ctrl = wx.CheckBox(
-            self, wx.ID_ANY, __("位置合わせ"), wx.DefaultPosition, wx.DefaultSize, 0
+            self, wx.ID_ANY, __("手首位置合わせ"), wx.DefaultPosition, wx.DefaultSize, 0
         )
         self.align_check_ctrl.SetToolTip(__("手首の位置を元モーションと大体同じ位置になるよう合わせます"))
         self.align_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_align_ctrl)
@@ -229,7 +229,7 @@ class SizingPanel(NotebookPanel):
             wx.Size(12, 12),
             lambda event: self.on_help(
                 event,
-                "位置合わせ",
+                "手首位置合わせ",
                 [
                     "サイジング先モデルが元モデルと同じポーズになるように、手首の位置などを調整します",
                     "　・特に手を合わせたり、ハートを作るポーズなどが崩れにくくなります",

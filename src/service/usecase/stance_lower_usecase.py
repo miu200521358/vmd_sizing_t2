@@ -80,27 +80,31 @@ class StanceLowerUsecase:
             decoration=MLogger.Decoration.LINE,
         )
 
-        lower_ratio = (
-            (
-                dest_model.bones[BoneNames.knee("右")].position.distance(
-                    dest_model.bones[BoneNames.leg("右")].position
-                )
-                + dest_model.bones[BoneNames.knee("左")].position.distance(
-                    dest_model.bones[BoneNames.leg("左")].position
-                )
-            )
-            / 2
-        ) / (
-            (
-                src_model.bones[BoneNames.knee("右")].position.distance(
-                    src_model.bones[BoneNames.leg("右")].position
-                )
-                + src_model.bones[BoneNames.knee("左")].position.distance(
-                    src_model.bones[BoneNames.leg("左")].position
-                )
-            )
-            / 2
+        lower_ratio = dest_model.bones[BoneNames.lower()].position.distance(
+            dest_model.bones[BoneNames.center_leg()].position
+        ) / src_model.bones[BoneNames.lower()].position.distance(
+            src_model.bones[BoneNames.center_leg()].position
         )
+
+        leg_ratio = (
+            dest_model.bones[BoneNames.knee("右")].position.distance(
+                dest_model.bones[BoneNames.leg("右")].position
+            )
+            + dest_model.bones[BoneNames.knee("左")].position.distance(
+                dest_model.bones[BoneNames.leg("左")].position
+            )
+        ) / (
+            src_model.bones[BoneNames.knee("右")].position.distance(
+                src_model.bones[BoneNames.leg("右")].position
+            )
+            + src_model.bones[BoneNames.knee("左")].position.distance(
+                src_model.bones[BoneNames.leg("左")].position
+            )
+        )
+
+        # 足の長さ＋下半身から足中心までの長さの比率
+        # lower_leg_ratio = lower_ratio * leg_ratio
+        lower_leg_ratio = (lower_ratio + leg_ratio) / 2
 
         for fidx, fno in enumerate(dest_initial_matrixes.indexes):
             logger.count(
@@ -144,19 +148,6 @@ class StanceLowerUsecase:
             center_leg_tail_bf.register = True
             dest_motion.insert_bone_frame(center_leg_tail_bf)
 
-        # 処理対象ボーン名取得
-        target_bone_names = dest_motion.bones.get_animate_bone_names(
-            dest_model,
-            [BoneNames.ankle("右"), BoneNames.ankle("左"), BoneNames.center_knee()],
-        )
-
-        # 処理対象ボーンの行列取得
-        (
-            bone_dict,
-            bone_offset_matrixes,
-            bone_pos_matrixes,
-        ) = dest_motion.bones.create_bone_matrixes(dest_model, target_bone_names)
-
         for fidx, fno in enumerate(dest_initial_matrixes.indexes):
             logger.count(
                 "【No.{x}】下半身補正",
@@ -166,190 +157,79 @@ class StanceLowerUsecase:
                 display_block=100,
             )
 
-            # モーションボーンの初期値を取得
-            (
-                is_motion_identity_poses,
-                is_motion_identity_qqs,
-                is_motion_identity_scales,
-                is_motion_identity_local_poses,
-                is_motion_identity_local_qqs,
-                is_motion_identity_local_scales,
-                motion_bone_poses,
-                motion_bone_qqs,
-                motion_bone_scales,
-                motion_bone_local_poses,
-                motion_bone_local_qqs,
-                motion_bone_local_scales,
-                motion_bone_fk_qqs,
-            ) = dest_motion.bones.get_bone_matrixes(
-                [fno],
-                dest_model,
-                target_bone_names,
-                out_fno_log=False,
-            )
-
             # --------------
+
+            # 下半身先
+            lower_tail_bf = dest_motion.bones[BoneNames.lower_tail()][fno]
+            lower_tail_bf.rotation = dest_initial_matrixes[
+                BoneNames.lower(), fno
+            ].frame_fk_rotation
+            dest_motion.insert_bone_frame(lower_tail_bf)
+
+            # 足中心先
+            center_leg_tail_bf = dest_motion.bones[BoneNames.center_leg_tail()][fno]
+            center_leg_tail_bf.rotation = MQuaternion.slerp(
+                src_initial_matrixes[BoneNames.leg("右"), fno].frame_fk_rotation,
+                src_initial_matrixes[BoneNames.leg("左"), fno].frame_fk_rotation,
+                0.5,
+            )
+            dest_motion.insert_bone_frame(center_leg_tail_bf)
 
             # 下半身IK
             lower_ik_bf = dest_motion.bones[BoneNames.lower_ik()][fno]
-            lower_ik_bf.position = (
-                dest_initial_matrixes[BoneNames.center_leg(), fno].position
-            ) + (
+            lower_ik_bf.position = dest_initial_matrixes[
+                BoneNames.lower(), fno
+            ].position + (
                 (
                     (
-                        (
-                            src_initial_matrixes[BoneNames.knee("右"), fno].position
-                            + src_initial_matrixes[BoneNames.knee("左"), fno].position
-                        )
-                        / 2
+                        src_initial_matrixes[BoneNames.knee("右"), fno].position
+                        + src_initial_matrixes[BoneNames.knee("左"), fno].position
                     )
-                    - src_initial_matrixes[BoneNames.center_leg(), fno].position
+                    / 2
+                    - src_initial_matrixes[BoneNames.lower(), fno].position
                 )
-                * lower_ratio
+                * lower_leg_ratio
             )
             dest_motion.insert_bone_frame(lower_ik_bf)
 
-            lower_tail_qq = dest_initial_matrixes[
-                BoneNames.lower(), fno
-            ].frame_fk_rotation
+            # ■ --------------
+            from datetime import datetime
 
-            center_leg_tail_qq = MQuaternion.slerp(
-                dest_initial_matrixes[BoneNames.leg("右"), fno].frame_fk_rotation,
-                dest_initial_matrixes[BoneNames.leg("左"), fno].frame_fk_rotation,
-                0.5,
+            from mlib.vmd.vmd_writer import VmdWriter
+
+            VmdWriter(
+                dest_motion,
+                f"E:/MMD/サイジング/足IK/IK_step/{datetime.now():%Y%m%d_%H%M%S_%f}_下半身_{fno:04d}.vmd",
+                model_name="Test Model",
+            ).save()
+            # ■ --------------
+
+            # IK解決する
+            _, _, ik_qqs = dest_motion.bones.get_ik_rotation(
+                fidx,
+                fno,
+                dest_model,
+                dest_model.bones[BoneNames.lower_ik()],
             )
 
-            for n in range(50):
-                # 下半身先
-                lower_tail_bf = dest_motion.bones[BoneNames.lower_tail()][fno]
-                lower_tail_bf.rotation = lower_tail_qq
-                dest_motion.insert_bone_frame(lower_tail_bf)
-
-                # 足中心先
-                center_leg_tail_bf = dest_motion.bones[BoneNames.center_leg_tail()][fno]
-                center_leg_tail_bf.rotation = center_leg_tail_qq
-                dest_motion.insert_bone_frame(center_leg_tail_bf)
-
-                # ■ --------------
-                from datetime import datetime
-
-                from mlib.vmd.vmd_writer import VmdWriter
-
-                VmdWriter(
-                    dest_motion,
-                    f"E:/MMD/サイジング/足IK/IK_step/{datetime.now():%Y%m%d_%H%M%S_%f}_下半身_{fno:04d}_{n:02d}.vmd",
-                    model_name="Test Model",
-                ).save()
-                # ■ --------------
-
-                # 下半身：IK解決する
-                _, _, ik_qqs = dest_motion.bones.get_ik_rotation(
-                    fidx,
-                    fno,
-                    dest_model,
-                    dest_model.bones[BoneNames.lower_ik()],
-                )
-
-                lower_bf = dest_motion.bones[BoneNames.lower()][fno]
-                lower_bf.rotation = lower_tail_qq = ik_qqs[
-                    dest_model.bones[BoneNames.lower_tail()].index
-                ]
-                dest_motion.insert_bone_frame(lower_bf)
-
-                motion_bone_qqs[
-                    0, dest_model.bones[BoneNames.lower_tail()].index
-                ] = motion_bone_qqs[0, dest_model.bones[BoneNames.lower()].index] = (
-                    ik_qqs[dest_model.bones[BoneNames.lower_tail()].index]
-                    .to_matrix4x4()
-                    .vector
-                )
-
-                # 右足：IK解決する
-                _, _, right_leg_ik_qqs = dest_motion.bones.get_ik_rotation(
-                    fidx,
-                    fno,
-                    dest_model,
-                    dest_model.bones[BoneNames.leg_ik("右")],
-                )
-
-                motion_bone_qqs[0, dest_model.bones[BoneNames.leg("右")].index] = (
-                    right_leg_ik_qqs[dest_model.bones[BoneNames.leg("右")].index]
-                    .to_matrix4x4()
-                    .vector
-                )
-
-                motion_bone_qqs[0, dest_model.bones[BoneNames.knee("右")].index] = (
-                    right_leg_ik_qqs[dest_model.bones[BoneNames.knee("右")].index]
-                    .to_matrix4x4()
-                    .vector
-                )
-
-                # 左足：IK解決する
-                _, _, left_leg_ik_qqs = dest_motion.bones.get_ik_rotation(
-                    fidx,
-                    fno,
-                    dest_model,
-                    dest_model.bones[BoneNames.leg_ik("左")],
-                )
-
-                motion_bone_qqs[0, dest_model.bones[BoneNames.leg("左")].index] = (
-                    left_leg_ik_qqs[dest_model.bones[BoneNames.leg("左")].index]
-                    .to_matrix4x4()
-                    .vector
-                )
-
-                motion_bone_qqs[0, dest_model.bones[BoneNames.knee("左")].index] = (
-                    left_leg_ik_qqs[dest_model.bones[BoneNames.knee("左")].index]
-                    .to_matrix4x4()
-                    .vector
-                )
-
-                # 足中心先
-                center_leg_tail_qq = MQuaternion.slerp(
-                    right_leg_ik_qqs[dest_model.bones[BoneNames.leg("右")].index],
-                    left_leg_ik_qqs[dest_model.bones[BoneNames.leg("左")].index],
-                    0.5,
-                )
-
-                motion_bone_qqs[
-                    0, dest_model.bones[BoneNames.center_leg_tail()].index
-                ] = center_leg_tail_qq.to_matrix4x4().vector
-
-                # 下半身 解決後の行列取得
-                matrixes = dest_motion.bones.calc_bone_matrixes(
-                    [fno],
-                    dest_model,
-                    bone_dict,
-                    bone_offset_matrixes,
-                    bone_pos_matrixes,
-                    is_motion_identity_poses,
-                    is_motion_identity_qqs,
-                    is_motion_identity_scales,
-                    is_motion_identity_local_poses,
-                    is_motion_identity_local_qqs,
-                    is_motion_identity_local_scales,
-                    motion_bone_poses,
-                    motion_bone_qqs,
-                    motion_bone_scales,
-                    motion_bone_local_poses,
-                    motion_bone_local_qqs,
-                    motion_bone_local_scales,
-                    motion_bone_fk_qqs,
-                    matrixes=None,
-                    out_fno_log=False,
-                    description="",
-                )
-
-                if (
-                    1e-2
-                    > (
-                        matrixes[BoneNames.center_knee(), fno].position
-                        - lower_ik_bf.position
-                    ).length_squared()
-                ):
-                    break
+            lower_bf = dest_motion.bones[BoneNames.lower()][fno]
+            lower_bf.rotation = ik_qqs[dest_model.bones[BoneNames.lower_tail()].index]
+            dest_motion.insert_bone_frame(lower_bf)
 
             # ■ --------------
+            lower_tail_bf = dest_motion.bones[BoneNames.lower_tail()][fno]
+            lower_tail_bf.rotation = ik_qqs[
+                dest_model.bones[BoneNames.lower_tail()].index
+            ]
+            dest_motion.insert_bone_frame(lower_tail_bf)
+
+            # 足中心先
+            center_leg_tail_bf = dest_motion.bones[BoneNames.center_leg_tail()][fno]
+            center_leg_tail_bf.rotation = ik_qqs[
+                dest_model.bones[BoneNames.center_leg_tail()].index
+            ]
+            dest_motion.insert_bone_frame(center_leg_tail_bf)
+
             VmdWriter(
                 dest_motion,
                 f"E:/MMD/サイジング/足IK/IK_step/{datetime.now():%Y%m%d_%H%M%S_%f}_下半身結果_{fno:04d}.vmd",
@@ -463,19 +343,18 @@ class StanceLowerUsecase:
         # 下半身IKの構成
         lower_ik = Ik()
         lower_ik.bone_index = center_knee_bone.index
-        lower_ik.loop_count = 1
+        lower_ik.loop_count = 20
         lower_ik.unit_rotation.degrees = MVector3D(180, 0, 0)
+
+        # 足中心先
+        lower_ik_center_leg = IkLink()
+        lower_ik_center_leg.bone_index = center_leg_tail_bone.index
+        lower_ik.links.append(lower_ik_center_leg)
 
         # 下半身先
         lower_ik_lower = IkLink()
         lower_ik_lower.bone_index = lower_tail_bone.index
         lower_ik.links.append(lower_ik_lower)
-
-        # # 足中心先（動かさない）
-        # lower_ik_center_leg = IkLink()
-        # lower_ik_center_leg.bone_index = center_leg_tail_bone.index
-        # lower_ik_center_leg.angle_limit = True
-        # lower_ik.links.append(lower_ik_center_leg)
 
         lower_ik_bone.ik = lower_ik
 
