@@ -44,36 +44,8 @@ class BoneNames:
         return f"{direction}腕捩" if index == 0 else f"{direction}腕捩{index}"
 
     @staticmethod
-    def arm_ik_parent(direction: str) -> str:
-        return f"{direction}腕IK親"
-
-    @staticmethod
-    def arm_ik(direction: str) -> str:
-        return f"{direction}腕IK"
-
-    @staticmethod
-    def arm_rotate_ik(direction: str) -> str:
-        return f"{direction}腕回転IK"
-
-    @staticmethod
     def elbow(direction: str) -> str:
         return f"{direction}ひじ"
-
-    @staticmethod
-    def elbow_tail(direction: str) -> str:
-        return f"{direction}ひじ先"
-
-    @staticmethod
-    def elbow_vertical(direction: str) -> str:
-        return f"{direction}ひじ垂線"
-
-    @staticmethod
-    def elbow_ik_parent(direction: str) -> str:
-        return f"{direction}ひじIK親"
-
-    @staticmethod
-    def elbow_ik(direction: str) -> str:
-        return f"{direction}ひじIK"
 
     @staticmethod
     def wrist_twist(direction: str, index: int = 0):
@@ -82,30 +54,6 @@ class BoneNames:
     @staticmethod
     def wrist(direction: str) -> str:
         return f"{direction}手首"
-
-    @staticmethod
-    def wrist_tail(direction: str) -> str:
-        return f"{direction}手首先"
-
-    @staticmethod
-    def wrist_vertical(direction: str) -> str:
-        return f"{direction}手首垂線"
-
-    @staticmethod
-    def wrist_ik_parent(direction: str) -> str:
-        return f"{direction}手首IK親"
-
-    @staticmethod
-    def wrist_ik(direction: str) -> str:
-        return f"{direction}手首IK"
-
-    @staticmethod
-    def wrist_rotate_ik(direction: str) -> str:
-        return f"{direction}手首回転IK"
-
-    @staticmethod
-    def wrist_direction_ik(direction: str) -> str:
-        return f"{direction}手首方向IK"
 
     @staticmethod
     def thumb0(direction: str) -> str:
@@ -220,10 +168,6 @@ class BoneNames:
             BoneNames.pinky_tail(direction),
         ]
 
-    # @staticmethod
-    # def parent() -> str:
-    #     return "全ての親"
-
     @staticmethod
     def center() -> str:
         return "センター"
@@ -253,24 +197,8 @@ class BoneNames:
         return "下半身"
 
     @staticmethod
-    def lower_tail() -> str:
-        return "下半身先"
-
-    @staticmethod
-    def lower_ik() -> str:
-        return "下半身IK"
-
-    @staticmethod
-    def center_leg() -> str:
+    def leg_center() -> str:
         return "足中心"
-
-    @staticmethod
-    def center_leg_tail() -> str:
-        return "足中心先"
-
-    @staticmethod
-    def center_knee() -> str:
-        return "ひざ中心"
 
     @staticmethod
     def neck() -> str:
@@ -327,3 +255,77 @@ class BoneNames:
     @staticmethod
     def toe_ik(direction: str) -> str:
         return f"{direction}つま先ＩＫ"
+
+    # ------------------------------------------
+    # 捩り分散用
+
+    @staticmethod
+    def arm_ik_parent(direction: str) -> str:
+        return f"{direction}腕IK親"
+
+    @staticmethod
+    def arm_ik(direction: str) -> str:
+        return f"{direction}腕IK"
+
+    @staticmethod
+    def arm_rotate_ik(direction: str) -> str:
+        return f"{direction}腕回転IK"
+
+    @staticmethod
+    def elbow_tail(direction: str) -> str:
+        return f"{direction}ひじ先"
+
+    @staticmethod
+    def elbow_vertical(direction: str) -> str:
+        return f"{direction}ひじ垂線"
+
+    @staticmethod
+    def elbow_ik_parent(direction: str) -> str:
+        return f"{direction}ひじIK親"
+
+    @staticmethod
+    def elbow_ik(direction: str) -> str:
+        return f"{direction}ひじIK"
+
+    @staticmethod
+    def wrist_tail(direction: str) -> str:
+        return f"{direction}手首先"
+
+    @staticmethod
+    def wrist_vertical(direction: str) -> str:
+        return f"{direction}手首垂線"
+
+    @staticmethod
+    def wrist_ik_parent(direction: str) -> str:
+        return f"{direction}手首IK親"
+
+    @staticmethod
+    def wrist_ik(direction: str) -> str:
+        return f"{direction}手首IK"
+
+    @staticmethod
+    def wrist_rotate_ik(direction: str) -> str:
+        return f"{direction}手首回転IK"
+
+    @staticmethod
+    def wrist_direction_ik(direction: str) -> str:
+        return f"{direction}手首方向IK"
+
+    # ------------------------------------------
+    # 下半身補正用
+
+    @staticmethod
+    def lower_tail(direction: str) -> str:
+        return f"{direction}下半身先"
+
+    @staticmethod
+    def leg_tail(direction: str) -> str:
+        return f"{direction}足先"
+
+    @staticmethod
+    def knee_tail(direction: str) -> str:
+        return f"{direction}ひざ先"
+
+    @staticmethod
+    def lower_ik(direction: str) -> str:
+        return f"{direction}下半身IK"
