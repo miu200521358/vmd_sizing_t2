@@ -48,7 +48,7 @@ class ArmTwistUsecase:
         if set(ARM_BONE_NAMES) - set(dest_model.bones.names):
             if show_message:
                 logger.warning(
-                    "【No.{x}】サイジング先モデルに肩・腕捩・腕・ひじ・手捩・手首の左右ボーンがないため、捩り分散をスキップします",
+                    "【No.{x}】サイジング先モデルに肩・腕捩・腕・ひじ・手捩・手首の左右ボーンのいずれかがないため、捩り分散をスキップします",
                     x=sizing_idx + 1,
                     decoration=MLogger.Decoration.BOX,
                 )
