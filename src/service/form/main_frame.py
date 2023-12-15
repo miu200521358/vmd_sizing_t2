@@ -2,17 +2,16 @@ import os
 from typing import Optional
 
 import wx
-from service.form.panel.bake_panel import BakePanel
-from service.form.panel.sizing_panel import SizingPanel
-from service.form.widgets.morph_sub_window import MorphSubCanvasWindow
-from service.worker.sizing_worker import SizingWorker
-
 from mlib.core.logger import MLogger
 from mlib.pmx.pmx_collection import PmxModel
 from mlib.pmx.shader import MShader
 from mlib.service.form.base_panel import BasePanel
 from mlib.service.form.notebook_frame import NotebookFrame
 from mlib.vmd.vmd_collection import VmdMotion
+from service.form.panel.bake_panel import BakePanel
+from service.form.panel.sizing_panel import SizingPanel
+from service.form.widgets.morph_sub_window import MorphSubCanvasWindow
+from service.worker.sizing_worker import SizingWorker
 
 logger = MLogger(os.path.basename(__file__), level=1)
 __ = logger.get_text
@@ -43,9 +42,9 @@ class MainFrame(NotebookFrame):
 
         # ボーンモーションサイジング
         self.sizing_panel = SizingPanel(self, 0)
-        self.sizing_panel.sizing_worker = SizingWorker(
-            self.sizing_panel, self.sizing_panel.on_exec_result
-        )
+        self.sizing_panel.sizing_worker = (
+            self.sizing_panel.exec_btn_ctrl.exec_worker
+        ) = SizingWorker(self.sizing_panel, self.sizing_panel.on_exec_result)
         self.notebook.AddPage(self.sizing_panel, __("サイジング"), True)
 
         # IK焼き込み
