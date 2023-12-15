@@ -58,9 +58,13 @@ class SizingWorker(BaseWorker):
         if sizing_panel.integrate_waist_check_ctrl.GetValue():
             self.integrate_waist()
 
-        # 下半身補正
-        if sizing_panel.stance_lower_check_ctrl.GetValue():
-            self.stance_lower()
+        # # つま先IK統合
+        # if sizing_panel.integrate_toe_ik_check_ctrl.GetValue():
+        #     self.integrate_toe_ik()
+
+        # # 下半身補正
+        # if sizing_panel.stance_lower_check_ctrl.GetValue():
+        #     self.stance_lower()
 
         # 腕スタンス補正
         self.sizing_arm_stance()
@@ -271,7 +275,6 @@ class SizingWorker(BaseWorker):
         ) as executor:
             futures: list[Future] = []
             for sizing_set in sizing_panel.sizing_sets:
-
                 # キーフレは元と変わっている可能性があるので、先モーションのキーフレを基準とする
                 fnos = usecase.get_fnos(sizing_set.output_motion_ctrl.data)
 
@@ -455,6 +458,8 @@ class SizingWorker(BaseWorker):
                             ik_models[(sizing_idx, False)],
                             sizing_set.output_motion_ctrl.data,
                             initial_matrixes,
+                            sizing_panel.twist_middle_check_ctrl.GetValue(),
+                            sizing_panel.twist_middle_threshold_slider.GetValue(),
                         )
                     )
 
@@ -509,6 +514,11 @@ class SizingWorker(BaseWorker):
         logger.info("腰統合", decoration=MLogger.Decoration.BOX)
 
         self.integrate(BoneNames.waist())
+
+    def integrate_toe_ik(self):
+        """つま先IK統合"""
+
+        logger.info("つま先IK統合", decoration=MLogger.Decoration.BOX)
 
     def integrate(self, bone_name: str):
         """ボーン統合"""

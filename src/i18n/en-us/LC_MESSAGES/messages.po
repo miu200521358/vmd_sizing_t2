@@ -898,3 +898,32 @@ msgstr "[No.{x}] Lower body correction: additional IK setup ({m})"
 
 msgid "下半身補正"
 msgstr "Lower body correction"
+
+msgid "　・腰の移動や回転を、上半身や下半身に割り当てます"
+msgstr "- Assign the movement and rotation of the hips to the upper and lower body"
+
+msgid "　・腕の軌跡がズレにくくなるよう、腕・腕捩・ひじ・手捩・手首のいずれかのキーが打たれているキーフレームに対して処理を行います"
+msgstr "・Processes keyframes where the arm, arm-twist, elbow, hand-twist, or wrist key is struck so that the trajectory of the arm is less likely to be displaced"
+
+msgid "　・中間点追加にチェックを入れると、全フレームで腕の軌跡がズレてないか確認し、ズレてたら中間キーフレームを追加してズレないようにします。"
+msgstr "・When the Add midpoint is checked, it checks if the arm trajectory is misaligned in all frames, and if it is, it adds an intermediate keyframe to prevent misalignment"
+
+msgid "【No.{x}】【{d}】中間キーフレームチェック 【閾値: {t:.3f}】"
+msgstr "[No.{x}] [{d}] Intermediate keyframe check [Threshold: {t:.3f}]"
+
+msgid "腕系キーの間で腕の軌跡がズレないよう、腕系キーフレームの中間でも捩り分散処理を行います"
+msgstr "Torsional dispersion processing is also performed in the middle of the arm keyframes so that the arm trajectory does not deviate between the arm keys"
+
+msgid "  閾値"
+msgstr "Threshold"
+
+msgid "腕系キーフレームの中間で、手首が元からどの程度ズレていたらキーフレームを追加するか指定できます"
+msgstr "In the middle of an arm-based keyframe, you can specify how many keyframes to add if the wrist is displaced from the original"
+
+msgid "【No.{x}】【{d}】中間捩り分散"
+msgstr "[No.{x}][{d}] Intermediate torsional dispersion"
+
+msgid "-- 【No.{x}】【{d}】中間捩り分散 [{i} ({p:.2f}%)]"
+msgstr "-- [No.{x}] [{d}] intermediate torsional variance [{i} ({p:.2f}%)]"
+msgid "【No.{x}】【{d}】中間キーフレーム追加【{f}F】【{w:.3f} >= {t:.3f}】"
+msgstr "[No.{x}] [{d}] Add intermediate keyframe [{f}F] [{w:.3f} >= {t:.3f}]"

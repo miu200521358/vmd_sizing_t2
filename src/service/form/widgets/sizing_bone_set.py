@@ -274,16 +274,16 @@ class SizingBoneSet:
                 sizing_types.append("I")
             if self.panel.integrate_waist_check_ctrl.GetValue():
                 sizing_types.append("W")
-            if self.panel.stance_lower_check_ctrl.GetValue():
-                sizing_types.append("L")
-            if (
-                self.panel.align_check_ctrl.GetValue()
-                or self.panel.align_finger_check_ctrl.GetValue()
-                or self.panel.align_finger_tail_check_ctrl.GetValue()
-            ):
-                sizing_types.append("P")
+            # if self.panel.stance_lower_check_ctrl.GetValue():
+            #     sizing_types.append("L")
             if self.panel.twist_check_ctrl.GetValue():
                 sizing_types.append("T")
+            # if (
+            #     self.panel.align_check_ctrl.GetValue()
+            # ):
+            #     sizing_types.append("P")
+            # if self.panel.integrate_toe_ik_check_ctrl.GetValue():
+            #     sizing_types.append("O")
             self.output_motion_ctrl.path = os.path.join(
                 motion_dir_path,
                 "".join(
