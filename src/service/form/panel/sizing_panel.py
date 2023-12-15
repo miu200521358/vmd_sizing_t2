@@ -73,7 +73,7 @@ class SizingPanel(NotebookPanel):
 
         self.is_full_config = False
         self.full_config_btn_ctrl = wx.Button(
-            self, wx.ID_ANY, __("全追加補正ON"), wx.DefaultPosition, wx.Size(120, -1)
+            self, wx.ID_ANY, __("全追加補正ON"), wx.DefaultPosition, wx.Size(200, -1)
         )
         self.full_config_btn_ctrl.SetToolTip(__("全ての追加補正を有効にします"))
         self.full_config_btn_ctrl.Bind(wx.EVT_BUTTON, self.on_full_config)

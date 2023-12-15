@@ -122,7 +122,7 @@ class StanceLowerUsecase:
         # )
 
         # 足の長さ＋下半身から足中心までの長さの比率
-        lower_ratio = lower_part_ratio * leg_part_ratio
+        lower_ratio = (lower_part_ratio + leg_part_ratio) / 2
         # # 足の長さ全体の比率
         # leg_ratio = leg_part_ratio * knee_part_ratio
 
@@ -213,17 +213,17 @@ class StanceLowerUsecase:
                 )
                 dest_motion.insert_bone_frame(lower_ik_bf)
 
-            # # ■ --------------
-            # from datetime import datetime
+            # ■ --------------
+            from datetime import datetime
 
-            # from mlib.vmd.vmd_writer import VmdWriter
+            from mlib.vmd.vmd_writer import VmdWriter
 
-            # VmdWriter(
-            #     dest_motion,
-            #     f"E:/MMD/サイジング/足IK/IK_step/{datetime.now():%Y%m%d_%H%M%S_%f}_下半身左右_{fno:04d}.vmd",
-            #     model_name="Test Model",
-            # ).save()
-            # # ■ --------------
+            VmdWriter(
+                dest_motion,
+                f"E:/MMD/サイジング/足IK/IK_step/{datetime.now():%Y%m%d_%H%M%S_%f}_下半身左右_{fno:04d}.vmd",
+                model_name="Test Model",
+            ).save()
+            # ■ --------------
 
             # IK解決をした上でグローバル位置を求める
             lower_matrixes = dest_motion.animate_bone(
@@ -239,13 +239,13 @@ class StanceLowerUsecase:
             ) / 2
             dest_motion.insert_bone_frame(lower_center_ik_bf)
 
-            # # ■ --------------
-            # VmdWriter(
-            #     dest_motion,
-            #     f"E:/MMD/サイジング/足IK/IK_step/{datetime.now():%Y%m%d_%H%M%S_%f}_下半身中_{fno:04d}.vmd",
-            #     model_name="Test Model",
-            # ).save()
-            # # ■ --------------
+            # ■ --------------
+            VmdWriter(
+                dest_motion,
+                f"E:/MMD/サイジング/足IK/IK_step/{datetime.now():%Y%m%d_%H%M%S_%f}_下半身中_{fno:04d}.vmd",
+                model_name="Test Model",
+            ).save()
+            # ■ --------------
 
             # IK解決する
             _, _, ik_qqs = dest_motion.bones.get_ik_rotation(
@@ -259,13 +259,13 @@ class StanceLowerUsecase:
             lower_bf.rotation = ik_qqs[dest_model.bones[BoneNames.lower()].index]
             dest_motion.insert_bone_frame(lower_bf)
 
-            # # ■ --------------
-            # VmdWriter(
-            #     dest_motion,
-            #     f"E:/MMD/サイジング/足IK/IK_step/{datetime.now():%Y%m%d_%H%M%S_%f}_下半身解決_{fno:04d}.vmd",
-            #     model_name="Test Model",
-            # ).save()
-            # # ■ --------------
+            # ■ --------------
+            VmdWriter(
+                dest_motion,
+                f"E:/MMD/サイジング/足IK/IK_step/{datetime.now():%Y%m%d_%H%M%S_%f}_下半身解決_{fno:04d}.vmd",
+                model_name="Test Model",
+            ).save()
+            # ■ --------------
 
             # # IK解決をした上でグローバル位置を求める
             # leg_matrixes = dest_motion.animate_bone(
@@ -505,12 +505,25 @@ class StanceLowerUsecase:
 
         return sizing_idx, is_src, ik_model
 
+    def get_fnos(self, motion: VmdMotion) -> list[int]:
+        fnos_set = (
+            {0}
+            # | set(motion.bones[BoneNames.center()].register_indexes)
+            # | set(motion.bones[BoneNames.groove()].register_indexes)
+            | set(motion.bones[BoneNames.lower()].register_indexes)
+            | set(motion.bones[BoneNames.leg("右")].register_indexes)
+            | set(motion.bones[BoneNames.leg("左")].register_indexes)
+        )
+
+        return sorted(fnos_set)
+
     def get_initial_matrixes(
         self,
         sizing_idx: int,
         is_src: bool,
         model: PmxModel,
         motion: VmdMotion,
+        fnos: list[int],
     ) -> tuple[int, bool, str, VmdBoneFrameTrees]:
         model_type = __("作成元モデル" if is_src else "サイジング先モデル")
 
@@ -525,17 +538,6 @@ class StanceLowerUsecase:
             BoneNames.ankle("右"),
             BoneNames.ankle("左"),
         ]
-
-        fnos_set = (
-            {0}
-            # | set(motion.bones[BoneNames.center()].register_indexes)
-            # | set(motion.bones[BoneNames.groove()].register_indexes)
-            | set(motion.bones[BoneNames.lower()].register_indexes)
-            | set(motion.bones[BoneNames.leg("右")].register_indexes)
-            | set(motion.bones[BoneNames.leg("左")].register_indexes)
-        )
-
-        fnos = sorted(fnos_set)
 
         initial_matrixes = motion.animate_bone(
             fnos,

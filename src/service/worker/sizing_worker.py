@@ -271,6 +271,10 @@ class SizingWorker(BaseWorker):
         ) as executor:
             futures: list[Future] = []
             for sizing_set in sizing_panel.sizing_sets:
+
+                # キーフレは元と変わっている可能性があるので、先モーションのキーフレを基準とする
+                fnos = usecase.get_fnos(sizing_set.output_motion_ctrl.data)
+
                 futures.append(
                     executor.submit(
                         usecase.get_initial_matrixes,
@@ -278,6 +282,7 @@ class SizingWorker(BaseWorker):
                         True,
                         sizing_set.src_model_ctrl.data,
                         sizing_set.motion_ctrl.data,
+                        fnos,
                     )
                 )
 
@@ -288,6 +293,7 @@ class SizingWorker(BaseWorker):
                         False,
                         sizing_set.dest_model_ctrl.data,
                         sizing_set.output_motion_ctrl.data,
+                        fnos,
                     )
                 )
 
@@ -362,8 +368,9 @@ class SizingWorker(BaseWorker):
                 if future.exception():
                     raise future.exception()
 
-    def sizing_arm_twist(self) -> None:
         """捩り分散"""
+
+    def sizing_arm_twist(self) -> None:
         logger.info("捩り分散", decoration=MLogger.Decoration.BOX)
 
         usecase = ArmTwistUsecase()
