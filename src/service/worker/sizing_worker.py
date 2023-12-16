@@ -58,9 +58,9 @@ class SizingWorker(BaseWorker):
         if sizing_panel.integrate_waist_check_ctrl.GetValue():
             self.integrate_waist()
 
-        # # つま先IK統合
-        # if sizing_panel.integrate_toe_ik_check_ctrl.GetValue():
-        #     self.integrate_toe_ik()
+        # つま先IK統合
+        if sizing_panel.integrate_toe_ik_check_ctrl.GetValue():
+            self.integrate_toe_ik()
 
         # # 下半身補正
         # if sizing_panel.stance_lower_check_ctrl.GetValue():

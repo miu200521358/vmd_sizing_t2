@@ -296,33 +296,32 @@ class SizingPanel(NotebookPanel):
 
         # self.config_sizer.Add(self.align_group_sizer, 0, wx.ALL, 1)
 
-        # # つま先IK統合 ------------------------
-        # self.integrate_toe_ik_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        # self.integrate_toe_ik_check_ctrl = wx.CheckBox(
-        #     self, wx.ID_ANY, __("つま先IK統合"), wx.DefaultPosition, wx.DefaultSize, 0
-        # )
-        # self.integrate_toe_ik_check_ctrl.SetToolTip(
-        #     __("つま先IKの移動や回転を足IKに振り分けて、つま先IKのキーフレームを削除します")
-        # )
-        # self.integrate_toe_ik_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_add_config)
-        # self.integrate_toe_ik_sizer.Add(self.integrate_toe_ik_check_ctrl, 0, wx.ALL, 3)
-        # self.integrate_toe_ik_help_ctrl = ImageButton(
-        #     self,
-        #     "resources/icon/help.png",
-        #     wx.Size(12, 12),
-        #     lambda event: self.on_help(
-        #         event,
-        #         "つま先IK統合",
-        #         [
-        #             "サイジング先モデルが元モデルと同じポーズになるように、つま先IKの値を子ボーンに移し替えます",
-        #             "　・つま先IKの移動や回転を、足IKボーンに割り当てます",
-        #             "　・チェックをONにした場合、サイジングモーションに「O」を追加します",
-        #         ],
-        #     ),
-        #     __("解説をメッセージ欄に表示します"),
-        # )
-        # self.integrate_toe_ik_sizer.Add(self.integrate_toe_ik_help_ctrl, 0, wx.ALL, 0)
-        # self.config_sizer.Add(self.integrate_toe_ik_sizer, 0, wx.ALL, 1)
+        # つま先IK統合 ------------------------
+        self.integrate_toe_ik_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.integrate_toe_ik_check_ctrl = wx.CheckBox(
+            self, wx.ID_ANY, __("つま先IK統合"), wx.DefaultPosition, wx.DefaultSize, 0
+        )
+        self.integrate_toe_ik_check_ctrl.SetToolTip(
+            __("つま先IKの移動や回転を足IKに振り分けて、つま先IKのキーフレームを削除します")
+        )
+        self.integrate_toe_ik_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_add_config)
+        self.integrate_toe_ik_sizer.Add(self.integrate_toe_ik_check_ctrl, 0, wx.ALL, 3)
+        self.integrate_toe_ik_help_ctrl = ImageButton(
+            self,
+            "resources/icon/help.png",
+            wx.Size(12, 12),
+            lambda event: self.on_help(
+                event,
+                "つま先IK統合",
+                [
+                    "サイジング先モデルが元モデルと同じポーズになるように、つま先IKの値を足IKに移し替えます",
+                    "　・チェックをONにした場合、サイジングモーションに「O」を追加します",
+                ],
+            ),
+            __("解説をメッセージ欄に表示します"),
+        )
+        self.integrate_toe_ik_sizer.Add(self.integrate_toe_ik_help_ctrl, 0, wx.ALL, 0)
+        self.config_sizer.Add(self.integrate_toe_ik_sizer, 0, wx.ALL, 1)
 
         # # スタンス追加補正 ----------------------
         # self.stance_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -452,6 +451,7 @@ class SizingPanel(NotebookPanel):
         # self.align_check_ctrl.SetValue(self.is_full_config)
         # self.align_finger_check_ctrl.SetValue(self.is_full_config)
         # self.align_finger_tail_check_ctrl.SetValue(self.is_full_config)
+        self.integrate_toe_ik_check_ctrl.SetValue(self.is_full_config)
 
         self.on_change_dest_model_pmx(event)
 
@@ -555,6 +555,8 @@ class SizingPanel(NotebookPanel):
         # self.align_finger_check_ctrl.Enable(enable)
         # self.align_finger_tail_check_ctrl.Enable(enable)
         # self.align_help_ctrl.Enable(enable)
+        self.integrate_toe_ik_check_ctrl.Enable(enable)
+        self.integrate_toe_ik_help_ctrl.Enable(enable)
 
         self.EnableExec(enable)
 

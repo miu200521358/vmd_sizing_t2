@@ -282,8 +282,8 @@ class SizingBoneSet:
             #     self.panel.align_check_ctrl.GetValue()
             # ):
             #     sizing_types.append("P")
-            # if self.panel.integrate_toe_ik_check_ctrl.GetValue():
-            #     sizing_types.append("O")
+            if self.panel.integrate_toe_ik_check_ctrl.GetValue():
+                sizing_types.append("O")
             self.output_motion_ctrl.path = os.path.join(
                 motion_dir_path,
                 "".join(
