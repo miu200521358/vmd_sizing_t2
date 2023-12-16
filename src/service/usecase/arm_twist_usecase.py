@@ -61,7 +61,7 @@ class ArmTwistUsecase:
         sizing_idx: int,
         dest_model: PmxModel,
         dest_motion: VmdMotion,
-        dest_all_initial_matrixes: dict[tuple[int, bool, str], VmdBoneFrameTrees],
+        dest_all_initial_matrixes: dict[tuple[int, str], VmdBoneFrameTrees],
         is_middle: bool,
         middle_threshold: float,
     ) -> tuple[int, str, VmdMotion]:
@@ -70,7 +70,7 @@ class ArmTwistUsecase:
                 sizing_idx,
                 dest_model,
                 dest_motion,
-                dest_all_initial_matrixes[sizing_idx, False, direction],
+                dest_all_initial_matrixes[(sizing_idx, direction)],
                 direction,
                 is_middle,
                 middle_threshold,
@@ -668,13 +668,12 @@ class ArmTwistUsecase:
     def setup_model_ik(
         self,
         sizing_idx: int,
-        is_src: bool,
         model: PmxModel,
     ) -> tuple[int, bool, PmxModel]:
         logger.info(
             "【No.{x}】捩り分散：追加IKセットアップ({m})",
             x=sizing_idx + 1,
-            m=__("モーション作成元モデル" if is_src else "サイジング先モデル"),
+            m=__("サイジング先モデル"),
             decoration=MLogger.Decoration.LINE,
         )
 
@@ -870,18 +869,17 @@ class ArmTwistUsecase:
                 include_system=True,
             ).save()
 
-        return sizing_idx, is_src, ik_model
+        return sizing_idx, ik_model
 
-    def get_initial_matrixes(
+    def get_dest_matrixes(
         self,
         sizing_idx: int,
-        is_src: bool,
         model: PmxModel,
         motion: VmdMotion,
         direction: str,
         is_middle: bool,
-    ) -> tuple[int, bool, str, VmdBoneFrameTrees]:
-        model_type = __("作成元モデル" if is_src else "サイジング先モデル")
+    ) -> tuple[int, str, VmdBoneFrameTrees]:
+        model_type = __("サイジング先モデル")
 
         logger.info(
             "【No.{x}】【{d}】初期位置取得({m})",
@@ -924,7 +922,6 @@ class ArmTwistUsecase:
 
         return (
             sizing_idx,
-            is_src,
             direction,
             initial_matrixes,
         )

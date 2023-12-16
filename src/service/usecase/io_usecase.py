@@ -10,6 +10,7 @@ from mlib.pmx.pmx_reader import PmxReader
 from mlib.utils.file_utils import get_path
 from mlib.vmd.vmd_collection import VmdMotion
 from mlib.vmd.vmd_reader import VmdReader
+from mlib.vmd.vmd_tree import VmdBoneFrameTrees
 from mlib.vmd.vmd_writer import VmdWriter
 from service.usecase.bone_names import BoneNames
 
@@ -382,3 +383,31 @@ class IoUsecase:
             p=output_path,
             decoration=MLogger.Decoration.BOX,
         )
+
+    def get_src_matrixes(
+        self,
+        sizing_idx: int,
+        model: PmxModel,
+        motion: VmdMotion,
+    ) -> tuple[int, VmdBoneFrameTrees]:
+        model_type = __("作成元モデル")
+
+        logger.info(
+            "【No.{x}】初期位置取得({m})",
+            x=sizing_idx + 1,
+            m=model_type,
+            decoration=MLogger.Decoration.LINE,
+        )
+
+        # 全フレーム取得
+        fnos = list(range(motion.max_fno + 1))
+
+        # 全ボーン取得
+        initial_matrixes = motion.animate_bone(
+            fnos,
+            model,
+            out_fno_log=True,
+            description=f"{sizing_idx + 1}|{__('初期位置取得')}|{model_type}",
+        )
+
+        return sizing_idx, initial_matrixes

@@ -927,3 +927,27 @@ msgid "-- 【No.{x}】【{d}】中間捩り分散 [{i} ({p:.2f}%)]"
 msgstr "-- [No.{x}] [{d}] intermediate torsional variance [{i} ({p:.2f}%)]"
 msgid "【No.{x}】【{d}】中間キーフレーム追加【{f}F】【{w:.3f} >= {t:.3f}】"
 msgstr "[No.{x}] [{d}] Add intermediate keyframe [{f}F] [{w:.3f} >= {t:.3f}]"
+
+msgid "つま先IK統合"
+msgstr "Toe IK Integration"
+
+msgid "つま先IKの移動や回転を足IKに振り分けて、つま先IKのキーフレームを削除します"
+msgstr "Assign the toe IK movement and rotation to the foot IK and remove the toe IK keyframes"
+
+msgid "サイジング先モデルが元モデルと同じポーズになるように、つま先IKの値を足IKに移し替えます"
+msgstr "Transfers the toe IK values to the foot IK so that the sizing destination model is in the same pose as the source model"
+
+msgid "　・チェックをONにした場合、サイジングモーションに「O」を追加します"
+msgstr "・If the check is turned on, "O" is added to the sizing motion"
+
+msgid "【No.{i}】つま先IK統合"
+msgstr "[No.{i}] Toe IK integration"
+
+msgid "【No.{x}】【{d}】つま先IK統合"
+msgstr "[No.{x}][{d}] toe IK integration"
+
+msgid "-- 【No.{x}】【{d}】つま先IK統合 [{i} ({p:.2f}%)]"
+msgstr "-- [No.{x}][{d}] toe IK integration [{i} ({p:.2f}%)]"
+
+msgid "モデル名に日本語・英語で判読できない文字（環境依存文字・他言語文字等）が含まれているため、仮モデル名を設定します。 {m}"
+msgstr "Set a temporary model name because the model name contains characters that are not legible in Japanese or English (environment-dependent characters, other language characters, etc.). {m}"
