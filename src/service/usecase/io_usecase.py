@@ -12,6 +12,7 @@ from mlib.vmd.vmd_collection import VmdMotion
 from mlib.vmd.vmd_reader import VmdReader
 from mlib.vmd.vmd_tree import VmdBoneFrameTrees
 from mlib.vmd.vmd_writer import VmdWriter
+from service.usecase.align_arm_usecase import ARM_BONE_NAMES
 from service.usecase.bone_names import BoneNames
 
 logger = MLogger(os.path.basename(__file__), level=1)
@@ -113,15 +114,20 @@ class IoUsecase:
                         original_model.bones[original_bone.effect_index].name
                     ].index
                     bone.effect_factor = original_bone.effect_factor
+            else:
+                # ボーンが存在しなかった場合、フラグを立てておく
+                bone.bone_flg |= BoneFlg.NOTHING
 
         if BoneNames.groove() not in original_model.bones:
             # グルーブがなかったらセンターから再計算
+            model.bones[BoneNames.groove()].bone_flg |= BoneFlg.NOTHING
             model.bones[BoneNames.groove()].position = MVector3D(
                 0, original_model.bones[BoneNames.center()].position.y * 1.05, 0
             )
 
         if BoneNames.waist() not in original_model.bones:
             # 腰がなかったら上半身と下半身の間
+            model.bones[BoneNames.waist()].bone_flg |= BoneFlg.NOTHING
             model.bones[BoneNames.waist()].position = (
                 model.bones[BoneNames.upper()].position
                 + model.bones[BoneNames.lower()].position
@@ -129,6 +135,7 @@ class IoUsecase:
 
         if BoneNames.upper2() not in original_model.bones:
             # 上半身2がなかったら上半身と首の間
+            model.bones[BoneNames.upper2()].bone_flg |= BoneFlg.NOTHING
             model.bones[BoneNames.upper2()].position = (
                 model.bones[BoneNames.upper()].position
                 + model.bones[BoneNames.neck()].position
@@ -136,6 +143,7 @@ class IoUsecase:
 
         if BoneNames.upper3() not in original_model.bones:
             # 上半身3がなかったら上半身2と首の間
+            model.bones[BoneNames.upper3()].bone_flg |= BoneFlg.NOTHING
             model.bones[BoneNames.upper3()].position = (
                 model.bones[BoneNames.upper2()].position
                 + model.bones[BoneNames.neck()].position
@@ -160,6 +168,8 @@ class IoUsecase:
 
             # 捩りボーンがなかったら中間に配置
             if BoneNames.arm_twist(direction) not in original_model.bones:
+                model.bones[BoneNames.arm_twist(direction)].bone_flg |= BoneFlg.NOTHING
+
                 model.bones[BoneNames.arm_twist(direction)].position = (
                     model.bones[BoneNames.elbow(direction)].position
                     + model.bones[BoneNames.arm(direction)].position
@@ -169,6 +179,10 @@ class IoUsecase:
                     - model.bones[BoneNames.arm(direction)].position
                 ).normalized()
             if BoneNames.wrist_twist(direction) not in original_model.bones:
+                model.bones[
+                    BoneNames.wrist_twist(direction)
+                ].bone_flg |= BoneFlg.NOTHING
+
                 model.bones[BoneNames.wrist_twist(direction)].position = (
                     model.bones[BoneNames.wrist(direction)].position
                     + model.bones[BoneNames.elbow(direction)].position
@@ -179,6 +193,8 @@ class IoUsecase:
                 ).normalized()
 
             if BoneNames.thumb0(direction) not in original_model.bones:
+                model.bones[BoneNames.thumb0(direction)].bone_flg |= BoneFlg.NOTHING
+
                 # 親指0がなかったら親指1と手首の間
                 model.bones[BoneNames.thumb0(direction)].position = MVector3D(
                     *np.average(
@@ -247,6 +263,10 @@ class IoUsecase:
             ].position.copy()
 
             if BoneNames.leg_ik_parent(direction) not in original_model.bones:
+                model.bones[
+                    BoneNames.leg_ik_parent(direction)
+                ].bone_flg |= BoneFlg.NOTHING
+
                 # 足IK親がなかったら足IKから再計算
                 model.bones[
                     BoneNames.leg_ik_parent(direction)
@@ -261,6 +281,8 @@ class IoUsecase:
                     original_model.bones[BoneNames.toe_ik(direction)].ik.bone_index
                 ].position.copy()
             if BoneNames.toe_ex(direction) not in original_model.bones:
+                model.bones[BoneNames.toe_ex(direction)].bone_flg |= BoneFlg.NOTHING
+
                 # 足先EXがなかったらつま先と足首の間
                 model.bones[BoneNames.toe_ex(direction)].position = MVector3D(
                     *np.average(
@@ -399,8 +421,20 @@ class IoUsecase:
             decoration=MLogger.Decoration.LINE,
         )
 
-        # 全フレーム取得
-        fnos = list(range(motion.max_fno + 1))
+        # # 全フレーム取得
+        # fnos = list(range(motion.max_fno + 1))
+
+        # 必要なフレーム取得
+        fnos_set = {0}
+        for bone_name in (
+            [BoneNames.toe_ik("右"), BoneNames.toe_ik("左")]
+            + list(ARM_BONE_NAMES)
+            + BoneNames.fingers("右")
+            + BoneNames.fingers("左")
+        ):
+            fnos_set |= set(motion.bones[bone_name].register_indexes)
+
+        fnos = sorted(fnos_set)
 
         # 全ボーン取得
         initial_matrixes = motion.animate_bone(

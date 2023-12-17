@@ -28,14 +28,6 @@ class BoneNames:
         return f"{direction}肩中点"
 
     @staticmethod
-    def shoulder_ik_parent(direction: str) -> str:
-        return f"{direction}肩IK親"
-
-    @staticmethod
-    def shoulder_ik(direction: str) -> str:
-        return f"{direction}肩IK"
-
-    @staticmethod
     def arm(direction: str) -> str:
         return f"{direction}腕"
 
@@ -58,14 +50,6 @@ class BoneNames:
     @staticmethod
     def thumb0(direction: str) -> str:
         return f"{direction}親指０"
-
-    @staticmethod
-    def thumb_ik_parent(direction: str) -> str:
-        return f"{direction}親IK親"
-
-    @staticmethod
-    def thumb_ik(direction: str) -> str:
-        return f"{direction}親IK"
 
     @staticmethod
     def thumb1(direction: str) -> str:
@@ -257,15 +241,42 @@ class BoneNames:
         return f"{direction}つま先ＩＫ"
 
     # ------------------------------------------
-    # 捩り分散用
+    # 腕位置合わせ用
 
     @staticmethod
-    def arm_ik_parent(direction: str) -> str:
-        return f"{direction}腕IK親"
+    def shoulder_ik(direction: str) -> str:
+        return f"{direction}肩IK"
 
     @staticmethod
     def arm_ik(direction: str) -> str:
         return f"{direction}腕IK"
+
+    @staticmethod
+    def wrist_ik(direction: str) -> str:
+        return f"{direction}手首IK"
+
+    @staticmethod
+    def thumb_ik(direction: str) -> str:
+        return f"{direction}親指IK"
+
+    @staticmethod
+    def index_ik(direction: str) -> str:
+        return f"{direction}人指IK"
+
+    @staticmethod
+    def middle_ik(direction: str) -> str:
+        return f"{direction}中指IK"
+
+    @staticmethod
+    def ring_ik(direction: str) -> str:
+        return f"{direction}薬指IK"
+
+    @staticmethod
+    def pinky_ik(direction: str) -> str:
+        return f"{direction}小指IK"
+
+    # ------------------------------------------
+    # 捩り分散用
 
     @staticmethod
     def arm_rotate_ik(direction: str) -> str:

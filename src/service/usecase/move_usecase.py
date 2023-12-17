@@ -1,8 +1,10 @@
 import os
+from typing import Optional
 
 import numpy as np
 from mlib.core.logger import MLogger
 from mlib.core.math import MVector3D
+from mlib.pmx.bone_setting import BoneFlg
 from mlib.pmx.pmx_collection import PmxModel
 from mlib.vmd.vmd_collection import VmdMotion
 from service.usecase.bone_names import BoneNames
@@ -38,6 +40,43 @@ MOVE_CHECK_BONE_NAMES = {
 
 
 class MoveUsecase:
+    def validate(
+        self,
+        sizing_idx: int,
+        src_model: Optional[PmxModel],
+        dest_model: Optional[PmxModel],
+        show_message: bool = False,
+    ) -> bool:
+        if not src_model or not dest_model:
+            # モデルが揃ってない場合、スルー
+            return False
+
+        if MOVE_CHECK_BONE_NAMES - set(src_model.bones.names) or True in [
+            BoneFlg.NOTHING in src_model.bones[bone_name].bone_flg
+            for bone_name in MOVE_CHECK_BONE_NAMES
+        ]:
+            if show_message:
+                logger.warning(
+                    "【No.{i}】モーション作成元モデルに足・ひざ・足首・足ＩＫ・つま先ＩＫの左右ボーンがないため、移動補正をスキップします",
+                    i=sizing_idx + 1,
+                    decoration=MLogger.Decoration.BOX,
+                )
+            return False
+
+        if MOVE_CHECK_BONE_NAMES - set(dest_model.bones.names) or True in [
+            BoneFlg.NOTHING in dest_model.bones[bone_name].bone_flg
+            for bone_name in MOVE_CHECK_BONE_NAMES
+        ]:
+            if show_message:
+                logger.warning(
+                    "【No.{i}】サイジング先モデルに足・ひざ・足首・足ＩＫ・つま先ＩＫの左右ボーンがないため、移動補正をスキップします",
+                    i=sizing_idx + 1,
+                    decoration=MLogger.Decoration.BOX,
+                )
+            return False
+
+        return True
+
     def sizing_move(
         self,
         sizing_idx: int,
@@ -49,21 +88,6 @@ class MoveUsecase:
         motion: VmdMotion,
     ) -> tuple[int, VmdMotion]:
         """移動補正"""
-        if MOVE_CHECK_BONE_NAMES - set(src_model.bones.names):
-            logger.warning(
-                "【No.{i}】モーション作成元モデルに足・ひざ・足首・足ＩＫ・つま先ＩＫの左右ボーンがないため、移動補正をスキップします",
-                i=sizing_idx + 1,
-                decoration=MLogger.Decoration.BOX,
-            )
-            return sizing_idx, motion
-
-        if MOVE_CHECK_BONE_NAMES - set(dest_model.bones.names):
-            logger.warning(
-                "【No.{i}】サイジング先モデルに足・ひざ・足首・足ＩＫ・つま先ＩＫの左右ボーンがないため、移動補正をスキップします",
-                i=sizing_idx + 1,
-                decoration=MLogger.Decoration.BOX,
-            )
-            return sizing_idx, motion
 
         logger.info(
             "【No.{i}】移動補正  縮尺: XZ[{x:.5f}](元: {ox:.5f}), Y[{y:.5f}] センターオフセット[{c}]",
@@ -120,11 +144,6 @@ class MoveUsecase:
         self, src_model: PmxModel, dest_model: PmxModel
     ) -> tuple[float, float, MVector3D]:
         """移動補正用比率算出"""
-        if (MOVE_CHECK_BONE_NAMES - set(src_model.bones.names)) or (
-            MOVE_CHECK_BONE_NAMES - set(dest_model.bones.names)
-        ):
-            return 1.0, 1.0, MVector3D()
-
         # 足からひざまでの長さ
         src_upper_length = float(
             np.mean(

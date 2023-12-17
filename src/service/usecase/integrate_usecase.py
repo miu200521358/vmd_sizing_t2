@@ -1,7 +1,9 @@
 import os
+from typing import Optional
 
 from mlib.core.logger import MLogger
 from mlib.core.math import MMatrix4x4, MVector3D
+from mlib.pmx.bone_setting import BoneFlg
 from mlib.pmx.pmx_collection import PmxModel
 from mlib.vmd.vmd_collection import VmdMotion
 
@@ -10,6 +12,30 @@ __ = logger.get_text
 
 
 class IntegrateUsecase:
+    def validate(
+        self,
+        sizing_idx: int,
+        src_model: Optional[PmxModel],
+        dest_model: Optional[PmxModel],
+        bone_name: str,
+        show_message: bool = False,
+    ) -> bool:
+        if not src_model or not dest_model:
+            # モデルが揃ってない、チェックが入ってない場合、スルー
+            return False
+
+        if BoneFlg.NOTHING in dest_model.bones[bone_name].bone_flg:
+            if show_message:
+                logger.warning(
+                    "【No.{x}】サイジング先モデルに{b}ボーンがないため、{b}統合をスキップします",
+                    x=sizing_idx + 1,
+                    b=__(bone_name),
+                    decoration=MLogger.Decoration.BOX,
+                )
+            return False
+
+        return True
+
     def integrate(
         self,
         sizing_idx: int,
@@ -18,21 +44,21 @@ class IntegrateUsecase:
         bone_name: str,
     ) -> tuple[int, VmdMotion]:
         """ボーン統合"""
-        logger.info(
-            "【No.{i}】{b}統合",
-            i=sizing_idx + 1,
-            b=__(bone_name),
-            decoration=MLogger.Decoration.LINE,
-        )
-
         if bone_name not in motion.bones:
-            logger.warning(
+            logger.info(
                 "【No.{x}】モーションに{b}のキーフレームがないため、{b}統合をスキップします",
                 x=sizing_idx + 1,
                 b=__(bone_name),
                 decoration=MLogger.Decoration.BOX,
             )
             return sizing_idx, motion
+
+        logger.info(
+            "【No.{i}】{b}統合",
+            i=sizing_idx + 1,
+            b=__(bone_name),
+            decoration=MLogger.Decoration.LINE,
+        )
 
         target_bone = model.bones[bone_name]
 

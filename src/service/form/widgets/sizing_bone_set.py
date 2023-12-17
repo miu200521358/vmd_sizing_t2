@@ -278,10 +278,8 @@ class SizingBoneSet:
             #     sizing_types.append("L")
             if self.panel.twist_check_ctrl.GetValue():
                 sizing_types.append("T")
-            # if (
-            #     self.panel.align_check_ctrl.GetValue()
-            # ):
-            #     sizing_types.append("P")
+            if self.panel.align_arm_check_ctrl.GetValue():
+                sizing_types.append("P")
             if self.panel.integrate_toe_ik_check_ctrl.GetValue():
                 sizing_types.append("O")
             self.output_motion_ctrl.path = os.path.join(
@@ -362,9 +360,3 @@ class SizingBoneSet:
         self.src_model_ctrl.Enable(enable)
         self.dest_model_ctrl.Enable(enable)
         self.output_motion_ctrl.Enable(enable)
-        # self.stance_correct_check_ctrl.Enable(enable)
-        # self.stance_correct_btn_ctrl.Enable(enable)
-        # self.twist_check_ctrl.Enable(enable)
-        # self.align_check_ctrl.Enable(enable)
-        # self.align_finger_check_ctrl.Enable(enable)
-        # self.align_finger_tail_check_ctrl.Enable(enable)

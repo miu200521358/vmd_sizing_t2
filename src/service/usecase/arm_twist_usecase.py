@@ -37,15 +37,17 @@ class ArmTwistUsecase:
         self,
         sizing_idx: int,
         dest_model: Optional[PmxModel],
-        is_twist: bool,
         show_message: bool = False,
     ) -> bool:
-        if not dest_model or (not is_twist):
-            # モデルが揃ってない、チェックが入ってない場合、スルー
+        if not dest_model:
+            # モデルが揃ってない場合、スルー
             return False
 
         """捩り分散"""
-        if set(ARM_BONE_NAMES) - set(dest_model.bones.names):
+        if (set(ARM_BONE_NAMES) - set(dest_model.bones.names)) or True in [
+            BoneFlg.NOTHING in dest_model.bones[bone_name].bone_flg
+            for bone_name in ARM_BONE_NAMES
+        ]:
             if show_message:
                 logger.warning(
                     "【No.{x}】サイジング先モデルに肩・腕捩・腕・ひじ・手捩・手首の左右ボーンのいずれかがないため、捩り分散をスキップします",

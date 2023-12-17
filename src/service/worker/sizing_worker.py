@@ -15,9 +15,11 @@ from mlib.pmx.pmx_collection import PmxModel
 from mlib.service.base_worker import BaseWorker
 from mlib.service.form.base_panel import BasePanel
 from mlib.utils.file_utils import get_root_dir
+from mlib.vmd.vmd_collection import VmdMotion
 from mlib.vmd.vmd_tree import VmdBoneFrameTrees
 from service.form.panel.sizing_panel import SizingPanel
 from service.form.widgets.sizing_bone_set import SizingBoneSet
+from service.usecase.align_arm_usecase import AlignArmUsecase
 from service.usecase.arm_stance_usecase import ArmStanceUsecase
 from service.usecase.arm_twist_usecase import ArmTwistUsecase
 from service.usecase.bone_names import BoneNames
@@ -69,9 +71,9 @@ class SizingWorker(BaseWorker):
         # 腕スタンス補正
         self.sizing_arm_stance()
 
-        # # 腕位置合わせ
-        # if sizing_panel.align_check_ctrl.GetValue():
-        #     self.sizing_arm_align()
+        # 腕位置合わせ
+        if sizing_panel.align_arm_check_ctrl.GetValue():
+            self.sizing_align_arm(all_src_matrixes)
 
         # 捩り分散
         if sizing_panel.twist_check_ctrl.GetValue():
@@ -143,7 +145,7 @@ class SizingWorker(BaseWorker):
                     sizing_set.sizing_idx,
                     sizing_set.src_model_ctrl.data,
                     sizing_set.dest_model_ctrl.data,
-                    sizing_panel.stance_lower_check_ctrl.GetValue(),
+                    show_message=True,
                 ):
                     futures.append(
                         executor.submit(
@@ -173,17 +175,16 @@ class SizingWorker(BaseWorker):
                     sizing_set.sizing_idx,
                     sizing_set.src_model_ctrl.data,
                     sizing_set.dest_model_ctrl.data,
-                    sizing_panel.stance_lower_check_ctrl.GetValue(),
                 ):
                     futures.append(
                         executor.submit(
                             usecase.sizing_stance_lower,
                             sizing_set.sizing_idx,
                             sizing_set.src_model_ctrl.data,
-                            ik_models[(sizing_idx, False)],
+                            ik_models[(sizing_set.sizing_idx, False)],
                             sizing_set.output_motion_ctrl.data,
-                            initial_matrixes[(sizing_idx, True)],
-                            initial_matrixes[(sizing_idx, False)],
+                            initial_matrixes[(sizing_set.sizing_idx, True)],
+                            initial_matrixes[(sizing_set.sizing_idx, False)],
                         )
                     )
 
@@ -235,7 +236,7 @@ class SizingWorker(BaseWorker):
                 if usecase.validate(
                     sizing_set.sizing_idx,
                     sizing_set.dest_model_ctrl.data,
-                    sizing_panel.twist_check_ctrl.GetValue(),
+                    show_message=True,
                 ):
                     futures.append(
                         executor.submit(
@@ -263,17 +264,150 @@ class SizingWorker(BaseWorker):
                 if usecase.validate(
                     sizing_set.sizing_idx,
                     sizing_set.dest_model_ctrl.data,
-                    sizing_panel.twist_check_ctrl.GetValue(),
                 ):
                     futures.append(
                         executor.submit(
                             usecase.sizing_arm_twist,
                             sizing_set.sizing_idx,
-                            ik_dest_models[sizing_idx],
+                            ik_dest_models[sizing_set.sizing_idx],
                             sizing_set.output_motion_ctrl.data,
                             dest_matrixes,
                             sizing_panel.twist_middle_check_ctrl.GetValue(),
                             sizing_panel.twist_middle_threshold_slider.GetValue(),
+                        )
+                    )
+
+            wait(futures, return_when=FIRST_EXCEPTION)
+
+    def sizing_align_arm(self, all_src_matrixes: dict[int, VmdBoneFrameTrees]) -> None:
+        logger.info("腕位置合わせ", decoration=MLogger.Decoration.BOX)
+
+        usecase = AlignArmUsecase()
+        sizing_panel: SizingPanel = self.frame.sizing_panel
+
+        dist_align_sizing_sets: dict[
+            int, tuple[PmxModel, PmxModel, VmdMotion, VmdBoneFrameTrees]
+        ] = {}
+
+        for sizing_set in sizing_panel.sizing_sets:
+            if usecase.validate(
+                sizing_set.sizing_idx,
+                sizing_set.src_model_ctrl.data,
+                sizing_set.dest_model_ctrl.data,
+                show_message=True,
+            ):
+                dist_align_sizing_sets[sizing_set.sizing_idx] = (
+                    sizing_set.src_model_ctrl.data,
+                    sizing_set.dest_model_ctrl.data,
+                    sizing_set.output_motion_ctrl.data,
+                    all_src_matrixes[sizing_set.sizing_idx],
+                )
+
+        if not dist_align_sizing_sets:
+            return
+
+        # キーフレと全体位置取得
+        (
+            fnos,
+            align_bone_names,
+            align_bone_indexes,
+            all_bone_distances,
+        ) = usecase.calc_align_arm_positions(
+            dist_align_sizing_sets,
+            sizing_panel.align_finger_check_ctrl.GetValue(),
+        )
+
+        # 初期位置を取得する
+        dest_matrixes: dict[tuple[int, str], VmdBoneFrameTrees] = {}
+
+        with ThreadPoolExecutor(
+            thread_name_prefix="arm_initial", max_workers=self.max_worker
+        ) as executor:
+            futures: list[Future] = []
+            for sizing_set in sizing_panel.sizing_sets:
+                if usecase.validate(
+                    sizing_set.sizing_idx,
+                    sizing_set.src_model_ctrl.data,
+                    sizing_set.dest_model_ctrl.data,
+                ):
+                    for direction in ("右", "左"):
+                        futures.append(
+                            executor.submit(
+                                usecase.get_dest_matrixes,
+                                sizing_set.sizing_idx,
+                                sizing_set.dest_model_ctrl.data,
+                                sizing_set.output_motion_ctrl.data,
+                                direction,
+                                fnos,
+                                align_bone_names,
+                            )
+                        )
+
+            wait(futures, return_when=FIRST_EXCEPTION)
+
+            for future in as_completed(futures):
+                if future.exception():
+                    raise future.exception()
+                sizing_idx, direction, matrixes = future.result()
+                dest_matrixes[(sizing_idx, direction)] = matrixes
+
+        ik_dest_models: dict[int, PmxModel] = {}
+
+        # IKセットアップする
+        with ThreadPoolExecutor(
+            thread_name_prefix="ik_setup", max_workers=self.max_worker
+        ) as executor:
+            futures: list[Future] = []
+
+            for sizing_set in sizing_panel.sizing_sets:
+                if usecase.validate(
+                    sizing_set.sizing_idx,
+                    sizing_set.src_model_ctrl.data,
+                    sizing_set.dest_model_ctrl.data,
+                ):
+                    futures.append(
+                        executor.submit(
+                            usecase.setup_model_ik,
+                            sizing_set.sizing_idx,
+                            sizing_set.dest_model_ctrl.data,
+                            sizing_panel.align_finger_check_ctrl.GetValue(),
+                        )
+                    )
+
+            wait(futures, return_when=FIRST_EXCEPTION)
+
+            for future in as_completed(futures):
+                if future.exception():
+                    raise future.exception()
+
+                sizing_idx, ik_model = future.result()
+                ik_dest_models[sizing_idx] = ik_model
+
+        # 腕位置合わせを実行する
+        with ThreadPoolExecutor(
+            thread_name_prefix="align_arm", max_workers=self.max_worker
+        ) as executor:
+            futures: list[Future] = []
+            for sizing_set in sizing_panel.sizing_sets:
+                if usecase.validate(
+                    sizing_set.sizing_idx,
+                    sizing_set.src_model_ctrl.data,
+                    sizing_set.dest_model_ctrl.data,
+                ):
+                    futures.append(
+                        executor.submit(
+                            usecase.sizing_align_arm,
+                            sizing_set.sizing_idx,
+                            sizing_set.src_model_ctrl.data,
+                            ik_dest_models[sizing_set.sizing_idx],
+                            sizing_set.output_motion_ctrl.data,
+                            all_src_matrixes[sizing_set.sizing_idx],
+                            dest_matrixes,
+                            fnos,
+                            align_bone_names,
+                            align_bone_indexes,
+                            all_bone_distances,
+                            sizing_panel.align_finger_check_ctrl.GetValue(),
                         )
                     )
 
@@ -291,15 +425,21 @@ class SizingWorker(BaseWorker):
         ) as executor:
             futures: list[Future] = []
             for sizing_set in sizing_panel.sizing_sets:
-                futures.append(
-                    executor.submit(
-                        usecase.sizing_arm_stance,
-                        sizing_set.sizing_idx,
-                        sizing_set.src_model_ctrl.data,
-                        sizing_set.dest_model_ctrl.data,
-                        sizing_set.output_motion_ctrl.data,
+                if usecase.validate(
+                    sizing_set.sizing_idx,
+                    sizing_set.src_model_ctrl.data,
+                    sizing_set.dest_model_ctrl.data,
+                    show_message=True,
+                ):
+                    futures.append(
+                        executor.submit(
+                            usecase.sizing_arm_stance,
+                            sizing_set.sizing_idx,
+                            sizing_set.src_model_ctrl.data,
+                            sizing_set.dest_model_ctrl.data,
+                            sizing_set.output_motion_ctrl.data,
+                        )
                     )
-                )
 
             wait(futures, return_when=FIRST_EXCEPTION)
 
@@ -335,6 +475,7 @@ class SizingWorker(BaseWorker):
                     sizing_set.sizing_idx,
                     sizing_set.src_model_ctrl.data,
                     sizing_set.dest_model_ctrl.data,
+                    show_message=True,
                 ):
                     futures.append(
                         executor.submit(
@@ -362,15 +503,22 @@ class SizingWorker(BaseWorker):
         ) as executor:
             futures: list[Future] = []
             for sizing_set in sizing_panel.sizing_sets:
-                futures.append(
-                    executor.submit(
-                        usecase.integrate,
-                        sizing_set.sizing_idx,
-                        sizing_set.dest_model_ctrl.data,
-                        sizing_set.output_motion_ctrl.data,
-                        bone_name,
+                if usecase.validate(
+                    sizing_set.sizing_idx,
+                    sizing_set.src_model_ctrl.data,
+                    sizing_set.dest_model_ctrl.data,
+                    bone_name,
+                    show_message=True,
+                ):
+                    futures.append(
+                        executor.submit(
+                            usecase.integrate,
+                            sizing_set.sizing_idx,
+                            sizing_set.dest_model_ctrl.data,
+                            sizing_set.output_motion_ctrl.data,
+                            bone_name,
+                        )
                     )
-                )
 
             wait(futures, return_when=FIRST_EXCEPTION)
 
@@ -389,14 +537,20 @@ class SizingWorker(BaseWorker):
         for sizing_one_set in sizing_panel.sizing_sets:
             sizing_set: SizingBoneSet = sizing_one_set
 
-            # 個別の足XZ比率、足Y比率
-            xz_leg_ratio, y_leg_ratio, center_offset = usecase.get_move_ratio(
-                sizing_set.src_model_ctrl.data, sizing_set.dest_model_ctrl.data
-            )
+            if usecase.validate(
+                sizing_set.sizing_idx,
+                sizing_set.src_model_ctrl.data,
+                sizing_set.dest_model_ctrl.data,
+                show_message=True,
+            ):
+                # 個別の足XZ比率、足Y比率
+                xz_leg_ratio, y_leg_ratio, center_offset = usecase.get_move_ratio(
+                    sizing_set.src_model_ctrl.data, sizing_set.dest_model_ctrl.data
+                )
 
-            xz_leg_ratios.append(xz_leg_ratio)
-            y_leg_ratios.append(y_leg_ratio)
-            center_offsets.append(center_offset)
+                xz_leg_ratios.append(xz_leg_ratio)
+                y_leg_ratios.append(y_leg_ratio)
+                center_offsets.append(center_offset)
 
         # 全体の足XZ比率
         all_xz_leg_ratio = usecase.get_all_leg_xz_ratio(xz_leg_ratios)
@@ -408,18 +562,23 @@ class SizingWorker(BaseWorker):
             for sizing_set, xz_leg_ratio, y_leg_ratio, center_offset in zip(
                 sizing_panel.sizing_sets, xz_leg_ratios, y_leg_ratios, center_offsets
             ):
-                futures.append(
-                    executor.submit(
-                        usecase.sizing_move,
-                        sizing_set.sizing_idx,
-                        xz_leg_ratio,
-                        MVector3D(all_xz_leg_ratio, y_leg_ratio, all_xz_leg_ratio),
-                        center_offset,
-                        sizing_set.src_model_ctrl.data,
-                        sizing_set.dest_model_ctrl.data,
-                        sizing_set.output_motion_ctrl.data,
+                if usecase.validate(
+                    sizing_set.sizing_idx,
+                    sizing_set.src_model_ctrl.data,
+                    sizing_set.dest_model_ctrl.data,
+                ):
+                    futures.append(
+                        executor.submit(
+                            usecase.sizing_move,
+                            sizing_set.sizing_idx,
+                            xz_leg_ratio,
+                            MVector3D(all_xz_leg_ratio, y_leg_ratio, all_xz_leg_ratio),
+                            center_offset,
+                            sizing_set.src_model_ctrl.data,
+                            sizing_set.dest_model_ctrl.data,
+                            sizing_set.output_motion_ctrl.data,
+                        )
                     )
-                )
 
             wait(futures, return_when=FIRST_EXCEPTION)
 
@@ -516,6 +675,11 @@ class SizingWorker(BaseWorker):
         wait(src_model_futures, return_when=FIRST_EXCEPTION)
         wait(motion_futures, return_when=FIRST_EXCEPTION)
 
+        is_get_src_matrixes = bool(
+            sizing_panel.integrate_toe_ik_check_ctrl.GetValue()
+            or sizing_panel.align_arm_check_ctrl.GetValue()
+        )
+
         for future in as_completed(motion_futures):
             if future.exception():
                 raise future.exception()
@@ -531,19 +695,20 @@ class SizingWorker(BaseWorker):
             self.frame.cache_models[digest] = original_model
             sizing_panel.sizing_sets[sizing_idx].src_model_ctrl.data = model
 
-        with ThreadPoolExecutor(
-            thread_name_prefix="src_initial", max_workers=self.max_worker
-        ) as executor:
-            matrix_futures: list[Future] = []
-            for sizing_set in sizing_panel.sizing_sets:
-                matrix_futures.append(
-                    executor.submit(
-                        usecase.get_src_matrixes,
-                        sizing_set.sizing_idx,
-                        sizing_set.src_model_ctrl.data,
-                        sizing_set.motion_ctrl.data,
+        if is_get_src_matrixes:
+            with ThreadPoolExecutor(
+                thread_name_prefix="src_initial", max_workers=self.max_worker
+            ) as executor:
+                matrix_futures: list[Future] = []
+                for sizing_set in sizing_panel.sizing_sets:
+                    matrix_futures.append(
+                        executor.submit(
+                            usecase.get_src_matrixes,
+                            sizing_set.sizing_idx,
+                            sizing_set.src_model_ctrl.data,
+                            sizing_set.motion_ctrl.data,
+                        )
                     )
-                )
 
         for future in as_completed(dest_model_futures):
             if future.exception():
@@ -554,11 +719,12 @@ class SizingWorker(BaseWorker):
 
         all_src_matrixes: dict[int, VmdBoneFrameTrees] = {}
 
-        for future in as_completed(matrix_futures):
-            if future.exception():
-                raise future.exception()
-            sizing_idx, src_matrixes = future.result()
-            all_src_matrixes[sizing_idx] = src_matrixes
+        if is_get_src_matrixes:
+            for future in as_completed(matrix_futures):
+                if future.exception():
+                    raise future.exception()
+                sizing_idx, src_matrixes = future.result()
+                all_src_matrixes[sizing_idx] = src_matrixes
 
         return all_src_matrixes
 

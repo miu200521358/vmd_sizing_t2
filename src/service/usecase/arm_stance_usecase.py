@@ -1,8 +1,10 @@
 import os
+from typing import Optional
 
 import numpy as np
 from mlib.core.logger import MLogger
 from mlib.core.math import MMatrix4x4
+from mlib.pmx.bone_setting import BoneFlg
 from mlib.pmx.pmx_collection import PmxModel
 from mlib.vmd.vmd_collection import VmdMotion
 from numpy.linalg import inv
@@ -23,6 +25,43 @@ ARM_BONE_NAMES = [
 
 
 class ArmStanceUsecase:
+    def validate(
+        self,
+        sizing_idx: int,
+        src_model: Optional[PmxModel],
+        dest_model: Optional[PmxModel],
+        show_message: bool = False,
+    ) -> bool:
+        if not src_model or not dest_model:
+            # モデルが揃ってない、チェックが入ってない場合、スルー
+            return False
+
+        if set(ARM_BONE_NAMES) - set(src_model.bones.names) or True in [
+            BoneFlg.NOTHING in src_model.bones[bone_name].bone_flg
+            for bone_name in ARM_BONE_NAMES
+        ]:
+            if show_message:
+                logger.warning(
+                    "【No.{i}】モーション作成元モデルに腕・ひじ・手首の左右ボーンがないため、腕スタンス補正をスキップします",
+                    i=sizing_idx + 1,
+                    decoration=MLogger.Decoration.BOX,
+                )
+            return False
+
+        if set(ARM_BONE_NAMES) - set(dest_model.bones.names) or True in [
+            BoneFlg.NOTHING in dest_model.bones[bone_name].bone_flg
+            for bone_name in ARM_BONE_NAMES
+        ]:
+            if show_message:
+                logger.warning(
+                    "【No.{i}】サイジング先モデルに腕・ひじ・手首の左右ボーンがないため、腕スタンス補正をスキップします",
+                    i=sizing_idx + 1,
+                    decoration=MLogger.Decoration.BOX,
+                )
+            return False
+
+        return True
+
     def sizing_arm_stance(
         self,
         sizing_idx: int,
@@ -31,21 +70,6 @@ class ArmStanceUsecase:
         motion: VmdMotion,
     ) -> tuple[int, VmdMotion]:
         """腕スタンス補正によるサイジング"""
-        if set(ARM_BONE_NAMES) - set(src_model.bones.names):
-            logger.warning(
-                "【No.{i}】モーション作成元モデルに腕・ひじ・手首の左右ボーンがないため、腕スタンス補正をスキップします",
-                i=sizing_idx + 1,
-                decoration=MLogger.Decoration.BOX,
-            )
-            return sizing_idx, motion
-
-        if set(ARM_BONE_NAMES) - set(dest_model.bones.names):
-            logger.warning(
-                "【No.{i}】サイジング先モデルに腕・ひじ・手首の左右ボーンがないため、腕スタンス補正をスキップします",
-                i=sizing_idx + 1,
-                decoration=MLogger.Decoration.BOX,
-            )
-            return sizing_idx, motion
 
         offset_from_slope_matrixes, offset_to_slope_matrixes = self.get_slope_qq(
             src_model, dest_model, motion

@@ -30,15 +30,17 @@ class StanceLowerUsecase:
         sizing_idx: int,
         src_model: Optional[PmxModel],
         dest_model: Optional[PmxModel],
-        is_stance_lower: bool,
         show_message: bool = False,
     ) -> bool:
-        if not src_model or not dest_model or (not is_stance_lower):
+        if not src_model or not dest_model:
             # モデルが揃ってない、チェックが入ってない場合、スルー
             return False
 
         """下半身"""
-        if LOWER_BONE_NAMES - set(src_model.bones.names):
+        if LOWER_BONE_NAMES - set(src_model.bones.names) or True in [
+            BoneFlg.NOTHING in src_model.bones[bone_name].bone_flg
+            for bone_name in LOWER_BONE_NAMES
+        ]:
             if show_message:
                 logger.warning(
                     "【No.{x}】モーション作成元モデルに下半身・足・ひざ・足首ボーンのいずれかがないため、下半身補正をスキップします",
@@ -47,7 +49,10 @@ class StanceLowerUsecase:
                 )
             return False
 
-        if LOWER_BONE_NAMES - set(dest_model.bones.names):
+        if LOWER_BONE_NAMES - set(dest_model.bones.names) or True in [
+            BoneFlg.NOTHING in dest_model.bones[bone_name].bone_flg
+            for bone_name in LOWER_BONE_NAMES
+        ]:
             if show_message:
                 logger.warning(
                     "【No.{x}】サイジング先モデルに下半身・足・ひざ・足首ボーンのいずれかがないため、下半身補正をスキップします",

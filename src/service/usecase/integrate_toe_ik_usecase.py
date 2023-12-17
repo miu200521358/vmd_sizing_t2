@@ -2,6 +2,7 @@ import os
 from typing import Optional
 
 from mlib.core.logger import MLogger
+from mlib.pmx.bone_setting import BoneFlg
 from mlib.pmx.pmx_collection import PmxModel
 from mlib.vmd.vmd_collection import VmdMotion
 from mlib.vmd.vmd_tree import VmdBoneFrameTrees
@@ -14,11 +15,13 @@ TOE_BONE_NAMES = {
     BoneNames.leg("右"),
     BoneNames.knee("右"),
     BoneNames.ankle("右"),
-    BoneNames.toe("右"),
+    BoneNames.leg_ik("右"),
+    BoneNames.toe_ik("右"),
     BoneNames.leg("左"),
     BoneNames.knee("左"),
     BoneNames.ankle("左"),
-    BoneNames.toe("左"),
+    BoneNames.leg_ik("左"),
+    BoneNames.toe_ik("左"),
 }
 
 
@@ -35,19 +38,25 @@ class IntegrateToeIkUsecase:
             return False
 
         """つま先IK"""
-        if TOE_BONE_NAMES - set(src_model.bones.names):
+        if TOE_BONE_NAMES - set(src_model.bones.names) or True in [
+            BoneFlg.NOTHING in src_model.bones[bone_name].bone_flg
+            for bone_name in TOE_BONE_NAMES
+        ]:
             if show_message:
                 logger.warning(
-                    "【No.{x}】モーション作成元モデルに下半身・足・ひざ・足首・つま先ボーンのいずれかがないため、つま先IK統合をスキップします",
+                    "【No.{x}】モーション作成元モデルに下半身・足・ひざ・足首・足IK・つま先IKボーンのいずれかがないため、つま先IK統合をスキップします",
                     x=sizing_idx + 1,
                     decoration=MLogger.Decoration.BOX,
                 )
             return False
 
-        if TOE_BONE_NAMES - set(dest_model.bones.names):
+        if TOE_BONE_NAMES - set(dest_model.bones.names) or True in [
+            BoneFlg.NOTHING in dest_model.bones[bone_name].bone_flg
+            for bone_name in TOE_BONE_NAMES
+        ]:
             if show_message:
                 logger.warning(
-                    "【No.{x}】サイジング先モデルに下半身・足・ひざ・足首・つま先ボーンのいずれかがないため、つま先IK統合をスキップします",
+                    "【No.{x}】サイジング先モデルに下半身・足・ひざ・足首・足IK・つま先IKボーンのいずれかがないため、つま先IK統合をスキップします",
                     x=sizing_idx + 1,
                     decoration=MLogger.Decoration.BOX,
                 )

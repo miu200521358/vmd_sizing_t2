@@ -127,7 +127,7 @@ class SizingPanel(NotebookPanel):
                 event,
                 "腰統合",
                 [
-                    "サイジング先モデルが元モデルと同じポーズになるように、腰の値を子ボーンに移し替えます",
+                    "サイジング先モデルが元モデルと同じになるように、腰の値を子ボーンに移し替えます",
                     "　・腰の移動や回転を、上半身や下半身に割り当てます",
                     "　・チェックをONにした場合、サイジングモーションに「W」を追加します",
                 ],
@@ -153,7 +153,7 @@ class SizingPanel(NotebookPanel):
         #         event,
         #         "下半身補正",
         #         [
-        #             "サイジング先モデルが元モデルと同じポーズになるように、下半身の傾きを調整します",
+        #             "サイジング先モデルが元モデルと同じになるように、下半身の傾きを調整します",
         #             "　・特にしゃがんでいる時の足の向きが違っている時に有効です",
         #             "　・チェックをONにした場合、サイジングモーションに「L」を追加します",
         #         ],
@@ -162,6 +162,53 @@ class SizingPanel(NotebookPanel):
         # )
         # self.stance_lower_sizer.Add(self.stance_lower_help_ctrl, 0, wx.ALL, 0)
         # self.config_sizer.Add(self.stance_lower_sizer, 0, wx.ALL, 1)
+
+        # 腕位置合わせ ------------------------
+        self.align_arm_group_sizer = wx.BoxSizer(wx.VERTICAL)
+
+        self.align_arm_sizer = wx.BoxSizer(wx.HORIZONTAL)
+
+        self.align_arm_check_ctrl = wx.CheckBox(
+            self, wx.ID_ANY, __("腕位置合わせ"), wx.DefaultPosition, wx.DefaultSize, 0
+        )
+        self.align_arm_check_ctrl.SetToolTip(__("腕周りのを元モーションと大体同じ位置になるよう合わせます"))
+        self.align_arm_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_align_ctrl)
+        self.align_arm_sizer.Add(self.align_arm_check_ctrl, 0, wx.ALL, 3)
+
+        self.align_arm_help_ctrl = ImageButton(
+            self,
+            "resources/icon/help.png",
+            wx.Size(12, 12),
+            lambda event: self.on_help(
+                event,
+                "腕位置合わせ",
+                [
+                    "サイジング先モデルが元モデルと同じポーズになるように、腕系ボーンの位置を調整します",
+                    "　・肩の高さ、手首の位置など、腕周りのボーンを一括で調整します",
+                    "　・特に手を合わせたり、ハートを作るポーズなどが崩れにくくなります",
+                    "　・指位置合わせをONにした場合、親指0の差異も含めて調整します",
+                    "　・チェックをONにした場合、サイジングモーションに「P」を追加します",
+                ],
+            ),
+            __("解説をメッセージ欄に表示します"),
+        )
+        self.align_arm_sizer.Add(self.align_arm_help_ctrl, 0, wx.ALL, 0)
+        self.align_arm_group_sizer.Add(self.align_arm_sizer, 0, wx.ALL, 0)
+
+        self.align_finger_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.align_finger_blank = wx.StaticText(self, wx.ID_ANY, "     ")
+        self.align_finger_sizer.Add(self.align_finger_blank)
+
+        self.align_finger_check_ctrl = wx.CheckBox(
+            self, wx.ID_ANY, __("指位置合わせ"), wx.DefaultPosition, wx.DefaultSize, 0
+        )
+        self.align_finger_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_align_sub_ctrl)
+        self.align_finger_check_ctrl.SetToolTip(__("指の位置を元モーションと大体同じ位置になるよう合わせます"))
+
+        self.align_finger_sizer.Add(self.align_finger_check_ctrl, 0, wx.ALL, 3)
+        self.align_arm_group_sizer.Add(self.align_finger_sizer, 0, wx.ALL, 0)
+
+        self.config_sizer.Add(self.align_arm_group_sizer, 0, wx.ALL, 1)
 
         # 捩り分散 ------------------------
         self.twist_group_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -230,72 +277,6 @@ class SizingPanel(NotebookPanel):
 
         self.config_sizer.Add(self.twist_group_sizer, 0, wx.ALL, 1)
 
-        # # 位置合わせ ------------------------
-        # self.align_group_sizer = wx.BoxSizer(wx.VERTICAL)
-
-        # self.align_sizer = wx.BoxSizer(wx.HORIZONTAL)
-
-        # self.align_check_ctrl = wx.CheckBox(
-        #     self, wx.ID_ANY, __("手首位置合わせ"), wx.DefaultPosition, wx.DefaultSize, 0
-        # )
-        # self.align_check_ctrl.SetToolTip(__("手首の位置を元モーションと大体同じ位置になるよう合わせます"))
-        # self.align_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_align_ctrl)
-        # self.align_sizer.Add(self.align_check_ctrl, 0, wx.ALL, 3)
-
-        # self.align_help_ctrl = ImageButton(
-        #     self,
-        #     "resources/icon/help.png",
-        #     wx.Size(12, 12),
-        #     lambda event: self.on_help(
-        #         event,
-        #         "手首位置合わせ",
-        #         [
-        #             "サイジング先モデルが元モデルと同じポーズになるように、手首の位置などを調整します",
-        #             "　・特に手を合わせたり、ハートを作るポーズなどが崩れにくくなります",
-        #             "　・指位置合わせ・指先位置合わせは特にフィンガータットモーションが崩れにくくなります",
-        #             "　・チェックをONにした場合、サイジングモーションに「A」を追加します",
-        #         ],
-        #     ),
-        #     __("解説をメッセージ欄に表示します"),
-        # )
-        # self.align_sizer.Add(self.align_help_ctrl, 0, wx.ALL, 0)
-        # self.align_group_sizer.Add(self.align_sizer, 0, wx.ALL, 0)
-
-        # self.align_finger_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        # self.align_finger_blank = wx.StaticText(self, wx.ID_ANY, "     ")
-        # self.align_finger_sizer.Add(self.align_finger_blank)
-
-        # self.align_finger_check_ctrl = wx.CheckBox(
-        #     self, wx.ID_ANY, __("指位置合わせ"), wx.DefaultPosition, wx.DefaultSize, 0
-        # )
-        # self.align_finger_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_align_sub_ctrl)
-        # self.align_finger_check_ctrl.SetToolTip(
-        #     __("鎖骨あたりに対する指の位置を元モーションと大体同じ位置になるよう合わせます")
-        # )
-
-        # self.align_finger_sizer.Add(self.align_finger_check_ctrl, 0, wx.ALL, 3)
-        # self.align_group_sizer.Add(self.align_finger_sizer, 0, wx.ALL, 0)
-
-        # self.align_finger_tail_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        # self.align_finger_tail_blank = wx.StaticText(self, wx.ID_ANY, "     ")
-        # self.align_finger_tail_sizer.Add(self.align_finger_tail_blank)
-
-        # self.align_finger_tail_check_ctrl = wx.CheckBox(
-        #     self, wx.ID_ANY, __("指先位置合わせ"), wx.DefaultPosition, wx.DefaultSize, 0
-        # )
-        # self.align_finger_tail_check_ctrl.Bind(
-        #     wx.EVT_CHECKBOX, self.on_check_align_sub_ctrl
-        # )
-        # self.align_finger_tail_check_ctrl.SetToolTip(
-        #     __("手のひらに対する指先の位置を元モーションと大体同じ位置になるよう合わせます")
-        # )
-        # self.align_finger_tail_sizer.Add(
-        #     self.align_finger_tail_check_ctrl, 0, wx.ALL, 3
-        # )
-        # self.align_group_sizer.Add(self.align_finger_tail_sizer, 0, wx.ALL, 0)
-
-        # self.config_sizer.Add(self.align_group_sizer, 0, wx.ALL, 1)
-
         # つま先IK統合 ------------------------
         self.integrate_toe_ik_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.integrate_toe_ik_check_ctrl = wx.CheckBox(
@@ -314,7 +295,7 @@ class SizingPanel(NotebookPanel):
                 event,
                 "つま先IK統合",
                 [
-                    "サイジング先モデルが元モデルと同じポーズになるように、つま先IKの値を足IKに移し替えます",
+                    "サイジング先モデルが元モデルと同じになるように、つま先IKの値を足IKに移し替えます",
                     "　・チェックをONにした場合、サイジングモーションに「O」を追加します",
                 ],
             ),
@@ -322,62 +303,6 @@ class SizingPanel(NotebookPanel):
         )
         self.integrate_toe_ik_sizer.Add(self.integrate_toe_ik_help_ctrl, 0, wx.ALL, 0)
         self.config_sizer.Add(self.integrate_toe_ik_sizer, 0, wx.ALL, 1)
-
-        # # スタンス追加補正 ----------------------
-        # self.stance_sizer = wx.BoxSizer(wx.HORIZONTAL)
-
-        # self.stance_correct_check_ctrl = wx.CheckBox(self.window, wx.ID_ANY, __("スタンス追加補正"), wx.DefaultPosition, wx.DefaultSize, 0)
-        # self.stance_correct_check_ctrl.SetToolTip(__("元モーションの動きにより近くなるよう追加で補正を行います\n補正内容は任意で選択できます"))
-        # self.stance_correct_check_ctrl.SetBackgroundColour(self.background_color)
-        # self.stance_correct_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_stance_correct)
-        # self.stance_sizer.Add(self.stance_correct_check_ctrl, 0, wx.ALL, 2)
-
-        # self.stance_correct_btn_ctrl = wx.Button(self.window, wx.ID_ANY, __("補正内訳"), size=wx.Size(120, 20))
-        # self.stance_correct_btn_ctrl.Bind(wx.EVT_BUTTON, self.on_select_stance_correct)
-        # self.stance_correct_btn_ctrl.SetToolTip(__("スタンス追加補正で行う補正を取捨選択することができます"))
-        # self.stance_sizer.Add(self.stance_correct_btn_ctrl, 0, wx.ALL, 2)
-
-        # self.separate1 = wx.StaticText(self.window, wx.ID_ANY, "     |     ")
-        # self.separate1.SetBackgroundColour(self.background_color)
-        # self.stance_sizer.Add(self.separate1)
-
-        # # 捩り分散
-        # self.twist_check_ctrl = wx.CheckBox(self.window, wx.ID_ANY, __("捩り分散"), wx.DefaultPosition, wx.DefaultSize, 0)
-        # self.twist_check_ctrl.SetToolTip(__("腕を腕捩りなど、捩りボーンに捩り回転を分散させます"))
-        # self.twist_check_ctrl.SetBackgroundColour(self.background_color)
-        # self.stance_sizer.Add(self.twist_check_ctrl, 0, wx.ALL, 2)
-
-        # self.config_sizer.Add(self.stance_sizer, 0, wx.ALL, 2)
-
-        # self.config_sizer.Add(wx.StaticLine(self.window, wx.ID_ANY), 1, wx.EXPAND | wx.ALL, 10)
-
-        # self.config_sizer.Add(self.align_sizer, 0, wx.ALL, 2)
-
-        # self.config_sizer.Add(wx.StaticLine(self.window, wx.ID_ANY), 1, wx.EXPAND | wx.ALL, 10)
-
-        # # 足IKオフセット ------------------------
-        # self.offset_sizer = wx.BoxSizer(wx.HORIZONTAL)
-
-        # self.leg_ik_offset_label = wx.StaticText(self.window, wx.ID_ANY, __("足IKオフセット"))
-        # self.leg_ik_offset_label.SetBackgroundColour(self.background_color)
-        # self.offset_sizer.Add(self.leg_ik_offset_label, 0, wx.ALL, 2)
-
-        # self.leg_ik_offset_slider = FloatSliderCtrl(
-        #     parent=self.window,
-        #     value=0,
-        #     min_value=-5,
-        #     max_value=5,
-        #     increment=0.01,
-        #     spin_increment=0.01,
-        #     border=3,
-        #     size=wx.Size(270, -1),
-        #     change_event=None,
-        #     tooltip=__("モーションで足が重なってしまう場合などで、足を少し開き気味にするなどのオフセットを追加できます"),
-        # )
-        # self.leg_ik_offset_slider._slider.SetBackgroundColour(self.background_color)
-        # self.offset_sizer.Add(self.leg_ik_offset_slider.sizer, 0, wx.ALL, 2)
-
-        # self.config_sizer.Add(self.offset_sizer, 0, wx.ALL, 2)
 
         self.box_sizer.Add(self.config_sizer, 4, wx.ALL, 1)
 
@@ -448,9 +373,8 @@ class SizingPanel(NotebookPanel):
         # self.stance_lower_check_ctrl.SetValue(self.is_full_config)
         self.twist_check_ctrl.SetValue(self.is_full_config)
         self.twist_middle_check_ctrl.SetValue(self.is_full_config)
-        # self.align_check_ctrl.SetValue(self.is_full_config)
-        # self.align_finger_check_ctrl.SetValue(self.is_full_config)
-        # self.align_finger_tail_check_ctrl.SetValue(self.is_full_config)
+        self.align_arm_check_ctrl.SetValue(self.is_full_config)
+        self.align_finger_check_ctrl.SetValue(self.is_full_config)
         self.integrate_toe_ik_check_ctrl.SetValue(self.is_full_config)
 
         self.on_change_dest_model_pmx(event)
@@ -470,17 +394,13 @@ class SizingPanel(NotebookPanel):
         self.on_change_dest_model_pmx(event)
 
     def on_check_align_ctrl(self, event: wx.Event) -> None:
-        if not self.align_check_ctrl.GetValue():
+        if not self.align_arm_check_ctrl.GetValue():
             self.align_finger_check_ctrl.SetValue(0)
-            self.align_finger_tail_check_ctrl.SetValue(0)
         self.on_change_dest_model_pmx(event)
 
     def on_check_align_sub_ctrl(self, event: wx.Event) -> None:
-        if (
-            self.align_finger_check_ctrl.GetValue()
-            or self.align_finger_tail_check_ctrl.GetValue()
-        ):
-            self.align_check_ctrl.SetValue(1)
+        if self.align_finger_check_ctrl.GetValue():
+            self.align_arm_check_ctrl.SetValue(1)
         self.on_change_dest_model_pmx(event)
 
     def on_change_dest_model_pmx(self, event: wx.Event) -> None:
@@ -551,10 +471,9 @@ class SizingPanel(NotebookPanel):
         self.twist_middle_check_ctrl.Enable(enable)
         self.twist_middle_threshold_slider.Enable(enable)
         self.twist_help_ctrl.Enable(enable)
-        # self.align_check_ctrl.Enable(enable)
-        # self.align_finger_check_ctrl.Enable(enable)
-        # self.align_finger_tail_check_ctrl.Enable(enable)
-        # self.align_help_ctrl.Enable(enable)
+        self.align_arm_check_ctrl.Enable(enable)
+        self.align_finger_check_ctrl.Enable(enable)
+        self.align_arm_help_ctrl.Enable(enable)
         self.integrate_toe_ik_check_ctrl.Enable(enable)
         self.integrate_toe_ik_help_ctrl.Enable(enable)
 
