@@ -110,7 +110,7 @@ class AlignArmUsecase:
                 display_block=1000,
             )
 
-            align_bone_indexes: list[tuple[int, str]] = []
+            align_bone_indexes: dict[tuple[int, str], int] = {}
             align_bone_positions: list[np.ndarray] = []
 
             for sizing_idx, (
@@ -120,7 +120,9 @@ class AlignArmUsecase:
                 src_matrixes,
             ) in dist_align_sizing_sets.items():
                 for bone_name in align_bone_names:
-                    align_bone_indexes.append((sizing_idx, bone_name))
+                    align_bone_indexes[(sizing_idx, bone_name)] = len(
+                        align_bone_positions
+                    )
                     align_bone_positions.append(
                         src_matrixes[bone_name, fno].position.vector
                     )
@@ -146,9 +148,11 @@ class AlignArmUsecase:
         all_dest_matrixes: dict[tuple[int, str], VmdBoneFrameTrees],
         fnos: list[int],
         align_bone_names: list[str],
-        align_bone_indexes: list[tuple[int, str]],
+        align_bone_indexes: dict[tuple[int, str], int],
         all_bone_distances: dict[int, np.ndarray],
         is_finger: bool,
+        is_middle: bool,
+        middle_threshold: float,
     ) -> tuple[int, str, VmdMotion]:
         for direction in ("右", "左"):
             self.sizing_arm_align_direction(
@@ -163,6 +167,8 @@ class AlignArmUsecase:
                 align_bone_indexes,
                 all_bone_distances,
                 is_finger,
+                is_middle,
+                middle_threshold,
                 direction,
             )
 
@@ -176,9 +182,11 @@ class AlignArmUsecase:
         dest_matrixes: VmdBoneFrameTrees,
         fnos: list[int],
         align_bone_names: list[str],
-        align_bone_indexes: list[tuple[int, str]],
+        align_bone_indexes: dict[tuple[int, str], int],
         all_bone_distances: dict[int, np.ndarray],
         is_finger: bool,
+        is_middle: bool,
+        middle_threshold: float,
         direction: str,
     ) -> tuple[int, str, VmdMotion]:
         logger.info(
@@ -524,57 +532,19 @@ class AlignArmUsecase:
                 out_fno_log=False,
             )
 
-            # 肩IK --------------------
-            src_shoulder_local_position = (
-                src_matrixes[BoneNames.arm(direction), fno].position
-                - src_matrixes[BoneNames.shoulder_root(direction), fno].position
-            )
-            dest_shoulder_global_position = dest_matrixes[
-                BoneNames.shoulder_root(direction), fno
-            ].position + (src_shoulder_local_position * shoulder_ratio)
-
-            shoulder_ik_bf = dest_motion.bones[BoneNames.shoulder_ik(direction)][fno]
-            shoulder_ik_bf.position = dest_shoulder_global_position
-            dest_motion.append_bone_frame(shoulder_ik_bf)
-
-            # # ■ --------------
-            # from datetime import datetime
-
-            # from mlib.vmd.vmd_writer import VmdWriter
-
-            # VmdWriter(
-            #     dest_motion,
-            #     f"E:/MMD/サイジング/足IK/IK_step/{datetime.now():%Y%m%d_%H%M%S_%f}_{direction}肩_{fno:04d}.vmd",
-            #     model_name="Test Model",
-            # ).save()
-            # # ■ --------------
-
-            # IK解決する
-            _, _, ik_qqs = dest_motion.bones.get_ik_rotation(
-                fidx,
-                fno,
+            # 腕位置合わせ用行列取得
+            self.sizing_arm_align_direction_frame(
+                sizing_idx,
+                src_model,
                 dest_model,
-                dest_model.bones[BoneNames.shoulder_ik(direction)],
-            )
-
-            shoulder_bf = dest_motion.bones[BoneNames.shoulder(direction)][fno]
-            shoulder_bf.rotation = ik_qqs[
-                dest_model.bones[BoneNames.shoulder(direction)].index
-            ]
-            dest_motion.insert_bone_frame(shoulder_bf)
-
-            motion_bone_qqs[
-                0, dest_model.bones[BoneNames.shoulder(direction)].index
-            ] = (
-                ik_qqs[dest_model.bones[BoneNames.shoulder(direction)].index]
-                .to_matrix4x4()
-                .vector
-            )
-
-            # 肩解決後の行列取得
-            shoulder_matrixes = dest_motion.bones.calc_bone_matrixes(
-                [fno],
-                dest_model,
+                dest_motion,
+                src_matrixes,
+                dest_matrixes,
+                align_bone_names,
+                align_bone_indexes,
+                all_bone_distances,
+                is_finger,
+                direction,
                 bone_dict,
                 bone_offset_matrixes,
                 bone_pos_matrixes,
@@ -591,131 +561,69 @@ class AlignArmUsecase:
                 motion_bone_local_qqs,
                 motion_bone_local_scales,
                 motion_bone_fk_qqs,
-                matrixes=None,
-                out_fno_log=False,
-                description="",
-            )
-
-            # 腕IK --------------------
-            src_arm_local_position = (
-                src_matrixes[BoneNames.wrist(direction), fno].position
-                - src_matrixes[BoneNames.shoulder_center(direction), fno].position
-            )
-            dest_arm_global_position = shoulder_matrixes[
-                BoneNames.shoulder_center(direction), fno
-            ].position + (src_arm_local_position * arm_ratio)
-
-            arm_ik_bf = dest_motion.bones[BoneNames.arm_ik(direction)][fno]
-            arm_ik_bf.position = dest_arm_global_position
-            dest_motion.append_bone_frame(arm_ik_bf)
-
-            # # ■ --------------
-            # VmdWriter(
-            #     dest_motion,
-            #     f"E:/MMD/サイジング/足IK/IK_step/{datetime.now():%Y%m%d_%H%M%S_%f}_{direction}腕_{fno:04d}.vmd",
-            #     model_name="Test Model",
-            # ).save()
-            # # ■ --------------
-
-            # IK解決する
-            _, _, ik_qqs = dest_motion.bones.get_ik_rotation(
+                shoulder_ratio,
+                arm_ratio,
+                wrist_ratio,
+                thumb_ratio,
+                index_ratio,
+                middle_ratio,
+                ring_ratio,
+                pinky_ratio,
                 fidx,
                 fno,
-                dest_model,
-                dest_model.bones[BoneNames.arm_ik(direction)],
             )
 
-            arm_bf = dest_motion.bones[BoneNames.arm(direction)][fno]
-            arm_bf.rotation = ik_qqs[dest_model.bones[BoneNames.arm(direction)].index]
-            dest_motion.insert_bone_frame(arm_bf)
+        if is_middle:
+            # 腕の長さの一定範囲をズレ許容範囲とする
+            threshold = dest_model.bones[f"{direction}腕"].position.distance(
+                dest_model.bones[f"{direction}手首"].position
+            ) * (0.03 * middle_threshold)
 
-            elbow_bf = dest_motion.bones[BoneNames.elbow(direction)][fno]
-            elbow_bf.rotation = ik_qqs[
-                dest_model.bones[BoneNames.elbow(direction)].index
-            ]
-            dest_motion.insert_bone_frame(elbow_bf)
-
-            motion_bone_qqs[0, dest_model.bones[BoneNames.arm(direction)].index] = (
-                ik_qqs[dest_model.bones[BoneNames.arm(direction)].index]
-                .to_matrix4x4()
-                .vector
+            logger.info(
+                "【No.{x}】【{d}】中間キーフレームチェック 【閾値: {t:.3f}】",
+                x=sizing_idx + 1,
+                d=__(direction),
+                t=threshold,
+                decoration=MLogger.Decoration.LINE,
             )
 
-            motion_bone_qqs[0, dest_model.bones[BoneNames.elbow(direction)].index] = (
-                ik_qqs[dest_model.bones[BoneNames.elbow(direction)].index]
-                .to_matrix4x4()
-                .vector
-            )
+            # 全フレームから既に位置合わせ済みのフレームを除く
+            middle_fnos = sorted(set(range(dest_motion.bones.max_fno + 1)) - set(fnos))
 
-            # 腕解決後の行列取得
-            arm_matrixes = dest_motion.bones.calc_bone_matrixes(
-                [fno],
-                dest_model,
-                bone_dict,
-                bone_offset_matrixes,
-                bone_pos_matrixes,
-                is_motion_identity_poses,
-                is_motion_identity_qqs,
-                is_motion_identity_scales,
-                is_motion_identity_local_poses,
-                is_motion_identity_local_qqs,
-                is_motion_identity_local_scales,
-                motion_bone_poses,
-                motion_bone_qqs,
-                motion_bone_scales,
-                motion_bone_local_poses,
-                motion_bone_local_qqs,
-                motion_bone_local_scales,
-                motion_bone_fk_qqs,
-                matrixes=None,
-                out_fno_log=False,
-                description="",
-            )
+            for fidx, fno in enumerate(middle_fnos):
+                logger.count(
+                    "【No.{x}】【{d}】中間腕位置合わせ",
+                    x=sizing_idx + 1,
+                    d=__(direction),
+                    index=fidx,
+                    total_index_count=len(middle_fnos),
+                    display_block=50,
+                )
 
-            # 手首IK --------------------
-            src_wrist_local_position = (
-                src_matrixes[BoneNames.wrist_tail(direction), fno].position
-                - src_matrixes[BoneNames.wrist(direction), fno].position
-            )
-            dest_wrist_global_position = arm_matrixes[
-                BoneNames.wrist(direction), fno
-            ].position + (src_wrist_local_position * wrist_ratio)
+                # モーションボーンの初期値を取得
+                (
+                    is_motion_identity_poses,
+                    is_motion_identity_qqs,
+                    is_motion_identity_scales,
+                    is_motion_identity_local_poses,
+                    is_motion_identity_local_qqs,
+                    is_motion_identity_local_scales,
+                    motion_bone_poses,
+                    motion_bone_qqs,
+                    motion_bone_scales,
+                    motion_bone_local_poses,
+                    motion_bone_local_qqs,
+                    motion_bone_local_scales,
+                    motion_bone_fk_qqs,
+                ) = dest_motion.bones.get_bone_matrixes(
+                    [fno],
+                    dest_model,
+                    target_bone_names,
+                    out_fno_log=False,
+                )
 
-            wrist_ik_bf = dest_motion.bones[BoneNames.wrist_ik(direction)][fno]
-            wrist_ik_bf.position = dest_wrist_global_position
-            dest_motion.append_bone_frame(wrist_ik_bf)
-
-            # # ■ --------------
-            # VmdWriter(
-            #     dest_motion,
-            #     f"E:/MMD/サイジング/足IK/IK_step/{datetime.now():%Y%m%d_%H%M%S_%f}_{direction}手首_{fno:04d}.vmd",
-            #     model_name="Test Model",
-            # ).save()
-            # # ■ --------------
-
-            # IK解決する
-            _, _, ik_qqs = dest_motion.bones.get_ik_rotation(
-                fidx,
-                fno,
-                dest_model,
-                dest_model.bones[BoneNames.wrist_ik(direction)],
-            )
-
-            wrist_bf = dest_motion.bones[BoneNames.wrist(direction)][fno]
-            wrist_bf.rotation = ik_qqs[
-                dest_model.bones[BoneNames.wrist(direction)].index
-            ]
-            dest_motion.insert_bone_frame(wrist_bf)
-
-            motion_bone_qqs[0, dest_model.bones[BoneNames.wrist(direction)].index] = (
-                ik_qqs[dest_model.bones[BoneNames.wrist(direction)].index]
-                .to_matrix4x4()
-                .vector
-            )
-
-            if is_finger:
-                # 手首解決後の行列取得
-                wrist_matrixes = dest_motion.bones.calc_bone_matrixes(
+                # 初回行列取得
+                start_matrixes = dest_motion.bones.calc_bone_matrixes(
                     [fno],
                     dest_model,
                     bone_dict,
@@ -739,216 +647,70 @@ class AlignArmUsecase:
                     description="",
                 )
 
-                # 親指IK --------------------
-                src_thumb_local_position = (
-                    src_matrixes[BoneNames.thumb_tail(direction), fno].position
-                    - src_matrixes[BoneNames.wrist(direction), fno].position
+                # 手首の理想位置を求める
+                src_arm_local_position = (
+                    src_matrixes[BoneNames.wrist(direction), fno].position
+                    - src_matrixes[BoneNames.shoulder_center(direction), fno].position
                 )
-                dest_thumb_global_position = wrist_matrixes[
-                    BoneNames.wrist(direction), fno
-                ].position + (src_thumb_local_position * thumb_ratio)
+                dest_arm_global_position = start_matrixes[
+                    BoneNames.shoulder_center(direction), fno
+                ].position + (src_arm_local_position * arm_ratio)
 
-                thumb_ik_bf = dest_motion.bones[BoneNames.thumb_ik(direction)][fno]
-                thumb_ik_bf.position = dest_thumb_global_position
-                dest_motion.append_bone_frame(thumb_ik_bf)
+                wrist_distance = (
+                    start_matrixes[f"{direction}手首", fno].position
+                ).distance(dest_arm_global_position)
 
-                # 人指IK --------------------
-                src_index_local_position = (
-                    src_matrixes[BoneNames.index_tail(direction), fno].position
-                    - src_matrixes[BoneNames.index1(direction), fno].position
-                )
-                dest_index_global_position = wrist_matrixes[
-                    BoneNames.index1(direction), fno
-                ].position + (src_index_local_position * index_ratio)
+                if wrist_distance >= threshold:
+                    logger.info(
+                        "【No.{x}】【{d}】中間キーフレーム追加【{f}F】【{w:.3f} >= {t:.3f}】",
+                        x=sizing_idx + 1,
+                        d=__(direction),
+                        f=fno,
+                        w=wrist_distance,
+                        t=threshold,
+                        decoration=MLogger.Decoration.LINE,
+                    )
 
-                index_ik_bf = dest_motion.bones[BoneNames.index_ik(direction)][fno]
-                index_ik_bf.position = dest_index_global_position
-                dest_motion.append_bone_frame(index_ik_bf)
-
-                # 中指IK --------------------
-                src_middle_local_position = (
-                    src_matrixes[BoneNames.middle_tail(direction), fno].position
-                    - src_matrixes[BoneNames.middle1(direction), fno].position
-                )
-                dest_middle_global_position = wrist_matrixes[
-                    BoneNames.middle1(direction), fno
-                ].position + (src_middle_local_position * middle_ratio)
-
-                middle_ik_bf = dest_motion.bones[BoneNames.middle_ik(direction)][fno]
-                middle_ik_bf.position = dest_middle_global_position
-                dest_motion.append_bone_frame(middle_ik_bf)
-
-                # 薬指IK --------------------
-                src_ring_local_position = (
-                    src_matrixes[BoneNames.ring_tail(direction), fno].position
-                    - src_matrixes[BoneNames.ring1(direction), fno].position
-                )
-                dest_ring_global_position = wrist_matrixes[
-                    BoneNames.ring1(direction), fno
-                ].position + (src_ring_local_position * ring_ratio)
-
-                ring_ik_bf = dest_motion.bones[BoneNames.ring_ik(direction)][fno]
-                ring_ik_bf.position = dest_ring_global_position
-                dest_motion.append_bone_frame(ring_ik_bf)
-
-                # 小指IK --------------------
-                src_pinky_local_position = (
-                    src_matrixes[BoneNames.pinky_tail(direction), fno].position
-                    - src_matrixes[BoneNames.pinky1(direction), fno].position
-                )
-                dest_pinky_global_position = wrist_matrixes[
-                    BoneNames.pinky1(direction), fno
-                ].position + (src_pinky_local_position * pinky_ratio)
-
-                pinky_ik_bf = dest_motion.bones[BoneNames.pinky_ik(direction)][fno]
-                pinky_ik_bf.position = dest_pinky_global_position
-                dest_motion.append_bone_frame(pinky_ik_bf)
-
-                # # ■ --------------
-                # VmdWriter(
-                #     dest_motion,
-                #     f"E:/MMD/サイジング/足IK/IK_step/{datetime.now():%Y%m%d_%H%M%S_%f}_{direction}指_{fno:04d}.vmd",
-                #     model_name="Test Model",
-                # ).save()
-                # # ■ --------------
-
-                _, _, ik_qqs = dest_motion.bones.get_ik_rotation(
-                    fidx,
-                    fno,
-                    dest_model,
-                    dest_model.bones[BoneNames.thumb_ik(direction)],
-                )
-
-                if dest_model.bones[BoneNames.thumb0(direction)].index in ik_qqs:
-                    thumb0_bf = dest_motion.bones[BoneNames.thumb0(direction)][fno]
-                    thumb0_bf.rotation = ik_qqs[
-                        dest_model.bones[BoneNames.thumb0(direction)].index
-                    ]
-                    dest_motion.insert_bone_frame(thumb0_bf)
-
-                thumb1_bf = dest_motion.bones[BoneNames.thumb1(direction)][fno]
-                thumb1_bf.rotation = ik_qqs[
-                    dest_model.bones[BoneNames.thumb1(direction)].index
-                ]
-                dest_motion.insert_bone_frame(thumb1_bf)
-
-                thumb2_bf = dest_motion.bones[BoneNames.thumb2(direction)][fno]
-                thumb2_bf.rotation = ik_qqs[
-                    dest_model.bones[BoneNames.thumb2(direction)].index
-                ]
-                dest_motion.insert_bone_frame(thumb2_bf)
-
-                _, _, ik_qqs = dest_motion.bones.get_ik_rotation(
-                    fidx,
-                    fno,
-                    dest_model,
-                    dest_model.bones[BoneNames.index_ik(direction)],
-                    ik_qqs,
-                )
-
-                index1_bf = dest_motion.bones[BoneNames.index1(direction)][fno]
-                index1_bf.rotation = ik_qqs[
-                    dest_model.bones[BoneNames.index1(direction)].index
-                ]
-                dest_motion.insert_bone_frame(index1_bf)
-
-                index2_bf = dest_motion.bones[BoneNames.index2(direction)][fno]
-                index2_bf.rotation = ik_qqs[
-                    dest_model.bones[BoneNames.index2(direction)].index
-                ]
-                dest_motion.insert_bone_frame(index2_bf)
-
-                index3_bf = dest_motion.bones[BoneNames.index3(direction)][fno]
-                index3_bf.rotation = ik_qqs[
-                    dest_model.bones[BoneNames.index3(direction)].index
-                ]
-                dest_motion.insert_bone_frame(index3_bf)
-
-                _, _, ik_qqs = dest_motion.bones.get_ik_rotation(
-                    fidx,
-                    fno,
-                    dest_model,
-                    dest_model.bones[BoneNames.middle_ik(direction)],
-                    ik_qqs,
-                )
-
-                middle1_bf = dest_motion.bones[BoneNames.middle1(direction)][fno]
-                middle1_bf.rotation = ik_qqs[
-                    dest_model.bones[BoneNames.middle1(direction)].index
-                ]
-                dest_motion.insert_bone_frame(middle1_bf)
-
-                middle2_bf = dest_motion.bones[BoneNames.middle2(direction)][fno]
-                middle2_bf.rotation = ik_qqs[
-                    dest_model.bones[BoneNames.middle2(direction)].index
-                ]
-                dest_motion.insert_bone_frame(middle2_bf)
-
-                middle3_bf = dest_motion.bones[BoneNames.middle3(direction)][fno]
-                middle3_bf.rotation = ik_qqs[
-                    dest_model.bones[BoneNames.middle3(direction)].index
-                ]
-                dest_motion.insert_bone_frame(middle3_bf)
-
-                _, _, ik_qqs = dest_motion.bones.get_ik_rotation(
-                    fidx,
-                    fno,
-                    dest_model,
-                    dest_model.bones[BoneNames.ring_ik(direction)],
-                    ik_qqs,
-                )
-
-                ring1_bf = dest_motion.bones[BoneNames.ring1(direction)][fno]
-                ring1_bf.rotation = ik_qqs[
-                    dest_model.bones[BoneNames.ring1(direction)].index
-                ]
-                dest_motion.insert_bone_frame(ring1_bf)
-
-                ring2_bf = dest_motion.bones[BoneNames.ring2(direction)][fno]
-                ring2_bf.rotation = ik_qqs[
-                    dest_model.bones[BoneNames.ring2(direction)].index
-                ]
-                dest_motion.insert_bone_frame(ring2_bf)
-
-                ring3_bf = dest_motion.bones[BoneNames.ring3(direction)][fno]
-                ring3_bf.rotation = ik_qqs[
-                    dest_model.bones[BoneNames.ring3(direction)].index
-                ]
-                dest_motion.insert_bone_frame(ring3_bf)
-
-                _, _, ik_qqs = dest_motion.bones.get_ik_rotation(
-                    fidx,
-                    fno,
-                    dest_model,
-                    dest_model.bones[BoneNames.pinky_ik(direction)],
-                    ik_qqs,
-                )
-
-                pinky1_bf = dest_motion.bones[BoneNames.pinky1(direction)][fno]
-                pinky1_bf.rotation = ik_qqs[
-                    dest_model.bones[BoneNames.pinky1(direction)].index
-                ]
-                dest_motion.insert_bone_frame(pinky1_bf)
-
-                pinky2_bf = dest_motion.bones[BoneNames.pinky2(direction)][fno]
-                pinky2_bf.rotation = ik_qqs[
-                    dest_model.bones[BoneNames.pinky2(direction)].index
-                ]
-                dest_motion.insert_bone_frame(pinky2_bf)
-
-                pinky3_bf = dest_motion.bones[BoneNames.pinky3(direction)][fno]
-                pinky3_bf.rotation = ik_qqs[
-                    dest_model.bones[BoneNames.pinky3(direction)].index
-                ]
-                dest_motion.insert_bone_frame(pinky3_bf)
-
-            # # ■ --------------
-            # VmdWriter(
-            #     dest_motion,
-            #     f"E:/MMD/サイジング/足IK/IK_step/{datetime.now():%Y%m%d_%H%M%S_%f}_{direction}腕位置合わせ解決_{fno:04d}.vmd",
-            #     model_name="Test Model",
-            # ).save()
-            # # ■ --------------
+                    # 腕位置合わせ実行
+                    self.sizing_arm_align_direction_frame(
+                        sizing_idx,
+                        src_model,
+                        dest_model,
+                        dest_motion,
+                        src_matrixes,
+                        dest_matrixes,
+                        align_bone_names,
+                        align_bone_indexes,
+                        all_bone_distances,
+                        is_finger,
+                        direction,
+                        bone_dict,
+                        bone_offset_matrixes,
+                        bone_pos_matrixes,
+                        is_motion_identity_poses,
+                        is_motion_identity_qqs,
+                        is_motion_identity_scales,
+                        is_motion_identity_local_poses,
+                        is_motion_identity_local_qqs,
+                        is_motion_identity_local_scales,
+                        motion_bone_poses,
+                        motion_bone_qqs,
+                        motion_bone_scales,
+                        motion_bone_local_poses,
+                        motion_bone_local_qqs,
+                        motion_bone_local_scales,
+                        motion_bone_fk_qqs,
+                        shoulder_ratio,
+                        arm_ratio,
+                        wrist_ratio,
+                        thumb_ratio,
+                        index_ratio,
+                        middle_ratio,
+                        ring_ratio,
+                        pinky_ratio,
+                        fidx,
+                        fno,
+                    )
 
         # 終わったらIKボーンのキーフレを削除
         del dest_motion.bones[BoneNames.shoulder_ik(direction)]
@@ -962,6 +724,466 @@ class AlignArmUsecase:
             del dest_motion.bones[BoneNames.pinky_ik(direction)]
 
         return sizing_idx, direction, dest_motion
+
+    def sizing_arm_align_direction_frame(
+        self,
+        sizing_idx: int,
+        src_model: PmxModel,
+        dest_model: PmxModel,
+        dest_motion: VmdMotion,
+        src_matrixes: VmdBoneFrameTrees,
+        dest_matrixes: VmdBoneFrameTrees,
+        align_bone_names: list[str],
+        align_bone_indexes: dict[tuple[int, str], int],
+        all_bone_distances: dict[int, np.ndarray],
+        is_finger: bool,
+        direction: str,
+        bone_dict: dict[str, int],
+        bone_offset_matrixes: list[tuple[int, np.ndarray]],
+        bone_pos_matrixes: np.ndarray,
+        is_motion_identity_poses: bool,
+        is_motion_identity_qqs: bool,
+        is_motion_identity_scales: bool,
+        is_motion_identity_local_poses: bool,
+        is_motion_identity_local_qqs: bool,
+        is_motion_identity_local_scales: bool,
+        motion_bone_poses: np.ndarray,
+        motion_bone_qqs: np.ndarray,
+        motion_bone_scales: np.ndarray,
+        motion_bone_local_poses: np.ndarray,
+        motion_bone_local_qqs: np.ndarray,
+        motion_bone_local_scales: np.ndarray,
+        motion_bone_fk_qqs: np.ndarray,
+        shoulder_ratio: float,
+        arm_ratio: float,
+        wrist_ratio: float,
+        thumb_ratio: float,
+        index_ratio: float,
+        middle_ratio: float,
+        ring_ratio: float,
+        pinky_ratio: float,
+        fidx: int,
+        fno: int,
+    ) -> None:
+        # 肩IK --------------------
+        src_shoulder_local_position = (
+            src_matrixes[BoneNames.arm(direction), fno].position
+            - src_matrixes[BoneNames.shoulder_root(direction), fno].position
+        )
+        dest_shoulder_global_position = dest_matrixes[
+            BoneNames.shoulder_root(direction), fno
+        ].position + (src_shoulder_local_position * shoulder_ratio)
+
+        shoulder_ik_bf = dest_motion.bones[BoneNames.shoulder_ik(direction)][fno]
+        shoulder_ik_bf.position = dest_shoulder_global_position
+        dest_motion.append_bone_frame(shoulder_ik_bf)
+
+        # # ■ --------------
+        # from datetime import datetime
+
+        # from mlib.vmd.vmd_writer import VmdWriter
+
+        # VmdWriter(
+        #     dest_motion,
+        #     f"E:/MMD/サイジング/足IK/IK_step/{datetime.now():%Y%m%d_%H%M%S_%f}_{direction}肩_{fno:04d}.vmd",
+        #     model_name="Test Model",
+        # ).save()
+        # # ■ --------------
+
+        # IK解決する
+        _, _, ik_qqs = dest_motion.bones.get_ik_rotation(
+            fidx,
+            fno,
+            dest_model,
+            dest_model.bones[BoneNames.shoulder_ik(direction)],
+        )
+
+        shoulder_bf = dest_motion.bones[BoneNames.shoulder(direction)][fno]
+        shoulder_bf.rotation = ik_qqs[
+            dest_model.bones[BoneNames.shoulder(direction)].index
+        ]
+        dest_motion.insert_bone_frame(shoulder_bf)
+
+        motion_bone_qqs[0, dest_model.bones[BoneNames.shoulder(direction)].index] = (
+            ik_qqs[dest_model.bones[BoneNames.shoulder(direction)].index]
+            .to_matrix4x4()
+            .vector
+        )
+
+        # 肩解決後の行列取得
+        shoulder_matrixes = dest_motion.bones.calc_bone_matrixes(
+            [fno],
+            dest_model,
+            bone_dict,
+            bone_offset_matrixes,
+            bone_pos_matrixes,
+            is_motion_identity_poses,
+            is_motion_identity_qqs,
+            is_motion_identity_scales,
+            is_motion_identity_local_poses,
+            is_motion_identity_local_qqs,
+            is_motion_identity_local_scales,
+            motion_bone_poses,
+            motion_bone_qqs,
+            motion_bone_scales,
+            motion_bone_local_poses,
+            motion_bone_local_qqs,
+            motion_bone_local_scales,
+            motion_bone_fk_qqs,
+            matrixes=None,
+            out_fno_log=False,
+            description="",
+        )
+
+        # 腕IK --------------------
+        src_arm_local_position = (
+            src_matrixes[BoneNames.wrist(direction), fno].position
+            - src_matrixes[BoneNames.shoulder_center(direction), fno].position
+        )
+        dest_arm_global_position = shoulder_matrixes[
+            BoneNames.shoulder_center(direction), fno
+        ].position + (src_arm_local_position * arm_ratio)
+
+        arm_ik_bf = dest_motion.bones[BoneNames.arm_ik(direction)][fno]
+        arm_ik_bf.position = dest_arm_global_position
+        dest_motion.append_bone_frame(arm_ik_bf)
+
+        # # ■ --------------
+        # VmdWriter(
+        #     dest_motion,
+        #     f"E:/MMD/サイジング/足IK/IK_step/{datetime.now():%Y%m%d_%H%M%S_%f}_{direction}腕_{fno:04d}.vmd",
+        #     model_name="Test Model",
+        # ).save()
+        # # ■ --------------
+
+        # IK解決する
+        _, _, ik_qqs = dest_motion.bones.get_ik_rotation(
+            fidx,
+            fno,
+            dest_model,
+            dest_model.bones[BoneNames.arm_ik(direction)],
+        )
+
+        arm_bf = dest_motion.bones[BoneNames.arm(direction)][fno]
+        arm_bf.rotation = ik_qqs[dest_model.bones[BoneNames.arm(direction)].index]
+        dest_motion.insert_bone_frame(arm_bf)
+
+        elbow_bf = dest_motion.bones[BoneNames.elbow(direction)][fno]
+        elbow_bf.rotation = ik_qqs[dest_model.bones[BoneNames.elbow(direction)].index]
+        dest_motion.insert_bone_frame(elbow_bf)
+
+        motion_bone_qqs[0, dest_model.bones[BoneNames.arm(direction)].index] = (
+            ik_qqs[dest_model.bones[BoneNames.arm(direction)].index]
+            .to_matrix4x4()
+            .vector
+        )
+
+        motion_bone_qqs[0, dest_model.bones[BoneNames.elbow(direction)].index] = (
+            ik_qqs[dest_model.bones[BoneNames.elbow(direction)].index]
+            .to_matrix4x4()
+            .vector
+        )
+
+        # 腕解決後の行列取得
+        arm_matrixes = dest_motion.bones.calc_bone_matrixes(
+            [fno],
+            dest_model,
+            bone_dict,
+            bone_offset_matrixes,
+            bone_pos_matrixes,
+            is_motion_identity_poses,
+            is_motion_identity_qqs,
+            is_motion_identity_scales,
+            is_motion_identity_local_poses,
+            is_motion_identity_local_qqs,
+            is_motion_identity_local_scales,
+            motion_bone_poses,
+            motion_bone_qqs,
+            motion_bone_scales,
+            motion_bone_local_poses,
+            motion_bone_local_qqs,
+            motion_bone_local_scales,
+            motion_bone_fk_qqs,
+            matrixes=None,
+            out_fno_log=False,
+            description="",
+        )
+
+        # 手首IK --------------------
+        src_wrist_local_position = (
+            src_matrixes[BoneNames.wrist_tail(direction), fno].position
+            - src_matrixes[BoneNames.wrist(direction), fno].position
+        )
+        dest_wrist_global_position = arm_matrixes[
+            BoneNames.wrist(direction), fno
+        ].position + (src_wrist_local_position * wrist_ratio)
+
+        wrist_ik_bf = dest_motion.bones[BoneNames.wrist_ik(direction)][fno]
+        wrist_ik_bf.position = dest_wrist_global_position
+        dest_motion.append_bone_frame(wrist_ik_bf)
+
+        # # ■ --------------
+        # VmdWriter(
+        #     dest_motion,
+        #     f"E:/MMD/サイジング/足IK/IK_step/{datetime.now():%Y%m%d_%H%M%S_%f}_{direction}手首_{fno:04d}.vmd",
+        #     model_name="Test Model",
+        # ).save()
+        # # ■ --------------
+
+        # IK解決する
+        _, _, ik_qqs = dest_motion.bones.get_ik_rotation(
+            fidx,
+            fno,
+            dest_model,
+            dest_model.bones[BoneNames.wrist_ik(direction)],
+        )
+
+        wrist_bf = dest_motion.bones[BoneNames.wrist(direction)][fno]
+        wrist_bf.rotation = ik_qqs[dest_model.bones[BoneNames.wrist(direction)].index]
+        dest_motion.insert_bone_frame(wrist_bf)
+
+        motion_bone_qqs[0, dest_model.bones[BoneNames.wrist(direction)].index] = (
+            ik_qqs[dest_model.bones[BoneNames.wrist(direction)].index]
+            .to_matrix4x4()
+            .vector
+        )
+
+        if is_finger:
+            # 手首解決後の行列取得
+            wrist_matrixes = dest_motion.bones.calc_bone_matrixes(
+                [fno],
+                dest_model,
+                bone_dict,
+                bone_offset_matrixes,
+                bone_pos_matrixes,
+                is_motion_identity_poses,
+                is_motion_identity_qqs,
+                is_motion_identity_scales,
+                is_motion_identity_local_poses,
+                is_motion_identity_local_qqs,
+                is_motion_identity_local_scales,
+                motion_bone_poses,
+                motion_bone_qqs,
+                motion_bone_scales,
+                motion_bone_local_poses,
+                motion_bone_local_qqs,
+                motion_bone_local_scales,
+                motion_bone_fk_qqs,
+                matrixes=None,
+                out_fno_log=False,
+                description="",
+            )
+
+            # 親指IK --------------------
+            src_thumb_local_position = (
+                src_matrixes[BoneNames.thumb_tail(direction), fno].position
+                - src_matrixes[BoneNames.wrist(direction), fno].position
+            )
+            dest_thumb_global_position = wrist_matrixes[
+                BoneNames.wrist(direction), fno
+            ].position + (src_thumb_local_position * thumb_ratio)
+
+            thumb_ik_bf = dest_motion.bones[BoneNames.thumb_ik(direction)][fno]
+            thumb_ik_bf.position = dest_thumb_global_position
+            dest_motion.append_bone_frame(thumb_ik_bf)
+
+            # 人指IK --------------------
+            src_index_local_position = (
+                src_matrixes[BoneNames.index_tail(direction), fno].position
+                - src_matrixes[BoneNames.index1(direction), fno].position
+            )
+            dest_index_global_position = wrist_matrixes[
+                BoneNames.index1(direction), fno
+            ].position + (src_index_local_position * index_ratio)
+
+            index_ik_bf = dest_motion.bones[BoneNames.index_ik(direction)][fno]
+            index_ik_bf.position = dest_index_global_position
+            dest_motion.append_bone_frame(index_ik_bf)
+
+            # 中指IK --------------------
+            src_middle_local_position = (
+                src_matrixes[BoneNames.middle_tail(direction), fno].position
+                - src_matrixes[BoneNames.middle1(direction), fno].position
+            )
+            dest_middle_global_position = wrist_matrixes[
+                BoneNames.middle1(direction), fno
+            ].position + (src_middle_local_position * middle_ratio)
+
+            middle_ik_bf = dest_motion.bones[BoneNames.middle_ik(direction)][fno]
+            middle_ik_bf.position = dest_middle_global_position
+            dest_motion.append_bone_frame(middle_ik_bf)
+
+            # 薬指IK --------------------
+            src_ring_local_position = (
+                src_matrixes[BoneNames.ring_tail(direction), fno].position
+                - src_matrixes[BoneNames.ring1(direction), fno].position
+            )
+            dest_ring_global_position = wrist_matrixes[
+                BoneNames.ring1(direction), fno
+            ].position + (src_ring_local_position * ring_ratio)
+
+            ring_ik_bf = dest_motion.bones[BoneNames.ring_ik(direction)][fno]
+            ring_ik_bf.position = dest_ring_global_position
+            dest_motion.append_bone_frame(ring_ik_bf)
+
+            # 小指IK --------------------
+            src_pinky_local_position = (
+                src_matrixes[BoneNames.pinky_tail(direction), fno].position
+                - src_matrixes[BoneNames.pinky1(direction), fno].position
+            )
+            dest_pinky_global_position = wrist_matrixes[
+                BoneNames.pinky1(direction), fno
+            ].position + (src_pinky_local_position * pinky_ratio)
+
+            pinky_ik_bf = dest_motion.bones[BoneNames.pinky_ik(direction)][fno]
+            pinky_ik_bf.position = dest_pinky_global_position
+            dest_motion.append_bone_frame(pinky_ik_bf)
+
+            # # ■ --------------
+            # VmdWriter(
+            #     dest_motion,
+            #     f"E:/MMD/サイジング/足IK/IK_step/{datetime.now():%Y%m%d_%H%M%S_%f}_{direction}指_{fno:04d}.vmd",
+            #     model_name="Test Model",
+            # ).save()
+            # # ■ --------------
+
+            _, _, ik_qqs = dest_motion.bones.get_ik_rotation(
+                fidx,
+                fno,
+                dest_model,
+                dest_model.bones[BoneNames.thumb_ik(direction)],
+            )
+
+            if dest_model.bones[BoneNames.thumb0(direction)].index in ik_qqs:
+                thumb0_bf = dest_motion.bones[BoneNames.thumb0(direction)][fno]
+                thumb0_bf.rotation = ik_qqs[
+                    dest_model.bones[BoneNames.thumb0(direction)].index
+                ]
+                dest_motion.insert_bone_frame(thumb0_bf)
+
+            thumb1_bf = dest_motion.bones[BoneNames.thumb1(direction)][fno]
+            thumb1_bf.rotation = ik_qqs[
+                dest_model.bones[BoneNames.thumb1(direction)].index
+            ]
+            dest_motion.insert_bone_frame(thumb1_bf)
+
+            thumb2_bf = dest_motion.bones[BoneNames.thumb2(direction)][fno]
+            thumb2_bf.rotation = ik_qqs[
+                dest_model.bones[BoneNames.thumb2(direction)].index
+            ]
+            dest_motion.insert_bone_frame(thumb2_bf)
+
+            _, _, ik_qqs = dest_motion.bones.get_ik_rotation(
+                fidx,
+                fno,
+                dest_model,
+                dest_model.bones[BoneNames.index_ik(direction)],
+                ik_qqs,
+            )
+
+            index1_bf = dest_motion.bones[BoneNames.index1(direction)][fno]
+            index1_bf.rotation = ik_qqs[
+                dest_model.bones[BoneNames.index1(direction)].index
+            ]
+            dest_motion.insert_bone_frame(index1_bf)
+
+            index2_bf = dest_motion.bones[BoneNames.index2(direction)][fno]
+            index2_bf.rotation = ik_qqs[
+                dest_model.bones[BoneNames.index2(direction)].index
+            ]
+            dest_motion.insert_bone_frame(index2_bf)
+
+            index3_bf = dest_motion.bones[BoneNames.index3(direction)][fno]
+            index3_bf.rotation = ik_qqs[
+                dest_model.bones[BoneNames.index3(direction)].index
+            ]
+            dest_motion.insert_bone_frame(index3_bf)
+
+            _, _, ik_qqs = dest_motion.bones.get_ik_rotation(
+                fidx,
+                fno,
+                dest_model,
+                dest_model.bones[BoneNames.middle_ik(direction)],
+                ik_qqs,
+            )
+
+            middle1_bf = dest_motion.bones[BoneNames.middle1(direction)][fno]
+            middle1_bf.rotation = ik_qqs[
+                dest_model.bones[BoneNames.middle1(direction)].index
+            ]
+            dest_motion.insert_bone_frame(middle1_bf)
+
+            middle2_bf = dest_motion.bones[BoneNames.middle2(direction)][fno]
+            middle2_bf.rotation = ik_qqs[
+                dest_model.bones[BoneNames.middle2(direction)].index
+            ]
+            dest_motion.insert_bone_frame(middle2_bf)
+
+            middle3_bf = dest_motion.bones[BoneNames.middle3(direction)][fno]
+            middle3_bf.rotation = ik_qqs[
+                dest_model.bones[BoneNames.middle3(direction)].index
+            ]
+            dest_motion.insert_bone_frame(middle3_bf)
+
+            _, _, ik_qqs = dest_motion.bones.get_ik_rotation(
+                fidx,
+                fno,
+                dest_model,
+                dest_model.bones[BoneNames.ring_ik(direction)],
+                ik_qqs,
+            )
+
+            ring1_bf = dest_motion.bones[BoneNames.ring1(direction)][fno]
+            ring1_bf.rotation = ik_qqs[
+                dest_model.bones[BoneNames.ring1(direction)].index
+            ]
+            dest_motion.insert_bone_frame(ring1_bf)
+
+            ring2_bf = dest_motion.bones[BoneNames.ring2(direction)][fno]
+            ring2_bf.rotation = ik_qqs[
+                dest_model.bones[BoneNames.ring2(direction)].index
+            ]
+            dest_motion.insert_bone_frame(ring2_bf)
+
+            ring3_bf = dest_motion.bones[BoneNames.ring3(direction)][fno]
+            ring3_bf.rotation = ik_qqs[
+                dest_model.bones[BoneNames.ring3(direction)].index
+            ]
+            dest_motion.insert_bone_frame(ring3_bf)
+
+            _, _, ik_qqs = dest_motion.bones.get_ik_rotation(
+                fidx,
+                fno,
+                dest_model,
+                dest_model.bones[BoneNames.pinky_ik(direction)],
+                ik_qqs,
+            )
+
+            pinky1_bf = dest_motion.bones[BoneNames.pinky1(direction)][fno]
+            pinky1_bf.rotation = ik_qqs[
+                dest_model.bones[BoneNames.pinky1(direction)].index
+            ]
+            dest_motion.insert_bone_frame(pinky1_bf)
+
+            pinky2_bf = dest_motion.bones[BoneNames.pinky2(direction)][fno]
+            pinky2_bf.rotation = ik_qqs[
+                dest_model.bones[BoneNames.pinky2(direction)].index
+            ]
+            dest_motion.insert_bone_frame(pinky2_bf)
+
+            pinky3_bf = dest_motion.bones[BoneNames.pinky3(direction)][fno]
+            pinky3_bf.rotation = ik_qqs[
+                dest_model.bones[BoneNames.pinky3(direction)].index
+            ]
+            dest_motion.insert_bone_frame(pinky3_bf)
+
+        # # ■ --------------
+        # VmdWriter(
+        #     dest_motion,
+        #     f"E:/MMD/サイジング/足IK/IK_step/{datetime.now():%Y%m%d_%H%M%S_%f}_{direction}腕位置合わせ解決_{fno:04d}.vmd",
+        #     model_name="Test Model",
+        # ).save()
+        # # ■ --------------
 
     def setup_model_ik(
         self,
@@ -1035,7 +1257,7 @@ class AlignArmUsecase:
             arm_ik = Ik()
             arm_ik.bone_index = ik_model.bones[BoneNames.wrist(direction)].index
             arm_ik.loop_count = 100
-            arm_ik.unit_rotation.degrees = MVector3D(5, 0, 0)
+            arm_ik.unit_rotation.degrees = MVector3D(3, 0, 0)
 
             arm_ik_elbow = IkLink()
             arm_ik_elbow.bone_index = ik_model.bones[BoneNames.elbow(direction)].index
@@ -1103,7 +1325,7 @@ class AlignArmUsecase:
                     BoneNames.thumb_tail(direction)
                 ].index
                 thumb_ik.loop_count = 100
-                thumb_ik.unit_rotation.degrees = MVector3D(5, 0, 0)
+                thumb_ik.unit_rotation.degrees = MVector3D(3, 0, 0)
 
                 # 親指2
                 thumb_ik_thumb2 = IkLink()
@@ -1156,7 +1378,7 @@ class AlignArmUsecase:
                     BoneNames.index_tail(direction)
                 ].index
                 index_ik.loop_count = 100
-                index_ik.unit_rotation.degrees = MVector3D(5, 0, 0)
+                index_ik.unit_rotation.degrees = MVector3D(3, 0, 0)
 
                 # 人指3
                 index_ik_index3 = IkLink()
@@ -1205,7 +1427,7 @@ class AlignArmUsecase:
                     BoneNames.middle_tail(direction)
                 ].index
                 middle_ik.loop_count = 100
-                middle_ik.unit_rotation.degrees = MVector3D(5, 0, 0)
+                middle_ik.unit_rotation.degrees = MVector3D(3, 0, 0)
 
                 # 中指3
                 middle_ik_middle3 = IkLink()
@@ -1254,7 +1476,7 @@ class AlignArmUsecase:
                     BoneNames.ring_tail(direction)
                 ].index
                 ring_ik.loop_count = 100
-                ring_ik.unit_rotation.degrees = MVector3D(5, 0, 0)
+                ring_ik.unit_rotation.degrees = MVector3D(3, 0, 0)
 
                 # 薬指3
                 ring_ik_ring3 = IkLink()
@@ -1303,7 +1525,7 @@ class AlignArmUsecase:
                     BoneNames.pinky_tail(direction)
                 ].index
                 pinky_ik.loop_count = 100
-                pinky_ik.unit_rotation.degrees = MVector3D(5, 0, 0)
+                pinky_ik.unit_rotation.degrees = MVector3D(3, 0, 0)
 
                 # 小指3
                 pinky_ik_pinky3 = IkLink()

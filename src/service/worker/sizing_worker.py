@@ -314,7 +314,7 @@ class SizingWorker(BaseWorker):
             all_bone_distances,
         ) = usecase.calc_align_arm_positions(
             dist_align_sizing_sets,
-            sizing_panel.align_finger_check_ctrl.GetValue(),
+            sizing_panel.align_arm_finger_check_ctrl.GetValue(),
         )
 
         # 初期位置を取得する
@@ -370,7 +370,7 @@ class SizingWorker(BaseWorker):
                             usecase.setup_model_ik,
                             sizing_set.sizing_idx,
                             sizing_set.dest_model_ctrl.data,
-                            sizing_panel.align_finger_check_ctrl.GetValue(),
+                            sizing_panel.align_arm_finger_check_ctrl.GetValue(),
                         )
                     )
 
@@ -407,7 +407,9 @@ class SizingWorker(BaseWorker):
                             align_bone_names,
                             align_bone_indexes,
                             all_bone_distances,
-                            sizing_panel.align_finger_check_ctrl.GetValue(),
+                            sizing_panel.align_arm_finger_check_ctrl.GetValue(),
+                            sizing_panel.align_arm_middle_check_ctrl.GetValue(),
+                            sizing_panel.align_arm_middle_threshold_slider.GetValue(),
                         )
                     )
 
@@ -707,6 +709,7 @@ class SizingWorker(BaseWorker):
                             sizing_set.sizing_idx,
                             sizing_set.src_model_ctrl.data,
                             sizing_set.motion_ctrl.data,
+                            sizing_panel.align_arm_middle_check_ctrl.GetValue(),
                         )
                     )
 

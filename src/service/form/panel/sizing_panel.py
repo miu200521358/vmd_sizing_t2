@@ -172,7 +172,7 @@ class SizingPanel(NotebookPanel):
             self, wx.ID_ANY, __("腕位置合わせ"), wx.DefaultPosition, wx.DefaultSize, 0
         )
         self.align_arm_check_ctrl.SetToolTip(__("腕周りのを元モーションと大体同じ位置になるよう合わせます"))
-        self.align_arm_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_align_ctrl)
+        self.align_arm_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_align_arm_ctrl)
         self.align_arm_sizer.Add(self.align_arm_check_ctrl, 0, wx.ALL, 3)
 
         self.align_arm_help_ctrl = ImageButton(
@@ -187,6 +187,7 @@ class SizingPanel(NotebookPanel):
                     "　・肩の高さ、手首の位置など、腕周りのボーンを一括で調整します",
                     "　・特に手を合わせたり、ハートを作るポーズなどが崩れにくくなります",
                     "　・指位置合わせをONにした場合、親指0の差異も含めて調整します",
+                    "　・中間点追加にチェックを入れると、全フレームで腕の軌跡がズレてないか確認し、ズレてたら中間キーフレームを追加してズレないようにします。",
                     "　・チェックをONにした場合、サイジングモーションに「P」を追加します",
                 ],
             ),
@@ -195,18 +196,59 @@ class SizingPanel(NotebookPanel):
         self.align_arm_sizer.Add(self.align_arm_help_ctrl, 0, wx.ALL, 0)
         self.align_arm_group_sizer.Add(self.align_arm_sizer, 0, wx.ALL, 0)
 
-        self.align_finger_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.align_finger_blank = wx.StaticText(self, wx.ID_ANY, "     ")
-        self.align_finger_sizer.Add(self.align_finger_blank)
+        self.align_arm_finger_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.align_arm_finger_blank = wx.StaticText(self, wx.ID_ANY, "     ")
+        self.align_arm_finger_sizer.Add(self.align_arm_finger_blank)
 
-        self.align_finger_check_ctrl = wx.CheckBox(
+        self.align_arm_finger_check_ctrl = wx.CheckBox(
             self, wx.ID_ANY, __("指位置合わせ"), wx.DefaultPosition, wx.DefaultSize, 0
         )
-        self.align_finger_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_align_sub_ctrl)
-        self.align_finger_check_ctrl.SetToolTip(__("指の位置を元モーションと大体同じ位置になるよう合わせます"))
+        self.align_arm_finger_check_ctrl.Bind(
+            wx.EVT_CHECKBOX, self.on_check_align_arm_sub_ctrl
+        )
+        self.align_arm_finger_check_ctrl.SetToolTip(__("指の位置を元モーションと大体同じ位置になるよう合わせます"))
 
-        self.align_finger_sizer.Add(self.align_finger_check_ctrl, 0, wx.ALL, 3)
-        self.align_arm_group_sizer.Add(self.align_finger_sizer, 0, wx.ALL, 0)
+        self.align_arm_finger_sizer.Add(self.align_arm_finger_check_ctrl, 0, wx.ALL, 3)
+        self.align_arm_group_sizer.Add(self.align_arm_finger_sizer, 0, wx.ALL, 0)
+
+        self.align_arm_middle_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.align_arm_middle_blank = wx.StaticText(self, wx.ID_ANY, "     ")
+        self.align_arm_middle_sizer.Add(self.align_arm_middle_blank)
+
+        self.align_arm_middle_check_ctrl = wx.CheckBox(
+            self, wx.ID_ANY, __("中間点追加"), wx.DefaultPosition, wx.DefaultSize, 0
+        )
+        self.align_arm_middle_check_ctrl.Bind(
+            wx.EVT_CHECKBOX, self.on_check_align_arm_sub_ctrl
+        )
+        self.align_arm_middle_check_ctrl.SetToolTip(
+            __("腕系キーの間で腕の軌跡がズレないよう、腕系キーフレームの中間でも捩り分散処理を行います")
+        )
+
+        self.align_arm_middle_sizer.Add(self.align_arm_middle_check_ctrl, 0, wx.ALL, 3)
+
+        self.align_arm_middle_threshold_text = wx.StaticText(
+            self, wx.ID_ANY, __("  閾値")
+        )
+        self.align_arm_middle_sizer.Add(
+            self.align_arm_middle_threshold_text, 0, wx.ALL, 3
+        )
+
+        self.align_arm_middle_threshold_slider = FloatSliderCtrl(
+            parent=self,
+            value=4,
+            min_value=0,
+            max_value=10,
+            increment=0.01,
+            spin_increment=0.01,
+            border=3,
+            size=wx.Size(100, -1),
+            tooltip=__("腕系キーフレームの中間で、手首が元からどの程度ズレていたらキーフレームを追加するか指定できます"),
+        )
+        self.align_arm_middle_sizer.Add(
+            self.align_arm_middle_threshold_slider.sizer, 0, wx.ALL, 3
+        )
+        self.align_arm_group_sizer.Add(self.align_arm_middle_sizer, 0, wx.ALL, 0)
 
         self.config_sizer.Add(self.align_arm_group_sizer, 0, wx.ALL, 1)
 
@@ -374,7 +416,8 @@ class SizingPanel(NotebookPanel):
         self.twist_check_ctrl.SetValue(self.is_full_config)
         self.twist_middle_check_ctrl.SetValue(self.is_full_config)
         self.align_arm_check_ctrl.SetValue(self.is_full_config)
-        self.align_finger_check_ctrl.SetValue(self.is_full_config)
+        self.align_arm_finger_check_ctrl.SetValue(self.is_full_config)
+        self.align_arm_middle_check_ctrl.SetValue(self.is_full_config)
         self.integrate_toe_ik_check_ctrl.SetValue(self.is_full_config)
 
         self.on_change_dest_model_pmx(event)
@@ -393,13 +436,17 @@ class SizingPanel(NotebookPanel):
             self.twist_check_ctrl.SetValue(1)
         self.on_change_dest_model_pmx(event)
 
-    def on_check_align_ctrl(self, event: wx.Event) -> None:
+    def on_check_align_arm_ctrl(self, event: wx.Event) -> None:
         if not self.align_arm_check_ctrl.GetValue():
-            self.align_finger_check_ctrl.SetValue(0)
+            self.align_arm_finger_check_ctrl.SetValue(0)
+            self.align_arm_middle_check_ctrl.SetValue(0)
         self.on_change_dest_model_pmx(event)
 
-    def on_check_align_sub_ctrl(self, event: wx.Event) -> None:
-        if self.align_finger_check_ctrl.GetValue():
+    def on_check_align_arm_sub_ctrl(self, event: wx.Event) -> None:
+        if (
+            self.align_arm_finger_check_ctrl.GetValue()
+            or self.align_arm_middle_check_ctrl.GetValue()
+        ):
             self.align_arm_check_ctrl.SetValue(1)
         self.on_change_dest_model_pmx(event)
 
@@ -472,7 +519,9 @@ class SizingPanel(NotebookPanel):
         self.twist_middle_threshold_slider.Enable(enable)
         self.twist_help_ctrl.Enable(enable)
         self.align_arm_check_ctrl.Enable(enable)
-        self.align_finger_check_ctrl.Enable(enable)
+        self.align_arm_finger_check_ctrl.Enable(enable)
+        self.align_arm_middle_check_ctrl.Enable(enable)
+        self.align_arm_middle_threshold_slider.Enable(enable)
         self.align_arm_help_ctrl.Enable(enable)
         self.integrate_toe_ik_check_ctrl.Enable(enable)
         self.integrate_toe_ik_help_ctrl.Enable(enable)

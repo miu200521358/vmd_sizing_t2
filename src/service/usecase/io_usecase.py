@@ -411,6 +411,7 @@ class IoUsecase:
         sizing_idx: int,
         model: PmxModel,
         motion: VmdMotion,
+        is_align_arm_middle: bool,
     ) -> tuple[int, VmdBoneFrameTrees]:
         model_type = __("作成元モデル")
 
@@ -421,25 +422,33 @@ class IoUsecase:
             decoration=MLogger.Decoration.LINE,
         )
 
-        # # 全フレーム取得
-        # fnos = list(range(motion.max_fno + 1))
-
-        # 必要なフレーム取得
-        fnos_set = {0}
-        for bone_name in (
-            [BoneNames.toe_ik("右"), BoneNames.toe_ik("左")]
+        tail_bone_names = (
+            [
+                BoneNames.toe_ik("右"),
+                BoneNames.toe_ik("左"),
+                BoneNames.wrist_tail("右"),
+                BoneNames.wrist_tail("左"),
+            ]
             + list(ARM_BONE_NAMES)
             + BoneNames.fingers("右")
             + BoneNames.fingers("左")
-        ):
-            fnos_set |= set(motion.bones[bone_name].register_indexes)
+        )
 
-        fnos = sorted(fnos_set)
+        # 必要なフレーム取得
+        if is_align_arm_middle:
+            # 全フレーム取得
+            fnos = list(range(motion.max_fno + 1))
+        else:
+            fnos_set = {0}
+            for bone_name in tail_bone_names:
+                fnos_set |= set(motion.bones[bone_name].register_indexes)
+            fnos = sorted(fnos_set)
 
-        # 全ボーン取得
+        # ボーン行列取得
         initial_matrixes = motion.animate_bone(
             fnos,
             model,
+            tail_bone_names,
             out_fno_log=True,
             description=f"{sizing_idx + 1}|{__('初期位置取得')}|{model_type}",
         )

@@ -1362,3 +1362,11 @@ msgstr ""
 
 
 
+
+msgid "【No.{x}】【{d}】中間腕位置合わせ"
+msgstr ""
+
+
+msgid "-- 【No.{x}】【{d}】中間腕位置合わせ [{i} ({p:.2f}%)]"
+msgstr ""
+

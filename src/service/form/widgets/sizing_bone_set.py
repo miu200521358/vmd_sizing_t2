@@ -97,72 +97,6 @@ class SizingBoneSet:
         self.output_motion_ctrl.set_parent_sizer(self.file_sizer)
         self.output_motion_ctrl.set_color(self.background_color)
 
-        # self.box_sizer.Add(self.file_sizer, 5, wx.ALL, 2)
-
-        # # ----------------------------------
-        # self.config_sizer = wx.BoxSizer(wx.VERTICAL)
-
-        # # スタンス追加補正 ----------------------
-        # self.stance_sizer = wx.BoxSizer(wx.HORIZONTAL)
-
-        # self.stance_correct_check_ctrl = wx.CheckBox(self.window, wx.ID_ANY, __("スタンス追加補正"), wx.DefaultPosition, wx.DefaultSize, 0)
-        # self.stance_correct_check_ctrl.SetToolTip(__("元モーションの動きにより近くなるよう追加で補正を行います\n補正内容は任意で選択できます"))
-        # self.stance_correct_check_ctrl.SetBackgroundColour(self.background_color)
-        # self.stance_correct_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_stance_correct)
-        # self.stance_sizer.Add(self.stance_correct_check_ctrl, 0, wx.ALL, 2)
-
-        # self.stance_correct_btn_ctrl = wx.Button(self.window, wx.ID_ANY, __("補正内訳"), size=wx.Size(120, 20))
-        # self.stance_correct_btn_ctrl.Bind(wx.EVT_BUTTON, self.on_select_stance_correct)
-        # self.stance_correct_btn_ctrl.SetToolTip(__("スタンス追加補正で行う補正を取捨選択することができます"))
-        # self.stance_sizer.Add(self.stance_correct_btn_ctrl, 0, wx.ALL, 2)
-
-        # self.separate1 = wx.StaticText(self.window, wx.ID_ANY, "     |     ")
-        # self.separate1.SetBackgroundColour(self.background_color)
-        # self.stance_sizer.Add(self.separate1)
-
-        # # 捩り分散
-        # self.twist_check_ctrl = wx.CheckBox(self.window, wx.ID_ANY, __("捩り分散"), wx.DefaultPosition, wx.DefaultSize, 0)
-        # self.twist_check_ctrl.SetToolTip(__("腕を腕捩りなど、捩りボーンに捩り回転を分散させます"))
-        # self.twist_check_ctrl.SetBackgroundColour(self.background_color)
-        # self.stance_sizer.Add(self.twist_check_ctrl, 0, wx.ALL, 2)
-
-        # self.config_sizer.Add(self.stance_sizer, 0, wx.ALL, 2)
-
-        # self.config_sizer.Add(wx.StaticLine(self.window, wx.ID_ANY), 1, wx.EXPAND | wx.ALL, 10)
-
-        # # 位置合わせ ------------------------
-        # self.align_sizer = wx.BoxSizer(wx.HORIZONTAL)
-
-        # self.align_check_ctrl = wx.CheckBox(self.window, wx.ID_ANY, __("手首位置合わせ"), wx.DefaultPosition, wx.DefaultSize, 0)
-        # self.align_check_ctrl.SetToolTip(__("手首の位置を元モーションと大体同じ位置になるよう合わせます"))
-        # self.align_check_ctrl.SetBackgroundColour(self.background_color)
-        # self.align_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_change_dest_model_pmx)
-        # self.align_sizer.Add(self.align_check_ctrl, 0, wx.ALL, 2)
-
-        # self.separate2 = wx.StaticText(self.window, wx.ID_ANY, "     |     ")
-        # self.separate2.SetBackgroundColour(self.background_color)
-        # self.align_sizer.Add(self.separate2)
-
-        # self.align_finger_check_ctrl = wx.CheckBox(self.window, wx.ID_ANY, __("指位置合わせ"), wx.DefaultPosition, wx.DefaultSize, 0)
-        # self.align_finger_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_align_ctrl)
-        # self.align_finger_check_ctrl.SetToolTip(__("指の位置を元モーションと大体同じ位置になるよう合わせます"))
-        # self.align_finger_check_ctrl.SetBackgroundColour(self.background_color)
-        # self.align_sizer.Add(self.align_finger_check_ctrl, 0, wx.ALL, 2)
-
-        # self.separate3 = wx.StaticText(self.window, wx.ID_ANY, "     |     ")
-        # self.separate3.SetBackgroundColour(self.background_color)
-        # self.align_sizer.Add(self.separate3)
-
-        # self.align_finger_tail_check_ctrl = wx.CheckBox(self.window, wx.ID_ANY, __("親指０位置合わせ"), wx.DefaultPosition, wx.DefaultSize, 0)
-        # self.align_finger_tail_check_ctrl.Bind(wx.EVT_CHECKBOX, self.on_check_align_ctrl)
-        # self.align_finger_tail_check_ctrl.SetToolTip(__("親指の位置を元モーションと大体同じ位置になるよう合わせます"))
-        # self.align_finger_tail_check_ctrl.SetBackgroundColour(self.background_color)
-        # self.align_sizer.Add(self.align_finger_tail_check_ctrl, 0, wx.ALL, 2)
-
-        # self.config_sizer.Add(self.align_sizer, 0, wx.ALL, 2)
-
-        # self.config_sizer.Add(wx.StaticLine(self.window, wx.ID_ANY), 1, wx.EXPAND | wx.ALL, 10)
-
         # # 足IKオフセット ------------------------
         # self.offset_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
@@ -189,46 +123,6 @@ class SizingBoneSet:
 
         # self.box_sizer.Add(self.config_sizer, 5, wx.ALL, 0)
         self.sizer.Add(self.file_sizer, 1, wx.EXPAND | wx.ALL, 0)
-
-    # def on_check_align_ctrl(self, event: wx.Event) -> None:
-    #     if self.align_finger_check_ctrl.GetValue() or self.align_finger_tail_check_ctrl.GetValue():
-    #         self.align_check_ctrl.SetValue(1)
-    #     self.on_change_dest_model_pmx(event)
-
-    # def on_check_stance_correct(self, event: wx.Event) -> None:
-    #     if self.stance_correct_check_ctrl.GetValue():
-    #         # チェックがONになった場合、スタンス追加補正のINDEXを追加
-    #         if not self.selected_stance_correct:
-    #             self.selected_stance_correct = INITIAL_STANCE_DETAIL_CHOICES
-    #         self.stance_correct_btn_ctrl.SetBackgroundColour(self.panel.active_background_color)
-    #         self.stance_correct_check_ctrl.SetValue(1)
-    #     else:
-    #         self.selected_stance_correct = []
-    #         self.stance_correct_btn_ctrl.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNFACE))
-    #         self.stance_correct_check_ctrl.SetValue(0)
-
-    # def on_select_stance_correct(self, event: wx.Event) -> None:
-    #     with wx.MultiChoiceDialog(
-    #         self.window,
-    #         __("スタンス追加補正のうち、チェックが入っている補正のみ実施します"),
-    #         caption=__("スタンス追加補正選択"),
-    #         choices=STANCE_DETAIL_CHOICES,
-    #         style=wx.CHOICEDLG_STYLE,
-    #     ) as choiceDialog:
-    #         choiceDialog.SetSelections(self.selected_stance_correct or INITIAL_STANCE_DETAIL_CHOICES)
-
-    #         if choiceDialog.ShowModal() == wx.ID_CANCEL:
-    #             return
-
-    #         self.selected_stance_correct = choiceDialog.GetSelections()
-
-    #         # 選択されている場合、ボタンの色を変える
-    #         if 0 < len(self.selected_stance_correct):
-    #             self.stance_correct_btn_ctrl.SetBackgroundColour(self.panel.active_background_color)
-    #             self.stance_correct_check_ctrl.SetValue(1)
-    #         else:
-    #             self.stance_correct_btn_ctrl.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_BTNFACE))
-    #             self.stance_correct_check_ctrl.SetValue(0)
 
     def on_change_src_model_pmx(self, event: wx.Event) -> None:
         self.src_model_ctrl.unwrap()

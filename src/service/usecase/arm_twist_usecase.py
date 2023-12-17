@@ -304,7 +304,7 @@ class ArmTwistUsecase:
                     out_fno_log=False,
                 )
 
-                # 捩り分散実行
+                # 初回行列取得
                 start_matrixes = dest_motion.bones.calc_bone_matrixes(
                     [fno],
                     dest_model,
@@ -410,7 +410,7 @@ class ArmTwistUsecase:
         wrist_twist_fixed_axis: MVector3D,
         fidx: int,
         fno: int,
-    ) -> tuple[int, str, VmdMotion]:
+    ) -> None:
         # --------------
 
         # 腕

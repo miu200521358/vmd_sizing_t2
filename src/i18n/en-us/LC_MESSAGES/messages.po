@@ -1025,3 +1025,9 @@ msgid "【No.{x}】サイジング先モデルに下半身・足・ひざ・足�
 msgstr "[No.{x}] Skip lower body correction because the sizing destination model does not have any lower body, foot, knee, or ankle bones"
 
 
+
+msgid "【No.{x}】【{d}】中間腕位置合わせ"
+msgstr "[No.{x}] [{d}] middle arm positioning"
+
+msgid "-- 【No.{x}】【{d}】中間腕位置合わせ [{i} ({p:.2f}%)]"
+msgstr "-- [No.{x}] [{d}] middle arm positioning [{i} ({p:.2f}%)]"
