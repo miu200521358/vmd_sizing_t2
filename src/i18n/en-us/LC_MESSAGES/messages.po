@@ -1024,8 +1024,6 @@ msgstr "[No.{x}] Skip lower body correction because the source model for motion 
 msgid "【No.{x}】サイジング先モデルに下半身・足・ひざ・足首ボーンのいずれかがないため、下半身補正をスキップします"
 msgstr "[No.{x}] Skip lower body correction because the sizing destination model does not have any lower body, foot, knee, or ankle bones"
 
-
-
 msgid "【No.{x}】【{d}】中間腕位置合わせ"
 msgstr "[No.{x}] [{d}] middle arm positioning"
 
