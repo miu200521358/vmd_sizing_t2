@@ -314,7 +314,6 @@ class SizingWorker(BaseWorker):
             all_bone_distances,
         ) = usecase.calc_align_arm_positions(
             dist_align_sizing_sets,
-            sizing_panel.align_arm_finger_check_ctrl.GetValue(),
         )
 
         # 初期位置を取得する
@@ -406,7 +405,7 @@ class SizingWorker(BaseWorker):
                             fnos,
                             align_bone_names,
                             align_bone_indexes,
-                            all_bone_distances,
+                            all_bone_distances[sizing_set.sizing_idx],
                             sizing_panel.align_arm_finger_check_ctrl.GetValue(),
                             sizing_panel.align_arm_middle_check_ctrl.GetValue(),
                             sizing_panel.align_arm_middle_threshold_slider.GetValue(),

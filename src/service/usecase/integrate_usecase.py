@@ -6,6 +6,7 @@ from mlib.core.math import MMatrix4x4, MVector3D
 from mlib.pmx.bone_setting import BoneFlg
 from mlib.pmx.pmx_collection import PmxModel
 from mlib.vmd.vmd_collection import VmdMotion
+from service.usecase.bone_names import BoneNames
 
 logger = MLogger(os.path.basename(__file__), level=1)
 __ = logger.get_text
@@ -165,6 +166,33 @@ class IntegrateUsecase:
                     matrixes[waist_bone.name, fno].frame_fk_rotation
                     * trunk_waist_diff_vector
                 ) - trunk_waist_diff_vector
+
+                motion.insert_bone_frame(center_bf)
+
+            for direction in ("右", "左"):
+                for fno in sorted(
+                    set(motion.bones[BoneNames.leg(direction)].register_indexes)
+                    | set(motion.bones[bone_name].register_indexes)
+                ):
+                    logger.count(
+                        "【No.{x}】{b}統合 - {l}",
+                        x=sizing_idx + 1,
+                        b=__(bone_name),
+                        l=BoneNames.leg(direction),
+                        index=n,
+                        total_index_count=total_count,
+                        display_block=1000,
+                    )
+
+                    waist_bf = motion.bones[BoneNames.waist()][fno]
+
+                    leg_bf = motion.bones[BoneNames.leg(direction)][fno]
+                    leg_bf.register = True
+
+                    # 腰キャンセル分を除外する
+                    leg_bf.rotation = waist_bf.rotation.inverse() * leg_bf.rotation
+
+                    motion.insert_bone_frame(leg_bf)
 
         # 対象キーフレを削除
         del motion.bones[bone_name]

@@ -25,6 +25,9 @@ ARM_BONE_NAMES = {
     BoneNames.wrist("左"),
 }
 
+# 逆指
+FINGER_REVERSE_Y_RAD = 7
+
 
 class AlignArmUsecase:
     def validate(
@@ -70,7 +73,6 @@ class AlignArmUsecase:
         dist_align_sizing_sets: dict[
             int, tuple[PmxModel, PmxModel, VmdMotion, VmdBoneFrameTrees]
         ],
-        is_finger: bool,
     ) -> tuple[list[int], list[str], list[tuple[int, str]], dict[int, np.ndarray]]:
         logger.info(
             "腕位置合わせ - 全体位置取得",
@@ -92,15 +94,14 @@ class AlignArmUsecase:
         fnos = sorted(fnos_set)
 
         align_bone_names = [BoneNames.wrist("右"), BoneNames.wrist("左")]
-        if is_finger:
-            for direction in ("右", "左"):
-                align_bone_names.append(BoneNames.thumb_tail(direction))
-                align_bone_names.append(BoneNames.index_tail(direction))
-                align_bone_names.append(BoneNames.middle_tail(direction))
-                align_bone_names.append(BoneNames.ring_tail(direction))
-                align_bone_names.append(BoneNames.pinky_tail(direction))
+        for direction in ("右", "左"):
+            align_bone_names.append(BoneNames.thumb_tail(direction))
+            align_bone_names.append(BoneNames.index_tail(direction))
+            align_bone_names.append(BoneNames.middle_tail(direction))
+            align_bone_names.append(BoneNames.ring_tail(direction))
+            align_bone_names.append(BoneNames.pinky_tail(direction))
 
-        all_bone_distances: dict[int, np.ndarray] = {}
+        bone_distances: np.ndarray = {}
 
         for fidx, fno in enumerate(fnos):
             logger.count(
@@ -110,7 +111,7 @@ class AlignArmUsecase:
                 display_block=1000,
             )
 
-            align_bone_indexes: dict[tuple[int, str], int] = {}
+            align_bone_indexes: dict[int, tuple[int, str]] = {}
             align_bone_positions: list[np.ndarray] = []
 
             for sizing_idx, (
@@ -120,8 +121,9 @@ class AlignArmUsecase:
                 src_matrixes,
             ) in dist_align_sizing_sets.items():
                 for bone_name in align_bone_names:
-                    align_bone_indexes[(sizing_idx, bone_name)] = len(
-                        align_bone_positions
+                    align_bone_indexes[len(align_bone_positions)] = (
+                        sizing_idx,
+                        bone_name,
                     )
                     align_bone_positions.append(
                         src_matrixes[bone_name, fno].position.vector
@@ -134,9 +136,9 @@ class AlignArmUsecase:
             ) - np.expand_dims(align_bone_positions_ary, axis=0)
             bone_distances = np.sqrt(np.sum(bone_diffs**2, axis=-1))
 
-            all_bone_distances[fno] = bone_distances
+            bone_distances[fno] = bone_distances
 
-        return fnos, align_bone_names, align_bone_indexes, all_bone_distances
+        return fnos, align_bone_names, align_bone_indexes, bone_distances
 
     def sizing_align_arm(
         self,
@@ -149,7 +151,7 @@ class AlignArmUsecase:
         fnos: list[int],
         align_bone_names: list[str],
         align_bone_indexes: dict[tuple[int, str], int],
-        all_bone_distances: dict[int, np.ndarray],
+        bone_distances: np.ndarray,
         is_finger: bool,
         is_middle: bool,
         middle_threshold: float,
@@ -165,7 +167,7 @@ class AlignArmUsecase:
                 fnos,
                 align_bone_names,
                 align_bone_indexes,
-                all_bone_distances,
+                bone_distances,
                 is_finger,
                 is_middle,
                 middle_threshold,
@@ -183,7 +185,7 @@ class AlignArmUsecase:
         fnos: list[int],
         align_bone_names: list[str],
         align_bone_indexes: dict[tuple[int, str], int],
-        all_bone_distances: dict[int, np.ndarray],
+        bone_distances: np.ndarray,
         is_finger: bool,
         is_middle: bool,
         middle_threshold: float,
@@ -542,7 +544,7 @@ class AlignArmUsecase:
                 dest_matrixes,
                 align_bone_names,
                 align_bone_indexes,
-                all_bone_distances,
+                bone_distances,
                 is_finger,
                 direction,
                 bone_dict,
@@ -652,13 +654,13 @@ class AlignArmUsecase:
                     src_matrixes[BoneNames.wrist(direction), fno].position
                     - src_matrixes[BoneNames.shoulder_center(direction), fno].position
                 )
-                dest_arm_global_position = start_matrixes[
+                dest_wrist_global_position = start_matrixes[
                     BoneNames.shoulder_center(direction), fno
                 ].position + (src_arm_local_position * arm_ratio)
 
                 wrist_distance = (
                     start_matrixes[f"{direction}手首", fno].position
-                ).distance(dest_arm_global_position)
+                ).distance(dest_wrist_global_position)
 
                 if wrist_distance >= threshold:
                     logger.info(
@@ -681,7 +683,7 @@ class AlignArmUsecase:
                         dest_matrixes,
                         align_bone_names,
                         align_bone_indexes,
-                        all_bone_distances,
+                        bone_distances,
                         is_finger,
                         direction,
                         bone_dict,
@@ -716,12 +718,11 @@ class AlignArmUsecase:
         del dest_motion.bones[BoneNames.shoulder_ik(direction)]
         del dest_motion.bones[BoneNames.arm_ik(direction)]
         del dest_motion.bones[BoneNames.wrist_ik(direction)]
-        if is_finger:
-            del dest_motion.bones[BoneNames.thumb_ik(direction)]
-            del dest_motion.bones[BoneNames.index_ik(direction)]
-            del dest_motion.bones[BoneNames.middle_ik(direction)]
-            del dest_motion.bones[BoneNames.ring_ik(direction)]
-            del dest_motion.bones[BoneNames.pinky_ik(direction)]
+        del dest_motion.bones[BoneNames.thumb_ik(direction)]
+        del dest_motion.bones[BoneNames.index_ik(direction)]
+        del dest_motion.bones[BoneNames.middle_ik(direction)]
+        del dest_motion.bones[BoneNames.ring_ik(direction)]
+        del dest_motion.bones[BoneNames.pinky_ik(direction)]
 
         return sizing_idx, direction, dest_motion
 
@@ -735,7 +736,7 @@ class AlignArmUsecase:
         dest_matrixes: VmdBoneFrameTrees,
         align_bone_names: list[str],
         align_bone_indexes: dict[tuple[int, str], int],
-        all_bone_distances: dict[int, np.ndarray],
+        bone_distances: np.ndarray,
         is_finger: bool,
         direction: str,
         bone_dict: dict[str, int],
@@ -1332,6 +1333,12 @@ class AlignArmUsecase:
                 thumb_ik_thumb2.bone_index = ik_model.bones[
                     BoneNames.thumb2(direction)
                 ].index
+                # ローカル軸での角度制限を行う
+                thumb_ik_thumb2.local_angle_limit = True
+                thumb_ik_thumb2.local_min_angle_limit.radians = MVector3D(
+                    0, -FINGER_REVERSE_Y_RAD, 0
+                )
+                thumb_ik_thumb2.local_max_angle_limit.degrees = MVector3D(0, 180, 0)
                 thumb_ik.links.append(thumb_ik_thumb2)
 
                 # 親指1
@@ -1385,6 +1392,12 @@ class AlignArmUsecase:
                 index_ik_index3.bone_index = ik_model.bones[
                     BoneNames.index3(direction)
                 ].index
+                # ローカル軸での角度制限を行う
+                index_ik_index3.local_angle_limit = True
+                index_ik_index3.local_min_angle_limit.radians = MVector3D(
+                    0, -FINGER_REVERSE_Y_RAD, 0
+                )
+                index_ik_index3.local_max_angle_limit.degrees = MVector3D(0, 180, 0)
                 index_ik.links.append(index_ik_index3)
 
                 # 人指2
@@ -1392,6 +1405,12 @@ class AlignArmUsecase:
                 index_ik_index2.bone_index = ik_model.bones[
                     BoneNames.index2(direction)
                 ].index
+                # ローカル軸での角度制限を行う
+                index_ik_index2.local_angle_limit = True
+                index_ik_index2.local_min_angle_limit.radians = MVector3D(
+                    0, -FINGER_REVERSE_Y_RAD, 0
+                )
+                index_ik_index2.local_max_angle_limit.degrees = MVector3D(0, 180, 0)
                 index_ik.links.append(index_ik_index2)
 
                 # 人指1
@@ -1434,6 +1453,12 @@ class AlignArmUsecase:
                 middle_ik_middle3.bone_index = ik_model.bones[
                     BoneNames.middle3(direction)
                 ].index
+                # ローカル軸での角度制限を行う
+                middle_ik_middle3.local_angle_limit = True
+                middle_ik_middle3.local_min_angle_limit.radians = MVector3D(
+                    0, -FINGER_REVERSE_Y_RAD, 0
+                )
+                middle_ik_middle3.local_max_angle_limit.degrees = MVector3D(0, 180, 0)
                 middle_ik.links.append(middle_ik_middle3)
 
                 # 中指2
@@ -1441,6 +1466,12 @@ class AlignArmUsecase:
                 middle_ik_middle2.bone_index = ik_model.bones[
                     BoneNames.middle2(direction)
                 ].index
+                # ローカル軸での角度制限を行う
+                middle_ik_middle2.local_angle_limit = True
+                middle_ik_middle2.local_min_angle_limit.radians = MVector3D(
+                    0, -FINGER_REVERSE_Y_RAD, 0
+                )
+                middle_ik_middle2.local_max_angle_limit.degrees = MVector3D(0, 180, 0)
                 middle_ik.links.append(middle_ik_middle2)
 
                 # 中指1
@@ -1483,6 +1514,12 @@ class AlignArmUsecase:
                 ring_ik_ring3.bone_index = ik_model.bones[
                     BoneNames.ring3(direction)
                 ].index
+                # ローカル軸での角度制限を行う
+                ring_ik_ring3.local_angle_limit = True
+                ring_ik_ring3.local_min_angle_limit.radians = MVector3D(
+                    0, -FINGER_REVERSE_Y_RAD, 0
+                )
+                ring_ik_ring3.local_max_angle_limit.degrees = MVector3D(0, 180, 0)
                 ring_ik.links.append(ring_ik_ring3)
 
                 # 薬指2
@@ -1490,6 +1527,12 @@ class AlignArmUsecase:
                 ring_ik_ring2.bone_index = ik_model.bones[
                     BoneNames.ring2(direction)
                 ].index
+                # ローカル軸での角度制限を行う
+                ring_ik_ring2.local_angle_limit = True
+                ring_ik_ring2.local_min_angle_limit.radians = MVector3D(
+                    0, -FINGER_REVERSE_Y_RAD, 0
+                )
+                ring_ik_ring2.local_max_angle_limit.degrees = MVector3D(0, 180, 0)
                 ring_ik.links.append(ring_ik_ring2)
 
                 # 薬指1
@@ -1532,6 +1575,12 @@ class AlignArmUsecase:
                 pinky_ik_pinky3.bone_index = ik_model.bones[
                     BoneNames.pinky3(direction)
                 ].index
+                # ローカル軸での角度制限を行う
+                pinky_ik_pinky3.local_angle_limit = True
+                pinky_ik_pinky3.local_min_angle_limit.radians = MVector3D(
+                    0, -FINGER_REVERSE_Y_RAD, 0
+                )
+                pinky_ik_pinky3.local_max_angle_limit.degrees = MVector3D(0, 180, 0)
                 pinky_ik.links.append(pinky_ik_pinky3)
 
                 # 小指2
@@ -1539,6 +1588,12 @@ class AlignArmUsecase:
                 pinky_ik_pinky2.bone_index = ik_model.bones[
                     BoneNames.pinky2(direction)
                 ].index
+                # ローカル軸での角度制限を行う
+                pinky_ik_pinky2.local_angle_limit = True
+                pinky_ik_pinky2.local_min_angle_limit.radians = MVector3D(
+                    0, -FINGER_REVERSE_Y_RAD, 0
+                )
+                pinky_ik_pinky2.local_max_angle_limit.degrees = MVector3D(0, 180, 0)
                 pinky_ik.links.append(pinky_ik_pinky2)
 
                 # 小指1

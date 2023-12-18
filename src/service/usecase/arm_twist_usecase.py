@@ -29,7 +29,7 @@ ARM_BONE_NAMES = [
 ]
 
 # 逆ひじを許可する角度
-ELBOW_REVERSE_Y_RAD = radians(7)
+ELBOW_REVERSE_Y_RAD = radians(12)
 
 
 class ArmTwistUsecase:
